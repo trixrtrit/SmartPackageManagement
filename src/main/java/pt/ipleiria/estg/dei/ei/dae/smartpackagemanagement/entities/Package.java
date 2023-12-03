@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,16 +21,22 @@ public class Package extends Versionable{
     @OneToMany(mappedBy = "package", cascade = CascadeType.REMOVE)
     private List<Product> products;
 
+    @ManyToOne
+    @JoinColumn(name = "manufacturer_username")
+    @NotNull
+    private Manufacturer manufacturer;
+
     public Package() {
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public Package(Long id, String material, String type) {
+    public Package(Long id, String material, String type, Manufacturer manufacturer) {
         this.id = id;
         this.material = material;
         this.type = type;
+        this.manufacturer = manufacturer;
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
         this.measurements = new ArrayList<Measurement>();
@@ -56,6 +64,14 @@ public class Package extends Versionable{
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Manufacturer getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(Manufacturer manufacturer) {
+        this.manufacturer = manufacturer;
     }
 
     public List<Sensor> getSensors() {
