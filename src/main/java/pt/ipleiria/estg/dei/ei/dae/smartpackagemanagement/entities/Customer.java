@@ -10,17 +10,13 @@ import java.util.List;
 
 @Entity
 public class Customer extends User implements Serializable {
-
     private String NIF;
     private String address;
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private List<Order> orders;
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
-    private List<Product> products;
 
     public Customer() {
         this.orders = new ArrayList<Order>();
-        this.products = new ArrayList<Product>();
     }
 
     public Customer(String username, String password, String name, String email, String NIF, String address) {
@@ -28,7 +24,6 @@ public class Customer extends User implements Serializable {
         this.NIF = NIF;
         this.address = address;
         this.orders = new ArrayList<Order>();
-        this.products = new ArrayList<Product>();
     }
 
     public String getNIF() {
@@ -53,13 +48,5 @@ public class Customer extends User implements Serializable {
 
     public void setOrders(List<Order> orders) {
         this.orders = orders;
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
     }
 }
