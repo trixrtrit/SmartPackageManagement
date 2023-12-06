@@ -22,6 +22,11 @@ public class Package extends Versionable{
     private List<Product> products;
 
     @ManyToOne
+    @JoinColumn(name = "logisticsOperator_username")
+    @NotNull
+    private LogisticsOperator logisticsOperator;
+
+    @ManyToOne
     @JoinColumn(name = "manufacturer_username")
     @NotNull
     private Manufacturer manufacturer;
@@ -32,14 +37,23 @@ public class Package extends Versionable{
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public Package(Long id, String material, String type, Manufacturer manufacturer) {
+    public Package(Long id, String material, String type, Manufacturer manufacturer, LogisticsOperator logisticsOperator) {
         this.id = id;
         this.material = material;
         this.type = type;
         this.manufacturer = manufacturer;
+        this.logisticsOperator = logisticsOperator;
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
         this.measurements = new ArrayList<Measurement>();
+    }
+
+    public LogisticsOperator getLogisticsOperator() {
+        return logisticsOperator;
+    }
+
+    public void setLogisticsOperator(LogisticsOperator logisticsOperator) {
+        this.logisticsOperator = logisticsOperator;
     }
 
     public Long getId() {

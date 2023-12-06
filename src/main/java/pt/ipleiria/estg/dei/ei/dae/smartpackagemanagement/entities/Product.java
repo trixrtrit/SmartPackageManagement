@@ -16,6 +16,8 @@ public class Product extends Versionable{
     private String name;
     private String description;
     private double price;
+    private boolean isActive;
+    private float stock;
     @ManyToOne
     @JoinColumn(name = "manufacturer_username")
     @NotNull
@@ -33,14 +35,36 @@ public class Product extends Versionable{
         this.orderItems = new ArrayList<OrderItem>();
     }
 
-    public Product(long id, String name, String description, double price, Manufacturer manufacturer, Package aPackage) {
+    public Product(long id, String name, String description, double price, Manufacturer manufacturer, Package aPackage, boolean isActive, float stock) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.manufacturer = manufacturer;
         this.aPackage = aPackage;
+        this.isActive = isActive;
+        this.stock = stock;
         this.orderItems = new ArrayList<OrderItem>();
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+
+    public float getStock() {
+        return stock;
+    }
+
+    public void setStock(float stock) {
+        this.stock = stock;
     }
 
     public long getId() {

@@ -10,7 +10,7 @@ public class OrderItem extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int quantity;
+    private float quantity;
     private double price;
     @ManyToOne
     @JoinColumn(name = "product_id")
@@ -25,7 +25,7 @@ public class OrderItem extends Versionable{
     public OrderItem() {
     }
 
-    public OrderItem(Long id, int quantity, double price, Product product, Order order) {
+    public OrderItem(Long id, float quantity, double price, Product product, Order order) {
         this.id = id;
         this.quantity = quantity;
         this.price = price;
@@ -41,7 +41,7 @@ public class OrderItem extends Versionable{
         this.id = id;
     }
 
-    public int getQuantity() {
+    public float getQuantity() {
         return quantity;
     }
 

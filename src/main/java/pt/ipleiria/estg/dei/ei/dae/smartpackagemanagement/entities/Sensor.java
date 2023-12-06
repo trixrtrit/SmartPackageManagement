@@ -15,23 +15,24 @@ public class Sensor extends Versionable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private String type;
-    private String measurementUnit;
     @OneToMany(mappedBy = "sensor", cascade = CascadeType.REMOVE)
     private List<Measurement> measurements;
     @ManyToOne
     @JoinColumn(name = "package_id")
     private Package aPackage;
 
+    @ManyToOne
+    @JoinColumn(name = "sensorType_id")
+    private SensorType sensorType;
+
     public Sensor() {
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public Sensor(Long id, String name, String type, String measurementUnit, Package aPackage) {
+    public Sensor(Long id, String name, SensorType sensorType, Package aPackage) {
         this.id = id;
         this.name = name;
-        this.type = type;
-        this.measurementUnit = measurementUnit;
+        this.sensorType = sensorType;
         this.measurements = new ArrayList<Measurement>();
         this.aPackage = aPackage;
     }
@@ -50,22 +51,6 @@ public class Sensor extends Versionable{
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getMeasurementUnit() {
-        return measurementUnit;
-    }
-
-    public void setMeasurementUnit(String measurementUnit) {
-        this.measurementUnit = measurementUnit;
     }
 
     public List<Measurement> getMeasurements() {

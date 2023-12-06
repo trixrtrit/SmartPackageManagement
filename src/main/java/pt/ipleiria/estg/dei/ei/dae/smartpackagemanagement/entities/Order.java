@@ -24,11 +24,6 @@ public class Order extends Versionable{
     @NotNull
     private Customer customer;
 
-    @ManyToOne
-    @JoinColumn(name = "logisticsOperator_username")
-    @NotNull
-    private LogisticsOperator logisticsOperator;
-
     @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     private List<OrderItem> orderItems;
 
@@ -43,7 +38,6 @@ public class Order extends Versionable{
         this.date = date;
         this.status = status;
         this.customer = customer;
-        this.logisticsOperator = logisticsOperator;
         this.orderItems = new ArrayList<OrderItem>();
     }
 
@@ -93,14 +87,6 @@ public class Order extends Versionable{
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
-    }
-
-    public LogisticsOperator getLogisticsOperator() {
-        return logisticsOperator;
-    }
-
-    public void setLogisticsOperator(LogisticsOperator logisticsOperator) {
-        this.logisticsOperator = logisticsOperator;
     }
 
     public List<OrderItem> getOrderItems() {

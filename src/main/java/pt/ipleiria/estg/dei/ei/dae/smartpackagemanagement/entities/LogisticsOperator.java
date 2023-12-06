@@ -11,22 +11,22 @@ import java.util.List;
 @Entity
 public class LogisticsOperator extends User implements Serializable {
     @OneToMany(mappedBy = "logisticsOperator", cascade = CascadeType.REMOVE)
-    private List<Order> orders;
+    private List<Package> packages;
 
     public LogisticsOperator() {
-        this.orders = new ArrayList<Order>();
+        this.packages = new ArrayList<Package>();
     }
 
     public LogisticsOperator(String username, String password, String name, String email) {
         super(username, password, name, email);
-        this.orders = new ArrayList<Order>();
+        this.packages = new ArrayList<Package>();
     }
 
-    public List<Order> getOrders() {
-        return orders;
+    public List<Package> getPackages() {
+        return packages;
     }
 
-    public void setOrders(List<Order> orders) {
-        this.orders = orders;
+    public void setPackages(List<Package> packages) {
+        this.packages = packages;
     }
 }
