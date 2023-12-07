@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 public class Customer extends User implements Serializable {
-    private String NIF;
+    private String nif;
     private String address;
     @OneToMany(mappedBy = "customer", cascade = CascadeType.REMOVE)
     private List<Order> orders;
@@ -19,19 +19,19 @@ public class Customer extends User implements Serializable {
         this.orders = new ArrayList<Order>();
     }
 
-    public Customer(String username, String password, String name, String email, String NIF, String address) {
+    public Customer(String username, String password, String name, String email, String nif, String address) {
         super(username, password, name, email);
-        this.NIF = NIF;
+        this.nif = nif;
         this.address = address;
         this.orders = new ArrayList<Order>();
     }
 
-    public String getNIF() {
-        return NIF;
+    public String getNif() {
+        return nif;
     }
 
-    public void setNIF(String NIF) {
-        this.NIF = NIF;
+    public void setNif(String nif) {
+        this.nif = nif;
     }
 
     public String getAddress() {
