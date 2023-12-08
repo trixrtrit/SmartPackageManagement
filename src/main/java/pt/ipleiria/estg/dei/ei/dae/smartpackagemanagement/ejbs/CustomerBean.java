@@ -1,0 +1,68 @@
+package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
+
+import jakarta.ejb.Stateless;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.validation.ConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+
+import java.util.List;
+
+@Stateless
+public class CustomerBean {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public void createCustomer(String username, String password, String name, String email, String nif, String address)
+            throws MyEntityExistsException, MyConstraintViolationException {
+        if (isExistingCustomer(username)) {
+            throw new MyEntityExistsException("A customer with the username: " + username + " already exists");
+        }
+        try {
+            Customer customer = new Customer(username, password, name, email, nif, address);
+            entityManager.persist(customer);
+        } catch (ConstraintViolationException err) {
+            throw new MyConstraintViolationException(err);
+        }
+    }
+
+    public List<Customer> getCustomers() {
+        return entityManager.createNamedQuery("getCustomers", Customer.class).getResultList();
+    }
+
+    public boolean isExistingCustomer(String username) {
+        Query query = entityManager.createQuery(
+                "SELECT COUNT(c.username) FROM Customer c WHERE c.username = :username", Long.class
+        );
+        query.setParameter("username", username);
+        return (Long) query.getSingleResult() > 0L;
+    }
+
+    public Customer findCustomer(String username) throws MyEntityNotFoundException {
+        Customer customer = entityManager.find(Customer.class, username);
+        if (customer == null) {
+            throw new MyEntityNotFoundException("The customer with the username: " + username + " does not exist");
+        }
+        return customer;
+    }
+
+    public void updateCustomer(String username, String password, String name, String email, String nif, String address) throws MyEntityNotFoundException {
+        Customer customer = this.findCustomer(username);
+        entityManager.lock(customer, LockModeType.OPTIMISTIC);
+        customer.setAddress(address);
+        customer.setNif(nif);
+        customer.setName(name);
+        customer.setEmail(email);
+        customer.setPassword(password);
+    }
+
+    public void removeCustomer(String username) throws MyEntityNotFoundException {
+        Customer customer = this.findCustomer(username);
+        entityManager.remove(customer);
+    }
+}

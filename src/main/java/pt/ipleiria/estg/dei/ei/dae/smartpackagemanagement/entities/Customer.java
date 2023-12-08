@@ -1,14 +1,18 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "getCustomers",
+                query = "SELECT c FROM Customer c ORDER BY c.name"
+        )
+})
 public class Customer extends User implements Serializable {
     private String nif;
     private String address;
