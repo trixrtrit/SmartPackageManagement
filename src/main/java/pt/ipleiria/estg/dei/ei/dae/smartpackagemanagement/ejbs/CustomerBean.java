@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
 import jakarta.ejb.Stateless;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
@@ -10,6 +11,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Hasher;
 
 import java.util.List;
 
@@ -17,6 +19,8 @@ import java.util.List;
 public class CustomerBean {
     @PersistenceContext
     private EntityManager entityManager;
+    @Inject
+    private Hasher hasher;
 
     public void createCustomer(String username, String password, String name, String email, String nif, String address)
             throws MyEntityExistsException, MyConstraintViolationException {
@@ -24,7 +28,7 @@ public class CustomerBean {
             throw new MyEntityExistsException("A customer with the username: " + username + " already exists");
         }
         try {
-            Customer customer = new Customer(username, password, name, email, nif, address);
+            Customer customer = new Customer(username, hasher.hash(password), name, email, nif, address);
             entityManager.persist(customer);
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
@@ -52,6 +56,7 @@ public class CustomerBean {
     }
 
     public void updateCustomer(String username, String password, String name, String email, String nif, String address) throws MyEntityNotFoundException {
+        //TODO: password updates on another endpoint instead of here
         Customer customer = this.findCustomer(username);
         entityManager.lock(customer, LockModeType.OPTIMISTIC);
         customer.setAddress(address);
