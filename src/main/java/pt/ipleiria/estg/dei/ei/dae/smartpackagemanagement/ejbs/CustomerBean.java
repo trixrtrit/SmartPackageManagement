@@ -7,7 +7,9 @@ import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -37,6 +39,15 @@ public class CustomerBean {
 
     public List<Customer> getCustomers() {
         return entityManager.createNamedQuery("getCustomers", Customer.class).getResultList();
+    }
+
+    public Customer getCustomerOrders(String username) throws MyEntityNotFoundException{
+        if(!this.isExistingCustomer(username)) {
+            throw new MyEntityNotFoundException("The customer with the username: " + username + " does not exist");
+        }
+        Customer customer = entityManager.find(Customer.class, username);
+        Hibernate.initialize(customer.getOrders());
+        return customer;
     }
 
     public boolean isExistingCustomer(String username) {
