@@ -24,7 +24,7 @@ public class CustomerBean {
     @Inject
     private Hasher hasher;
 
-    public void createCustomer(String username, String password, String name, String email, String nif, String address)
+    public void create(String username, String password, String name, String email, String nif, String address)
             throws MyEntityExistsException, MyConstraintViolationException {
         if (isExistingCustomer(username)) {
             throw new MyEntityExistsException("A customer with the username: " + username + " already exists");
@@ -58,7 +58,7 @@ public class CustomerBean {
         return (Long) query.getSingleResult() > 0L;
     }
 
-    public Customer findCustomer(String username) throws MyEntityNotFoundException {
+    public Customer find(String username) throws MyEntityNotFoundException {
         Customer customer = entityManager.find(Customer.class, username);
         if (customer == null) {
             throw new MyEntityNotFoundException("The customer with the username: " + username + " does not exist");
@@ -66,19 +66,20 @@ public class CustomerBean {
         return customer;
     }
 
-    public void updateCustomer(String username, String password, String name, String email, String nif, String address) throws MyEntityNotFoundException {
+    public void update(String username, String password, String name, String email, String nif, String address) throws MyEntityNotFoundException {
         //TODO: password updates on another endpoint instead of here
-        Customer customer = this.findCustomer(username);
+        Customer customer = this.find(username);
         entityManager.lock(customer, LockModeType.OPTIMISTIC);
         customer.setAddress(address);
         customer.setNif(nif);
         customer.setName(name);
         customer.setEmail(email);
-        customer.setPassword(password);
+        customer.setPassword(hasher.hash(password));
     }
 
-    public void removeCustomer(String username) throws MyEntityNotFoundException {
-        Customer customer = this.findCustomer(username);
+    public Customer delete(String username) throws MyEntityNotFoundException {
+        Customer customer = this.find(username);
         entityManager.remove(customer);
+        return customer;
     }
 }
