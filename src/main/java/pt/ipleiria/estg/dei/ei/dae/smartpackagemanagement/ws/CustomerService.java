@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.CustomerBean;
@@ -15,6 +16,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,7 +51,7 @@ public class CustomerService {
                 customer.getName(),
                 customer.getNif(),
                 customer.getAddress()
-                );
+        );
     }
 
     private OrderDTO orderToDTO(Order order) {
@@ -83,6 +85,7 @@ public class CustomerService {
     @GET
     @Path("{username}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    @Authenticated
     @RolesAllowed({"Customer"})
     public Response get(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
@@ -103,6 +106,7 @@ public class CustomerService {
 
     @GET
     @Path("{username}/orders")
+    @Authenticated
     @RolesAllowed({"Customer"})
     public Response getCustomerOrders(@PathParam("username") String username) throws MyEntityNotFoundException{
         var principal = securityContext.getUserPrincipal();
@@ -138,6 +142,7 @@ public class CustomerService {
 
     @PUT
     @Path("{username}")
+    @Authenticated
     @RolesAllowed({"Customer"})
     public Response update(@PathParam("username") String username, CustomerDTO customerDTO) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
@@ -159,6 +164,7 @@ public class CustomerService {
 
     @DELETE
     @Path("/{username}")
+    @Authenticated
     @RolesAllowed({"Customer"})
     public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException{
         var principal = securityContext.getUserPrincipal();

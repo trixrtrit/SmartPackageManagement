@@ -18,7 +18,7 @@ import java.util.HashSet;
 
 @Provider
 @Authenticated
-@Priority(Priorities.AUTHENTICATION)
+@Priority(Priorities.AUTHORIZATION)
 public class AuthorizationFilter implements ContainerRequestFilter {
     private static final Response ACCESS_DENIED = Response.status(401).entity("Access denied for this resource").build();
     private static final Response ACCESS_FORBIDDEN = Response.status(403).entity("Access forbidden for this resource").build();
@@ -27,7 +27,7 @@ public class AuthorizationFilter implements ContainerRequestFilter {
     private SecurityContext securityContext;
     @Override
     public void filter(ContainerRequestContext containerRequestContext) {
-        var methodInvoker = (ResourceMethodInvoker) containerRequestContext.getProperty("org.jboss.resteasy.core.ResourceMethodInvoke r");
+        var methodInvoker = (ResourceMethodInvoker) containerRequestContext.getProperty("org.jboss.resteasy.core.ResourceMethodInvoker");
         Method method = methodInvoker.getMethod();
         var resource = method.getDeclaringClass();
         // If authenticated, access granted for all roles

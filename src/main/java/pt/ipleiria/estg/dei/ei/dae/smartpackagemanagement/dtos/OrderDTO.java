@@ -1,8 +1,9 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class OrderDTO {
+public class OrderDTO implements Serializable {
     private Long id;
     private String address;
     private double totalPrice;

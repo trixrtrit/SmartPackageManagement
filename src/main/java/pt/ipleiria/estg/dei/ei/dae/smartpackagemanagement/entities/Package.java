@@ -14,11 +14,11 @@ public class Package extends Versionable{
     private Long id;
     private String material;
     private String type;
-    @OneToMany(mappedBy = "package", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<Sensor> sensors;
-    @OneToMany(mappedBy = "package", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<Measurement> measurements;
-    @OneToMany(mappedBy = "package", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<Product> products;
 
     @ManyToOne
