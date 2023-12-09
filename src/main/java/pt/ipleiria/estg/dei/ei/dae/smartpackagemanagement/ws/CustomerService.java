@@ -76,7 +76,6 @@ public class CustomerService {
 
     @GET
     @Path("/all")
-    @RolesAllowed({"LogisticsOperator"})
     public List<CustomerDTO> getAll() {
         return toDTOsNoOrders(customerBean.getCustomers());
     }
@@ -106,6 +105,11 @@ public class CustomerService {
     @Path("{username}/orders")
     @RolesAllowed({"Customer"})
     public Response getCustomerOrders(@PathParam("username") String username) throws MyEntityNotFoundException{
+        var principal = securityContext.getUserPrincipal();
+        if (!principal.getName().equals(username)){
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
         Customer customer = customerBean.getCustomerOrders(username);
         if (customer != null) {
             var dtos = ordersToDTOs(customer.getOrders());
@@ -136,6 +140,11 @@ public class CustomerService {
     @Path("{username}")
     @RolesAllowed({"Customer"})
     public Response update(@PathParam("username") String username, CustomerDTO customerDTO) throws MyEntityNotFoundException {
+        var principal = securityContext.getUserPrincipal();
+        if (!principal.getName().equals(username)){
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
         customerBean.update(
                 username,
                 customerDTO.getPassword(),
@@ -152,6 +161,11 @@ public class CustomerService {
     @Path("/{username}")
     @RolesAllowed({"Customer"})
     public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException{
+        var principal = securityContext.getUserPrincipal();
+        if (!principal.getName().equals(username)){
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
         Customer customer = customerBean.delete(username);
         return Response.status(Response.Status.OK).entity(toDTO(customer)).build();
     }
