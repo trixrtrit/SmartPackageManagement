@@ -67,15 +67,13 @@ public class CustomerBean {
         return customer;
     }
 
-    public void update(String username, String password, String name, String email, String nif, String address) throws MyEntityNotFoundException {
-        //TODO: password updates on another endpoint instead of here
+    public void update(String username, String name, String email, String nif, String address) throws MyEntityNotFoundException {
         Customer customer = this.find(username);
         entityManager.lock(customer, LockModeType.OPTIMISTIC);
         customer.setAddress(address);
         customer.setNif(nif);
         customer.setName(name);
         customer.setEmail(email);
-        customer.setPassword(hasher.hash(password));
     }
 
     public Customer delete(String username) throws MyEntityNotFoundException {

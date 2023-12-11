@@ -152,7 +152,6 @@ public class CustomerService {
 
         customerBean.update(
                 username,
-                customerDTO.getPassword(),
                 customerDTO.getName(),
                 customerDTO.getEmail(),
                 customerDTO.getNif(),
