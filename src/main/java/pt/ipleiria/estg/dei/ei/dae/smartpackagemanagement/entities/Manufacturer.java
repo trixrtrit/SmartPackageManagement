@@ -1,14 +1,18 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "getManufacturers",
+                query = "SELECT m FROM Manufacturer m ORDER BY m.name"
+        )
+})
 public class Manufacturer extends User implements Serializable {
     @OneToMany(mappedBy = "manufacturer", cascade = CascadeType.REMOVE)
     private List<Product> products;

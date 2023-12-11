@@ -7,7 +7,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.CustomerBean;
@@ -162,7 +161,7 @@ public class CustomerService {
     }
 
     @DELETE
-    @Path("/{username}")
+    @Path("{username}")
     @Authenticated
     @RolesAllowed({"Customer"})
     public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException{

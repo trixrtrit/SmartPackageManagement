@@ -26,7 +26,7 @@ public class CustomerBean {
 
     public void create(String username, String password, String name, String email, String nif, String address)
             throws MyEntityExistsException, MyConstraintViolationException {
-        if (isExistingCustomer(username)) {
+        if (exists(username)) {
             throw new MyEntityExistsException("A customer with the username: " + username + " already exists");
         }
         try {
@@ -42,7 +42,7 @@ public class CustomerBean {
     }
 
     public Customer getCustomerOrders(String username) throws MyEntityNotFoundException{
-        if(!this.isExistingCustomer(username)) {
+        if(!this.exists(username)) {
             throw new MyEntityNotFoundException("The customer with the username: " + username + " does not exist");
         }
         Customer customer = entityManager.find(Customer.class, username);
@@ -50,7 +50,7 @@ public class CustomerBean {
         return customer;
     }
 
-    public boolean isExistingCustomer(String username) {
+    public boolean exists(String username) {
         Query query = entityManager.createQuery(
                 "SELECT COUNT(c.username) FROM Customer c WHERE c.username = :username", Long.class
         );
