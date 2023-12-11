@@ -8,12 +8,12 @@ public class ManufacturerDTO {
     private String password;
     private String email;
     private String name;
-    private List<PackageDTO> packagesDTO;
-    private List<ProductDTO> productsDTO;
+    private List<PackageDTO> packages;
+    private List<ProductDTO> products;
 
     public ManufacturerDTO() {
-        this.packagesDTO = new ArrayList<>();
-        this.productsDTO = new ArrayList<>();
+        this.packages = new ArrayList<>();
+        this.products = new ArrayList<>();
     }
 
     public ManufacturerDTO(String username, String password, String email, String name) {
@@ -21,8 +21,8 @@ public class ManufacturerDTO {
         this.password = password;
         this.email = email;
         this.name = name;
-        this.packagesDTO = new ArrayList<>();
-        this.productsDTO = new ArrayList<>();
+        this.packages = new ArrayList<>();
+        this.products = new ArrayList<>();
     }
 
     public ManufacturerDTO(
@@ -30,12 +30,12 @@ public class ManufacturerDTO {
             String password,
             String email,
             String name,
-            List<PackageDTO> packagesDTO,
+            List<PackageDTO> packages,
             boolean hasProduct
     ) {
         this(username, password, email, name);
-        this.packagesDTO = packagesDTO;
-        this.productsDTO = new ArrayList<>();
+        this.packages = packages;
+        this.products = new ArrayList<>();
     }
 
     public ManufacturerDTO(
@@ -43,11 +43,11 @@ public class ManufacturerDTO {
             String password,
             String email,
             String name,
-            List<ProductDTO> productsDTO
+            List<ProductDTO> products
     ) {
         this(username, password, email, name);
-        this.productsDTO = productsDTO;
-        this.packagesDTO = new ArrayList<>();
+        this.products = products;
+        this.packages = new ArrayList<>();
     }
 
     public ManufacturerDTO(
@@ -55,11 +55,11 @@ public class ManufacturerDTO {
             String password,
             String email,
             String name,
-            List<PackageDTO> packagesDTO,
-            List<ProductDTO> productsDTO) {
+            List<PackageDTO> packages,
+            List<ProductDTO> products) {
         this(username, password, email, name);
-        this.packagesDTO = packagesDTO;
-        this.productsDTO = productsDTO;
+        this.packages = packages;
+        this.products = products;
     }
 
     public String getUsername() {
@@ -94,19 +94,19 @@ public class ManufacturerDTO {
         this.name = name;
     }
 
-    public List<PackageDTO> getPackagesDTO() {
-        return packagesDTO;
+    public List<PackageDTO> getPackages() {
+        return packages;
     }
 
-    public void setPackagesDTO(List<PackageDTO> packagesDTO) {
-        this.packagesDTO = packagesDTO;
+    public void setPackages(List<PackageDTO> packages) {
+        this.packages = packages;
     }
 
-    public List<ProductDTO> getProductsDTO() {
-        return productsDTO;
+    public List<ProductDTO> getProducts() {
+        return products;
     }
 
-    public void setProductsDTO(List<ProductDTO> productsDTO) {
-        this.productsDTO = productsDTO;
+    public void setProducts(List<ProductDTO> products) {
+        this.products = products;
     }
 }

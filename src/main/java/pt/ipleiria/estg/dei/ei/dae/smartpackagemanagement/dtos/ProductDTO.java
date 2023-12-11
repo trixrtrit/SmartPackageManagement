@@ -13,10 +13,11 @@ public class ProductDTO {
     private double price;
     private boolean isActive;
     private float stock;
-    private List<OrderItem> orderItems;
+    //TODO: OrderItemDTO
+    //private List<OrderItem> orderItems;
 
     public ProductDTO() {
-        this.orderItems = new ArrayList<>();
+        //this.orderItems = new ArrayList<>();
     }
 
     public ProductDTO(Long id, String name, String description, double price, boolean isActive, float stock) {
@@ -26,9 +27,10 @@ public class ProductDTO {
         this.price = price;
         this.isActive = isActive;
         this.stock = stock;
-        this.orderItems = new ArrayList<>();
+        //this.orderItems = new ArrayList<>();
     }
 
+    /*
     public ProductDTO(Long id, String name, String description, double price, boolean isActive, float stock, List<OrderItem> orderItems) {
         this.id = id;
         this.name = name;
@@ -37,7 +39,7 @@ public class ProductDTO {
         this.isActive = isActive;
         this.stock = stock;
         this.orderItems = orderItems;
-    }
+    }*/
 
     public Long getId() {
         return id;
@@ -87,11 +89,12 @@ public class ProductDTO {
         this.stock = stock;
     }
 
+    /*
     public List<OrderItem> getOrderItems() {
         return orderItems;
     }
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
-    }
+    }*/
 }

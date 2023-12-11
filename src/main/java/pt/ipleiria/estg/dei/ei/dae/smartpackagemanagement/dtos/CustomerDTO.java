@@ -11,10 +11,10 @@ public class CustomerDTO implements Serializable {
     private String name;
     private String nif;
     private String address;
-    private List<OrderDTO> ordersDTO;
+    private List<OrderDTO> orders;
 
     public CustomerDTO() {
-        this.ordersDTO = new ArrayList<>();
+        this.orders = new ArrayList<>();
     }
 
     public CustomerDTO(String username, String password, String email, String name, String nif, String address) {
@@ -24,12 +24,12 @@ public class CustomerDTO implements Serializable {
         this.name = name;
         this.nif = nif;
         this.address = address;
-        this.ordersDTO = new ArrayList<>();
+        this.orders = new ArrayList<>();
     }
 
-    public CustomerDTO(String username, String password, String email, String name, String nif, String address, List<OrderDTO> ordersDTO) {
+    public CustomerDTO(String username, String password, String email, String name, String nif, String address, List<OrderDTO> orders) {
         this(username, password, email, name, nif, address);
-        this.ordersDTO = ordersDTO;
+        this.orders = orders;
     }
 
     public String getUsername() {
@@ -80,11 +80,11 @@ public class CustomerDTO implements Serializable {
         this.address = address;
     }
 
-    public List<OrderDTO> getOrdersDTO() {
-        return ordersDTO;
+    public List<OrderDTO> getOrders() {
+        return orders;
     }
 
-    public void setOrdersDTO(List<OrderDTO> ordersDTO) {
-        this.ordersDTO = ordersDTO;
+    public void setOrders(List<OrderDTO> orders) {
+        this.orders = orders;
     }
 }
