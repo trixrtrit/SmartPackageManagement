@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.AuthDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ChangePasswordDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.UserDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.UserBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.User;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -43,14 +44,23 @@ public class AuthService {
     @Authenticated
     public Response changePassword(@Valid ChangePasswordDTO changePasswordDTO) throws
             MyEntityNotFoundException, BadRequestException {
-        User user = this.getAuthenticatedUser();
+        User user = this.getCurrentUser();
         userBean.updatePassword(user, changePasswordDTO.getNewPassword(), changePasswordDTO.getConfirmPassword());
         return Response.status(Response.Status.OK).build();
     }
 
-    private User getAuthenticatedUser() throws
+    private User getCurrentUser() throws
             MyEntityNotFoundException{
         String username = securityContext.getUserPrincipal().getName();
         return userBean.find(username);
+    }
+
+    @GET
+    @Authenticated
+    @Path("/user")
+    public Response getAuthenticatedUser() {
+        var username = securityContext.getUserPrincipal().getName();
+        var user = userBean.findOrFail(username);
+        return Response.ok(UserDTO.from(user)).build();
     }
 }
