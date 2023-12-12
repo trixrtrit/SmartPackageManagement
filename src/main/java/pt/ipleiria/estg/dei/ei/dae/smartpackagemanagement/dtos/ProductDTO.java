@@ -1,5 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderItem;
 
 import java.util.ArrayList;
@@ -10,23 +12,39 @@ public class ProductDTO {
     private Long id;
     private String name;
     private String description;
+    @Positive
     private double price;
     private boolean isActive;
+    @PositiveOrZero
     private float stock;
+    private String manufacturerUsername;
+    private long packageId;
+
     //TODO: OrderItemDTO
-    //private List<OrderItem> orderItems;
+    //private List<OrderItemDTO> orderItems;
 
     public ProductDTO() {
         //this.orderItems = new ArrayList<>();
     }
 
-    public ProductDTO(Long id, String name, String description, double price, boolean isActive, float stock) {
+    public ProductDTO(
+            Long id,
+            String name,
+            String description,
+            double price,
+            boolean isActive,
+            float stock,
+            String manufacturerUsername,
+            long packageId
+    ) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.isActive = isActive;
         this.stock = stock;
+        this.manufacturerUsername = manufacturerUsername;
+        this.packageId = packageId;
         //this.orderItems = new ArrayList<>();
     }
 
@@ -87,6 +105,22 @@ public class ProductDTO {
 
     public void setStock(float stock) {
         this.stock = stock;
+    }
+
+    public String getManufacturerUsername() {
+        return manufacturerUsername;
+    }
+
+    public void setManufacturerUsername(String manufacturerUsername) {
+        this.manufacturerUsername = manufacturerUsername;
+    }
+
+    public long getPackageId() {
+        return packageId;
+    }
+
+    public void setPackageId(long packageId) {
+        this.packageId = packageId;
     }
 
     /*

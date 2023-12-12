@@ -86,7 +86,9 @@ public class ManufacturerService {
                 product.getDescription(),
                 product.getPrice(),
                 product.isActive(),
-                product.getStock()
+                product.getStock(),
+                product.getManufacturer().getUsername(),
+                product.getaPackage().getId()
         );
     }
 
@@ -138,7 +140,7 @@ public class ManufacturerService {
             return Response.ok(toDTO(manufacturer)).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
-                .entity("ERROR_FINDING_CUSTOMER")
+                .entity("ERROR_FINDING_MANUFACTURER")
                 .build();
     }
 
@@ -158,7 +160,7 @@ public class ManufacturerService {
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
-                .entity("ERROR_FINDING_CUSTOMER")
+                .entity("ERROR_FINDING_MANUFACTURER")
                 .build();
     }
 
@@ -178,7 +180,7 @@ public class ManufacturerService {
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
-                .entity("ERROR_FINDING_CUSTOMER")
+                .entity("ERROR_FINDING_MANUFACTURER")
                 .build();
     }
 

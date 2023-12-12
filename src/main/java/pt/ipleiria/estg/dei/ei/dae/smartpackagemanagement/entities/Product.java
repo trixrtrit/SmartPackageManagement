@@ -2,21 +2,31 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "products")
+@NamedQueries({
+        @NamedQuery(
+                name = "getProducts",
+                query = "SELECT p FROM Product p ORDER BY p.name"
+        )
+})
 public class Product extends Versionable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
     private String name;
     private String description;
+    @Positive
     private double price;
     private boolean isActive;
+    @PositiveOrZero
     private float stock;
     @ManyToOne
     @JoinColumn(name = "manufacturer_username")
@@ -35,8 +45,15 @@ public class Product extends Versionable{
         this.orderItems = new ArrayList<OrderItem>();
     }
 
-    public Product(long id, String name, String description, double price, Manufacturer manufacturer, Package aPackage, boolean isActive, float stock) {
-        this.id = id;
+    public Product(
+            String name,
+            String description,
+            double price,
+            Manufacturer manufacturer,
+            Package aPackage,
+            boolean isActive,
+            float stock
+    ) {
         this.name = name;
         this.description = description;
         this.price = price;
