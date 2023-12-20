@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "products")
+@Table(name = "products",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"productReference", "manufacturer_username"})
+)
 @NamedQueries({
         @NamedQuery(
                 name = "getProducts",

@@ -15,10 +15,8 @@ public class ProductDTO {
     @Positive
     private double price;
     private boolean isActive;
-    @PositiveOrZero
-    private float stock;
     private String manufacturerUsername;
-    private long packageId;
+    private String reference;
 
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
@@ -33,18 +31,16 @@ public class ProductDTO {
             String description,
             double price,
             boolean isActive,
-            float stock,
             String manufacturerUsername,
-            long packageId
+            String reference
     ) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.isActive = isActive;
-        this.stock = stock;
+        this.reference = reference;
         this.manufacturerUsername = manufacturerUsername;
-        this.packageId = packageId;
         //this.orderItems = new ArrayList<>();
     }
 
@@ -99,14 +95,6 @@ public class ProductDTO {
         isActive = active;
     }
 
-    public float getStock() {
-        return stock;
-    }
-
-    public void setStock(float stock) {
-        this.stock = stock;
-    }
-
     public String getManufacturerUsername() {
         return manufacturerUsername;
     }
@@ -115,12 +103,12 @@ public class ProductDTO {
         this.manufacturerUsername = manufacturerUsername;
     }
 
-    public long getPackageId() {
-        return packageId;
+    public String getReference() {
+        return reference;
     }
 
-    public void setPackageId(long packageId) {
-        this.packageId = packageId;
+    public void setReference(String reference) {
+        this.reference = reference;
     }
 
     /*
