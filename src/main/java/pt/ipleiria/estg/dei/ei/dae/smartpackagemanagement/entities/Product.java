@@ -21,13 +21,22 @@ public class Product extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @NotNull
     private String name;
+    @NotNull
+    private String productReference;
     private String description;
     @Positive
+    @NotNull
     private double price;
+    @NotNull
     private boolean isActive;
     @PositiveOrZero
-    private float stock;
+    private float unitStock;
+    @PositiveOrZero
+    private float boxStock;
+    @PositiveOrZero
+    private float containerStock;
     @ManyToOne
     @JoinColumn(name = "manufacturer_username")
     @NotNull
@@ -35,7 +44,7 @@ public class Product extends Versionable{
 
     @ManyToOne
     @JoinColumn(name = "package_id")
-    @NotNull
+    //@NotNull
     private Package aPackage;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -50,17 +59,15 @@ public class Product extends Versionable{
             String description,
             double price,
             Manufacturer manufacturer,
-            Package aPackage,
             boolean isActive,
-            float stock
+            String productReference
     ) {
         this.name = name;
         this.description = description;
         this.price = price;
         this.manufacturer = manufacturer;
-        this.aPackage = aPackage;
         this.isActive = isActive;
-        this.stock = stock;
+        this.productReference = productReference;
         this.orderItems = new ArrayList<OrderItem>();
     }
 
@@ -76,12 +83,28 @@ public class Product extends Versionable{
         isActive = active;
     }
 
-    public float getStock() {
-        return stock;
+    public float getUnitStock() {
+        return unitStock;
     }
 
-    public void setStock(float stock) {
-        this.stock = stock;
+    public void setUnitStock(float unitStock) {
+        this.unitStock = unitStock;
+    }
+
+    public float getBoxStock() {
+        return boxStock;
+    }
+
+    public void setBoxStock(float boxStock) {
+        this.boxStock = boxStock;
+    }
+
+    public float getContainerStock() {
+        return containerStock;
+    }
+
+    public void setContainerStock(float containerStock) {
+        this.containerStock = containerStock;
     }
 
     public long getId() {
@@ -138,5 +161,13 @@ public class Product extends Versionable{
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public String getProductReference() {
+        return productReference;
+    }
+
+    public void setProductReference(String productReference) {
+        this.productReference = productReference;
     }
 }
