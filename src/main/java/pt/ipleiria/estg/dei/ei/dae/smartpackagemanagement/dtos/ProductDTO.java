@@ -17,11 +17,42 @@ public class ProductDTO {
     private boolean isActive;
     private String manufacturerUsername;
     private String reference;
+    @PositiveOrZero
+    private float unitStock;
+    @PositiveOrZero
+    private float boxStock;
+    @PositiveOrZero
+    private float containerStock;
 
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
 
     public ProductDTO() {
+        //this.orderItems = new ArrayList<>();
+    }
+
+    public ProductDTO(
+            Long id,
+            String name,
+            String description,
+            double price,
+            boolean isActive,
+            String manufacturerUsername,
+            String reference,
+            float unitStock,
+            float boxStock,
+            float containerStock
+    ) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.isActive = isActive;
+        this.reference = reference;
+        this.manufacturerUsername = manufacturerUsername;
+        this.unitStock = unitStock;
+        this.boxStock = boxStock;
+        this.containerStock = containerStock;
         //this.orderItems = new ArrayList<>();
     }
 
@@ -109,6 +140,30 @@ public class ProductDTO {
 
     public void setReference(String reference) {
         this.reference = reference;
+    }
+
+    public float getUnitStock() {
+        return unitStock;
+    }
+
+    public void setUnitStock(float unitStock) {
+        this.unitStock = unitStock;
+    }
+
+    public float getBoxStock() {
+        return boxStock;
+    }
+
+    public void setBoxStock(float boxStock) {
+        this.boxStock = boxStock;
+    }
+
+    public float getContainerStock() {
+        return containerStock;
+    }
+
+    public void setContainerStock(float containerStock) {
+        this.containerStock = containerStock;
     }
 
     /*

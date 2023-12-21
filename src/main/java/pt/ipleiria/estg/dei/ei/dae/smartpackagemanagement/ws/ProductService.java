@@ -35,7 +35,10 @@ public class ProductService {
                 product.getPrice(),
                 product.isActive(),
                 product.getManufacturer().getUsername(),
-                product.getProductReference()
+                product.getProductReference(),
+                product.getUnitStock(),
+                product.getBoxStock(),
+                product.getContainerStock()
         );
     }
 
@@ -131,7 +134,7 @@ public class ProductService {
     @PUT
     @Path("{id}/set-stock")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"LogisticsOperator", "Manufacturer"})
     public Response setStocks(@PathParam("id") long id, ProductStockDTO productStockDTO) throws MyEntityNotFoundException {
         productBean.setStocks(
                 id,
