@@ -37,8 +37,7 @@ public class Package extends Versionable{
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public Package(Long id, String material, String type, Manufacturer manufacturer, LogisticsOperator logisticsOperator) {
-        this.id = id;
+    public Package(String material, String type, Manufacturer manufacturer, LogisticsOperator logisticsOperator) {
         this.material = material;
         this.type = type;
         this.manufacturer = manufacturer;
