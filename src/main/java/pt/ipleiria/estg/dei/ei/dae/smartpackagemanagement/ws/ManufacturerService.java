@@ -86,9 +86,8 @@ public class ManufacturerService {
                 product.getDescription(),
                 product.getPrice(),
                 product.isActive(),
-                product.getStock(),
                 product.getManufacturer().getUsername(),
-                product.getaPackage().getId()
+                product.getProductReference()
         );
     }
 
