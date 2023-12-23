@@ -89,11 +89,11 @@ public class ProductService {
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
     //@Authenticated
     //@RolesAllowed({"Manufacturer"})
-    public Response export()
+    public Response export(@QueryParam("fileLocation") String fileLocation)
             throws IOException {
         try {
-            productBean.export();
-            File file = new File("temp.xlsx");
+            String location = productBean.export(fileLocation);
+            File file = new File(location);
             Response.ResponseBuilder response = Response.ok(file);
             response.header("Content-Disposition", "attachment;filename=temp.xlsx");
             return response.build();

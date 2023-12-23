@@ -17,9 +17,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNot
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Stateless
 public class ProductBean {
@@ -58,6 +57,10 @@ public class ProductBean {
         return entityManager.createNamedQuery("getProducts", Product.class).getResultList();
     }
 
+    public List<Product> getProductsForExport() {
+        return entityManager.createNamedQuery("getProductsForExport", Product.class).getResultList();
+    }
+
     public Product find(long id) throws MyEntityNotFoundException {
         Product product = entityManager.find(Product.class, id);
         if (product == null) {
@@ -71,17 +74,9 @@ public class ProductBean {
     //TODO: update manufacturer, update package, update isActive status. differnt endpoints?
     // qq tem de acontecer para alterar o estado do product para isActive false?
     //TODO: export
-    public void export() throws IOException {
-        Map<Integer, String> productAttributesMap = new HashMap<>();
-
-        productAttributesMap.put(0, "Id");
-        productAttributesMap.put(1, "Name");
-        productAttributesMap.put(2, "Description");
-        productAttributesMap.put(3, "Price");
-        productAttributesMap.put(4, "Manufacturer");
-        productAttributesMap.put(5, "IsActive");
-        productAttributesMap.put(6, "Reference");
-
+    public String export(String fileLocation) throws IOException {
+        List<String> productAttributesList = this.getExportableProperties();
+        System.out.println("hi");
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Products");
         Row header = sheet.createRow(0);
@@ -97,9 +92,9 @@ public class ProductBean {
         headerStyle.setFont(font);
 
         Cell headerCell;
-        for (int i = 0; i < productAttributesMap.keySet().size(); i++){
+        for (int i = 0; i < productAttributesList.size(); i++){
             headerCell = header.createCell(i);
-            headerCell.setCellValue(productAttributesMap.get(i));
+            headerCell.setCellValue(productAttributesList.get(i));
             headerCell.setCellStyle(headerStyle);
         }
 
@@ -107,25 +102,23 @@ public class ProductBean {
         style.setWrapText(true);
 
         int rowNum = 1;
-        List<Product> productList = getProducts();
+        List<Product> productList = getProductsForExport();
         for (Product product : productList) {
             Row row = sheet.createRow(rowNum++);
-            row.createCell(0).setCellValue(product.getId());
-            row.createCell(1).setCellValue(product.getName());
-            row.createCell(2).setCellValue(product.getDescription());
-            row.createCell(3).setCellValue(product.getPrice());
-            row.createCell(4).setCellValue(product.getManufacturer().getName());
-            row.createCell(5).setCellValue(product.isActive());
-            row.createCell(6).setCellValue(product.getProductReference());
+            this.parseProductToSheet(product, style, row, sheet, productAttributesList);
         }
 
-        String resourceDirectory = getClass().getClassLoader().getResource("").getPath();
-        String fileLocation = resourceDirectory + "temp.xlsx";
-        System.out.println(fileLocation);
+        if (fileLocation == null || fileLocation.isEmpty()) {
+            File currDir = new File(".");
+            String path = currDir.getAbsolutePath();
+            fileLocation = path.substring(0, path.length() - 1);
+        }
+        fileLocation = fileLocation + "temp.xlsx";
 
         FileOutputStream outputStream = new FileOutputStream(fileLocation);
         workbook.write(outputStream);
         workbook.close();
+        return fileLocation;
     }
 
     public void update(
@@ -173,4 +166,85 @@ public class ProductBean {
         return product;
     }
 
+    private List<String> getExportableProperties() {
+        List<String> productAttributesList = new ArrayList<>();
+
+        productAttributesList.add("Reference");
+        productAttributesList.add("Name");
+        productAttributesList.add("Description");
+        productAttributesList.add("Price");
+        productAttributesList.add("Manufacturer");
+        productAttributesList.add("ManufacturerEmail");
+        productAttributesList.add("UnitStock");
+        productAttributesList.add("BoxStock");
+        productAttributesList.add("ContainerStock");
+        productAttributesList.add("PackageType");
+        productAttributesList.add("PackageMaterial");
+
+        return productAttributesList;
+    }
+
+    private void parseProductToSheet(
+            Product product,
+            CellStyle style,
+            Row row,
+            Sheet sheet,
+            List<String> productAttributesList
+    ) {
+        Cell cell;
+        for (int i = 0; i < productAttributesList.size(); i++){
+            cell = row.createCell(i);
+            setCellValue(productAttributesList.get(i), product, cell);
+            cell.setCellStyle(style);
+        }
+
+    }
+
+    private void setCellValue(String attribute, Product product, Cell cell){
+        switch (attribute) {
+            case "Reference":
+                cell.setCellValue(product.getProductReference());
+                break;
+            case "Name":
+                cell.setCellValue(product.getName());
+                break;
+            case "Description":
+                cell.setCellValue(product.getDescription());
+                break;
+            case "Price":
+                cell.setCellValue(product.getPrice());
+                break;
+            case "Manufacturer":
+                cell.setCellValue(product.getManufacturer().getName());
+                break;
+            case "ManufacturerEmail":
+                cell.setCellValue(product.getManufacturer().getEmail());
+                break;
+            case "UnitStock":
+                cell.setCellValue(product.getUnitStock());
+                break;
+            case "BoxStock":
+                cell.setCellValue(product.getBoxStock());
+                break;
+            case "ContainerStock":
+                cell.setCellValue(product.getContainerStock());
+                break;
+            case "PackageType":
+                if(product.getaPackage() == null){
+                    cell.setCellValue("");
+                    break;
+                }
+                cell.setCellValue(product.getaPackage().getType());
+                break;
+            case "PackageMaterial":
+                if(product.getaPackage() == null){
+                    cell.setCellValue("");
+                    break;
+                }
+                cell.setCellValue(product.getaPackage().getMaterial());
+                break;
+            default:
+                break;
+        }
+    }
 }

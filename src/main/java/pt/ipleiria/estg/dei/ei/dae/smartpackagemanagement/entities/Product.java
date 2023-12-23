@@ -16,6 +16,10 @@ import java.util.List;
         @NamedQuery(
                 name = "getProducts",
                 query = "SELECT p FROM Product p ORDER BY p.name"
+        ),
+        @NamedQuery(
+                name = "getProductsForExport",
+                query = "SELECT p FROM Product p WHERE p.isActive = true ORDER BY p.name"
         )
 })
 public class Product extends Versionable{
