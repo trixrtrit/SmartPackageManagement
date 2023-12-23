@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,6 +25,8 @@ import java.util.List;
                 query = "SELECT p FROM Product p WHERE p.isActive = true ORDER BY p.name"
         )
 })
+@SQLDelete(sql="UPDATE products SET deleted = TRUE, isactive = FALSE WHERE id = ? AND deleted = ?::boolean")
+@Where(clause = "deleted IS FALSE")
 public class Product extends Versionable{
 
     @Id
@@ -52,6 +57,7 @@ public class Product extends Versionable{
     @JoinColumn(name = "package_id")
     //@NotNull
     private Package aPackage;
+    private boolean deleted;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<OrderItem> orderItems;
@@ -175,5 +181,13 @@ public class Product extends Versionable{
 
     public void setProductReference(String productReference) {
         this.productReference = productReference;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }
