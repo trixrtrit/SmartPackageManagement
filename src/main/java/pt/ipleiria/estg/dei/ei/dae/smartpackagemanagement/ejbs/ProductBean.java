@@ -36,15 +36,7 @@ public class ProductBean {
         if (manufacturer == null){
             throw new MyEntityNotFoundException("Manufacturer with username '" + manufacturer_username + "' not found.");
         }
-        //Package aPackage = new Package("a", "b", manufacturer, new LogisticsOperator("a" + package_id, "a", "b", "c@gmail.com"));
-/*
-        Package aPackage = entityManager.find(Package.class, package_id);
-        if (aPackage == null){
-            throw new MyEntityNotFoundException("Package with id '" + package_id + "' not found.");
-        }*/
-
         try {
-            //Product product = new Product(name, description, price, manufacturer, aPackage, true, stock);
             Product product = new Product(name, description, price, manufacturer, true, reference);
             entityManager.persist(product);
             return product.getId();

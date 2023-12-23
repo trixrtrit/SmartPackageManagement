@@ -66,7 +66,6 @@ public class ProductService {
                 .build();
     }
 
-    //TODO: endpoint devia ser /manufacturers/{username}/products?
     @POST
     @Path("/")
     @Authenticated
