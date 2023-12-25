@@ -69,7 +69,7 @@ public class ProductService {
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response create(ProductDTO productDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long productId = productBean.create(
@@ -133,7 +133,7 @@ public class ProductService {
     @PUT
     @Path("{id}/set-stock")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator", "Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response setStocks(@PathParam("id") long id, ProductStockDTO productStockDTO) throws MyEntityNotFoundException {
         productBean.setStocks(
                 id,
