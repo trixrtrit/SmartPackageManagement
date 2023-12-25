@@ -117,6 +117,7 @@ public class ManufacturerService {
 
     @GET
     @Path("/all")
+    @RolesAllowed({"LogisticsOperator"})
     public List<ManufacturerDTO> getAll() {
         return toDTOsNoProductsNoPackages(manufacturerBean.getManufacturers());
     }
@@ -185,6 +186,7 @@ public class ManufacturerService {
 
     @POST
     @Path("/")
+    @RolesAllowed({"LogisticsOperator"})
     public Response create(ManufacturerDTO manufacturerDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         manufacturerBean.create(
