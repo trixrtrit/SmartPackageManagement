@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -15,6 +16,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Hasher;
 
 import java.util.List;
 
+@Stateless
 public class LogisticsOperatorBean {
     @PersistenceContext
     private EntityManager entityManager;
