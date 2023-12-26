@@ -2,18 +2,31 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "packages")
+@Table(name = "packages",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"packageType", "material"}))
+@NamedQueries({
+        @NamedQuery(
+                name = "getPackages",
+                query = "SELECT p FROM Package p ORDER BY p.packageType, p.material"
+        ),
+        @NamedQuery(
+                name = "packageExists",
+                query = "SELECT COUNT(p.id) FROM Package p WHERE p.id = :id"
+        )
+})
 public class Package extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String material;
-    private String type;
+    @Enumerated(EnumType.STRING)
+    private PackageType packageType;
     @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<Sensor> sensors;
     @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
@@ -21,38 +34,18 @@ public class Package extends Versionable{
     @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<Product> products;
 
-    @ManyToOne
-    @JoinColumn(name = "logisticsOperator_username")
-    @NotNull
-    private LogisticsOperator logisticsOperator;
-
-    @ManyToOne
-    @JoinColumn(name = "manufacturer_username")
-    @NotNull
-    private Manufacturer manufacturer;
-
     public Package() {
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public Package(String material, String type, Manufacturer manufacturer, LogisticsOperator logisticsOperator) {
+    public Package(String material, PackageType packageType) {
         this.material = material;
-        this.type = type;
-        this.manufacturer = manufacturer;
-        this.logisticsOperator = logisticsOperator;
+        this.packageType = packageType;
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
         this.measurements = new ArrayList<Measurement>();
-    }
-
-    public LogisticsOperator getLogisticsOperator() {
-        return logisticsOperator;
-    }
-
-    public void setLogisticsOperator(LogisticsOperator logisticsOperator) {
-        this.logisticsOperator = logisticsOperator;
     }
 
     public Long getId() {
@@ -71,20 +64,12 @@ public class Package extends Versionable{
         this.material = material;
     }
 
-    public String getType() {
-        return type;
+    public String getPackageType() {
+        return packageType.getDisplayType();
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Manufacturer getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(Manufacturer manufacturer) {
-        this.manufacturer = manufacturer;
+    public void setPackageType(PackageType packageType) {
+        this.packageType = packageType;
     }
 
     public List<Sensor> getSensors() {

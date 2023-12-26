@@ -226,7 +226,7 @@ public class ProductBean {
                     cell.setCellValue("");
                     break;
                 }
-                cell.setCellValue(product.getaPackage().getType());
+                cell.setCellValue(product.getaPackage().getPackageType());
                 break;
             case "PackageMaterial":
                 if(product.getaPackage() == null){
