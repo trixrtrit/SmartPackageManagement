@@ -1,14 +1,22 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@NamedQueries({
+        @NamedQuery(
+                name = "getLogisticsOperators",
+                query = "SELECT lo FROM LogisticsOperator lo ORDER BY lo.name"
+        ),
+        @NamedQuery(
+                name = "logisticsOperatorsExists",
+                query = "SELECT COUNT(lo.username) FROM LogisticsOperator lo WHERE lo.username = :username"
+        )
+})
 public class LogisticsOperator extends User implements Serializable {
     @OneToMany(mappedBy = "logisticsOperator", cascade = CascadeType.REMOVE)
     private List<Package> packages;
