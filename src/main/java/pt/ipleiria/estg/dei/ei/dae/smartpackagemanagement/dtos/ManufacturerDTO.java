@@ -8,11 +8,9 @@ public class ManufacturerDTO {
     private String password;
     private String email;
     private String name;
-    private List<PackageDTO> packages;
     private List<ProductDTO> products;
 
     public ManufacturerDTO() {
-        this.packages = new ArrayList<>();
         this.products = new ArrayList<>();
     }
 
@@ -21,20 +19,6 @@ public class ManufacturerDTO {
         this.password = password;
         this.email = email;
         this.name = name;
-        this.packages = new ArrayList<>();
-        this.products = new ArrayList<>();
-    }
-
-    public ManufacturerDTO(
-            String username,
-            String password,
-            String email,
-            String name,
-            List<PackageDTO> packages,
-            boolean hasProduct
-    ) {
-        this(username, password, email, name);
-        this.packages = packages;
         this.products = new ArrayList<>();
     }
 
@@ -46,19 +30,6 @@ public class ManufacturerDTO {
             List<ProductDTO> products
     ) {
         this(username, password, email, name);
-        this.products = products;
-        this.packages = new ArrayList<>();
-    }
-
-    public ManufacturerDTO(
-            String username,
-            String password,
-            String email,
-            String name,
-            List<PackageDTO> packages,
-            List<ProductDTO> products) {
-        this(username, password, email, name);
-        this.packages = packages;
         this.products = products;
     }
 
@@ -92,14 +63,6 @@ public class ManufacturerDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<PackageDTO> getPackages() {
-        return packages;
-    }
-
-    public void setPackages(List<PackageDTO> packages) {
-        this.packages = packages;
     }
 
     public List<ProductDTO> getProducts() {
