@@ -50,7 +50,7 @@ public class LogisticsOperatorBean {
     }
 
     public boolean exists(String username) {
-        Query query = entityManager.createNamedQuery("logisticsOperatorsExists", LogisticsOperator.class);
+        Query query = entityManager.createNamedQuery("logisticsOperatorExists", LogisticsOperator.class);
         query.setParameter("username", username);
         return (Long) query.getSingleResult() > 0L;
     }

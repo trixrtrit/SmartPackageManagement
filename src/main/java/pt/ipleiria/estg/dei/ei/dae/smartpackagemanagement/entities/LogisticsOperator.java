@@ -13,7 +13,7 @@ import java.util.List;
                 query = "SELECT lo FROM LogisticsOperator lo ORDER BY lo.name"
         ),
         @NamedQuery(
-                name = "logisticsOperatorsExists",
+                name = "logisticsOperatorExists",
                 query = "SELECT COUNT(lo.username) FROM LogisticsOperator lo WHERE lo.username = :username"
         )
 })
