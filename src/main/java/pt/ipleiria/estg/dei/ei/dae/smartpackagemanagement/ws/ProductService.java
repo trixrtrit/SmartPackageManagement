@@ -69,7 +69,7 @@ public class ProductService {
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"Manufacturer"})
     public Response create(ProductDTO productDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long productId = productBean.create(
