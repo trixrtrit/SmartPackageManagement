@@ -2,7 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderItem;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +27,11 @@ public class ProductDTO {
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
 
+    private List<ProductParameter> productParameters;
+
     public ProductDTO() {
         //this.orderItems = new ArrayList<>();
+        this.productParameters = new ArrayList<>();
     }
 
     public ProductDTO(
@@ -53,6 +56,7 @@ public class ProductDTO {
         this.unitStock = unitStock;
         this.boxStock = boxStock;
         this.containerStock = containerStock;
+        this.productParameters = new ArrayList<>();
         //this.orderItems = new ArrayList<>();
     }
 

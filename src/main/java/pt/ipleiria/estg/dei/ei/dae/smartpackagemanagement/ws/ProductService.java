@@ -2,13 +2,18 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ws;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductParameterDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductStockDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -16,10 +21,12 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Path("products")
+@Transactional
 @Produces({MediaType.APPLICATION_JSON})
 @Consumes({MediaType.APPLICATION_JSON})
 public class ProductService {
@@ -46,6 +53,29 @@ public class ProductService {
         return products.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
+
+    private ProductParameterDTO productParametertoDTO(ProductParameter productParameter) {
+        return new ProductParameterDTO(
+                productParameter.getId(),
+                productParameter.getProduct().getId(),
+                productParameter.getSensorType().getId(),
+                productParameter.getMinValue(),
+                productParameter.getMaxValue()
+        );
+    }
+
+    private SensorTypeDTO sensorTypetoDTO(SensorType sensorType){
+        return new SensorTypeDTO(
+                sensorType.getId(),
+                sensorType.getName(),
+                sensorType.getMeasurementUnit()
+        );
+    }
+
+    private List<ProductParameterDTO> productParameterstoDTOs(List<ProductParameter> productParameters) {
+        return productParameters.stream().map(this::productParametertoDTO).collect(Collectors.toList());
+    }
+
     @GET
     @Path("/all")
     public List<ProductDTO> getAll() {
@@ -66,10 +96,35 @@ public class ProductService {
                 .build();
     }
 
+    @GET
+    @Path("{id}/product-parameters")
+    public Response getProductProductParameters(@PathParam("id") Long id) throws MyEntityNotFoundException {
+        if (!productBean.exists(id)){
+            throw new MyEntityNotFoundException("The product with the id: " + id + " does not exist");
+        };
+
+        var productParameters = productBean.getProductParametersWithSensorType(id);
+        List<ProductParameterDTO> dtos = new ArrayList<>();
+
+        for (ProductParameter pp : productParameters) {
+            ProductParameterDTO dto = new ProductParameterDTO(
+                    pp.getId(),
+                    id,
+                    pp.getSensorType().getId(),
+                    pp.getMinValue(),
+                    pp.getMaxValue(),
+                    sensorTypetoDTO(pp.getSensorType())
+            );
+            dtos.add(dto);
+        }
+
+        return Response.ok(dtos).build();
+    }
+
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"Manufacturer"})
     public Response create(ProductDTO productDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long productId = productBean.create(
