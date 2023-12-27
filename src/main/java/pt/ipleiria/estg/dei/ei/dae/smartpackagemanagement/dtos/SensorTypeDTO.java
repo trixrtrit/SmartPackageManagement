@@ -22,6 +22,7 @@ public class SensorTypeDTO extends Versionable {
         this.name = name;
         this.measurementUnit = measurementUnit;
         this.sensors = new ArrayList<SensorDTO>();
+        this.productParameters = new ArrayList<>();
     }
 
     public Long getId() {
