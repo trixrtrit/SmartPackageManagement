@@ -242,7 +242,7 @@ public class ProductBean {
                     cell.setCellValue("");
                     break;
                 }
-                cell.setCellValue(product.getaPackage().getPackageType());
+                cell.setCellValue(product.getaPackage().getPackageType().getDisplayType());
                 break;
             case "PackageMaterial":
                 if(product.getaPackage() == null){

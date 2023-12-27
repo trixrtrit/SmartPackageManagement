@@ -60,8 +60,8 @@ public class Package extends Versionable{
         this.material = material;
     }
 
-    public String getPackageType() {
-        return packageType.getDisplayType();
+    public PackageType getPackageType() {
+        return packageType;
     }
 
     public void setPackageType(PackageType packageType) {

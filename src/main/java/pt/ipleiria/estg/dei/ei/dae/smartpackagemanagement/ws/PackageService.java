@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
@@ -69,14 +70,13 @@ public class PackageService {
     }
 
 
-
-   /*
     private PackageDTO toDTOSensors(Package aPackage) {
         return new PackageDTO(
                 aPackage.getId(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
-                sensorsToDTOs(aPackage.getSensors())
+                sensorsToDTOs(aPackage.getSensors()),
+                true
         );
     }
 
@@ -91,7 +91,6 @@ public class PackageService {
     private List<SensorDTO> sensorsToDTOs(List<Sensor> sensors) {
         return sensors.stream().map(this::sensorToDTO).collect(Collectors.toList());
     }
-    */
 
     @GET
     @Path("/all")
@@ -130,7 +129,7 @@ public class PackageService {
                 .entity("ERROR_FINDING_PACKAGE")
                 .build();
     }
-/*
+
     @GET
     @Path("{id}/sensors")
     @Authenticated
@@ -145,7 +144,7 @@ public class PackageService {
                 .entity("ERROR_FINDING_PACKAGE")
                 .build();
     }
-    */
+
 
     //TODO: swap id for code which can be inserted->unique
     @POST
@@ -155,7 +154,7 @@ public class PackageService {
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long packageId = packageBean.create(
                 packageDTO.getMaterial(),
-                packageDTO.getType()
+                packageDTO.getPackageType()
         );
         var aPackage = packageBean.find(packageId);
         return Response.status(Response.Status.CREATED).entity(toDTO(aPackage)).build();
@@ -166,12 +165,12 @@ public class PackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response update(@PathParam("id") long id, PackageDTO packageDTO)
-            throws MyEntityNotFoundException {
+            throws MyEntityNotFoundException, MyConstraintViolationException {
 
         packageBean.update(
                 id,
                 packageDTO.getMaterial(),
-                packageDTO.getType()
+                packageDTO.getPackageType()
         );
         var aPackage = packageBean.find(id);
         return Response.ok(toDTO(aPackage)).build();

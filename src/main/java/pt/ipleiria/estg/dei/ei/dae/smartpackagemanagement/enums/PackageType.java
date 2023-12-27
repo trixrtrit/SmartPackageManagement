@@ -1,7 +1,9 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums;
 
 public enum PackageType {
-    PRIMARY, SECONDARY, TERTIARY;
+    PRIMARY,
+    SECONDARY,
+    TERTIARY;
 
     public String getDisplayType() {
         switch(this) {
