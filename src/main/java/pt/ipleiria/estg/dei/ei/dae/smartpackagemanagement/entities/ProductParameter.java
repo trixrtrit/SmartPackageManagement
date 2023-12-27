@@ -6,23 +6,26 @@ import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "productParameters")
-@IdClass(ProductParameterKey.class)
+@Table(name = "productParameters", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_id", "sensor_type_id"})
+})
 @NamedQueries({
         @NamedQuery(
                 name = "getProductParameters",
                 query = "SELECT pp FROM ProductParameter pp"
         )
 })
-public class ProductParameter {
+public class ProductParameter extends Versionable{
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     @ManyToOne
     @JoinColumn(name = "product_id", referencedColumnName = "id")
     @NotNull
     private Product product;
 
-    @Id
     @ManyToOne
     @JoinColumn(name = "sensor_type_id", referencedColumnName = "id")
     @NotNull
@@ -40,6 +43,14 @@ public class ProductParameter {
         this.sensorType = sensorType;
         this.minValue = minValue;
         this.maxValue = maxValue;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Product getProduct() {
