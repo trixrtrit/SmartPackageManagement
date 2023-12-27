@@ -59,4 +59,28 @@ public class SensorTypeService {
         var sensorType = sensorTypeBean.find(id);
         return Response.status(Response.Status.CREATED).entity(toDTO(sensorType)).build();
     }
+
+    @PUT
+    @Path("{id}")
+    @Authenticated
+    @RolesAllowed({"Manufacturer"})
+    public Response update(@PathParam("id") long id, SensorTypeDTO sensorTypeDTO)
+            throws MyEntityNotFoundException, MyConstraintViolationException {
+        sensorTypeBean.update(
+                id,
+                sensorTypeDTO.getName(),
+                sensorTypeDTO.getMeasurementUnit()
+        );
+        var sensorType = sensorTypeBean.find(id);
+        return Response.ok(toDTO(sensorType)).build();
+    }
+
+    @DELETE
+    @Path("{id}")
+    @Authenticated
+    @RolesAllowed({"Manufacturer"})
+    public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
+        var sensorType = sensorTypeBean.delete(id);
+        return Response.status(Response.Status.OK).entity(toDTO(sensorType)).build();
+    }
 }

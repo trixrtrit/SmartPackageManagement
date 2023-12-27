@@ -2,6 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.ConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
@@ -16,7 +17,7 @@ public class ProductParameterBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public ProductParameterKey create(Long productId, Long sensorTypeId, float minValue, float maxValue)
+    public long create(Long productId, Long sensorTypeId, float minValue, float maxValue)
             throws MyEntityExistsException, MyConstraintViolationException, MyEntityNotFoundException {
 
         var product = (Product)entityManager.find(Product.class, productId);
@@ -37,7 +38,7 @@ public class ProductParameterBean {
         try {
             var productParameter = new ProductParameter(product, sensorType, minValue, maxValue);
             entityManager.persist(productParameter);
-            return new ProductParameterKey(productId, sensorTypeId);
+            return productParameter.getId();
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         }
@@ -56,11 +57,24 @@ public class ProductParameterBean {
         return query.getSingleResult() > 0L;
     }
 
-    public ProductParameter find(ProductParameterKey key) throws MyEntityNotFoundException {
-        var productParameter = (ProductParameter)entityManager.find(ProductParameter.class, key);
+    public ProductParameter find(Long id) throws MyEntityNotFoundException {
+        var productParameter = (ProductParameter)entityManager.find(ProductParameter.class, id);
         if (productParameter == null) {
-            throw new MyEntityNotFoundException("The Product parameter with the productId: " + key.getProduct() + " and sensorType: " + key.getSensorType() + " does not exist");
+            throw new MyEntityNotFoundException("The Product parameter with the id: " + id + " does not exist");
         }
+        return productParameter;
+    }
+
+    public void update(long id, float minValue, float maxValue) throws MyEntityNotFoundException, MyConstraintViolationException {
+        var productParameter = this.find(id);
+        entityManager.lock(productParameter, LockModeType.OPTIMISTIC);
+        productParameter.setMinValue(minValue);
+        productParameter.setMaxValue(maxValue);
+    }
+
+    public ProductParameter delete(long id) throws MyEntityNotFoundException {
+        var productParameter = this.find(id);
+        entityManager.remove(productParameter);
         return productParameter;
     }
 

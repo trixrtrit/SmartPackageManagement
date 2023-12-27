@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductParameterDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductParameterBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -30,6 +31,7 @@ public class ProductParameterService {
 
     private ProductParameterDTO toDTO(ProductParameter productParameter) {
         return new ProductParameterDTO(
+                productParameter.getId(),
                 productParameter.getProduct().getId(),
                 productParameter.getSensorType().getId(),
                 productParameter.getMinValue(),
@@ -53,13 +55,38 @@ public class ProductParameterService {
     @RolesAllowed({"Manufacturer"})
     public Response create(ProductParameterDTO productParameterDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
-        var key = productParameterBean.create(
+        var id = productParameterBean.create(
                 productParameterDTO.getProductId(),
                 productParameterDTO.getSensorTypeId(),
                 productParameterDTO.getMinValue(),
                 productParameterDTO.getMaxValue()
         );
-        var productParameter = productParameterBean.find(key);
+        var productParameter = productParameterBean.find(id);
         return Response.status(Response.Status.CREATED).entity(toDTO(productParameter)).build();
+    }
+
+
+    @PUT
+    @Path("{id}")
+    @Authenticated
+    @RolesAllowed({"Manufacturer"})
+    public Response update(@PathParam("id") long id, ProductParameterDTO productParameterDTO)
+            throws MyEntityNotFoundException, MyConstraintViolationException {
+        productParameterBean.update(
+                id,
+                productParameterDTO.getMinValue(),
+                productParameterDTO.getMaxValue()
+        );
+        var productParameter = productParameterBean.find(id);
+        return Response.ok(toDTO(productParameter)).build();
+    }
+
+    @DELETE
+    @Path("{id}")
+    @Authenticated
+    @RolesAllowed({"Manufacturer"})
+    public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
+        var productParameter = productParameterBean.delete(id);
+        return Response.status(Response.Status.OK).entity(toDTO(productParameter)).build();
     }
 }
