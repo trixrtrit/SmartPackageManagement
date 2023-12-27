@@ -11,6 +11,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
@@ -53,12 +54,27 @@ public class ProductBean {
         return entityManager.createNamedQuery("getProductsForExport", Product.class).getResultList();
     }
 
+    public boolean exists(Long id) {
+        var query = entityManager.createQuery(
+                "SELECT COUNT(*) FROM Product p WHERE p.id = :id", Long.class
+        );
+        query.setParameter("id", id);
+        return query.getSingleResult() > 0L;
+    }
+
     public Product find(long id) throws MyEntityNotFoundException {
         Product product = entityManager.find(Product.class, id);
         if (product == null) {
             throw new MyEntityNotFoundException("The product with the id: " + id + " does not exist");
         }
         return product;
+    }
+
+    public List<ProductParameter> getProductParametersWithSensorType(Long productId) {
+        var queryString = "SELECT pp FROM ProductParameter pp JOIN FETCH pp.sensorType WHERE pp.product.id = :productId";
+        var query = entityManager.createQuery(queryString, ProductParameter.class);
+        query.setParameter("productId", productId);
+        return query.getResultList();
     }
 
     //TODO: load function with excel
