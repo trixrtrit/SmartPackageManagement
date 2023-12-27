@@ -8,7 +8,6 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -31,7 +30,7 @@ public class Product extends Versionable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     @NotNull
     private String name;
     @NotNull
@@ -62,8 +61,12 @@ public class Product extends Versionable{
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<OrderItem> orderItems;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<ProductParameter> productParameters;
+
     public Product() {
         this.orderItems = new ArrayList<OrderItem>();
+        this.productParameters = new ArrayList<ProductParameter>();
     }
 
     public Product(
@@ -83,9 +86,6 @@ public class Product extends Versionable{
         this.orderItems = new ArrayList<OrderItem>();
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     public boolean isActive() {
         return isActive;
@@ -119,11 +119,11 @@ public class Product extends Versionable{
         this.containerStock = containerStock;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -189,5 +189,13 @@ public class Product extends Versionable{
 
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public List<ProductParameter> getProductParameters() {
+        return productParameters;
+    }
+
+    public void setProductParameters(List<ProductParameter> productParameters) {
+        this.productParameters = productParameters;
     }
 }
