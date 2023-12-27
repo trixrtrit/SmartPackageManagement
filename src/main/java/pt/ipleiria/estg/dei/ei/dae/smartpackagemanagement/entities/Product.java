@@ -7,6 +7,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +27,7 @@ import java.util.List;
 })
 @SQLDelete(sql="UPDATE products SET deleted = TRUE, isactive = FALSE WHERE id = ? AND deleted = ?::boolean")
 @Where(clause = "deleted IS FALSE")
-public class Product extends Versionable{
+public class Product extends Versionable implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,12 +62,12 @@ public class Product extends Versionable{
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
     private List<OrderItem> orderItems;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
     private List<ProductParameter> productParameters;
 
     public Product() {
         this.orderItems = new ArrayList<OrderItem>();
-        this.productParameters = new ArrayList<ProductParameter>();
+        this.productParameters = new ArrayList<>();
     }
 
     public Product(
@@ -84,6 +85,7 @@ public class Product extends Versionable{
         this.isActive = isActive;
         this.productReference = productReference;
         this.orderItems = new ArrayList<OrderItem>();
+        this.productParameters = new ArrayList<>();
     }
 
 
