@@ -1,15 +1,13 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "packages",
-        uniqueConstraints = @UniqueConstraint(columnNames = {"packageType", "material"}))
+@Table(name = "packages")
 @NamedQueries({
         @NamedQuery(
                 name = "getPackages",
@@ -17,13 +15,12 @@ import java.util.List;
         ),
         @NamedQuery(
                 name = "packageExists",
-                query = "SELECT COUNT(p.id) FROM Package p WHERE p.id = :id"
+                query = "SELECT COUNT(p.code) FROM Package p WHERE p.code = :code"
         )
 })
 public class Package extends Versionable{
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long code;
     private String material;
     @Enumerated(EnumType.STRING)
     private PackageType packageType;
@@ -37,19 +34,20 @@ public class Package extends Versionable{
         this.products = new ArrayList<Product>();
     }
 
-    public Package(String material, PackageType packageType) {
+    public Package(long code, String material, PackageType packageType) {
+        this.code = code;
         this.material = material;
         this.packageType = packageType;
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
     }
 
-    public Long getId() {
-        return id;
+    public long getCode() {
+        return code;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCode(long code) {
+        this.code = code;
     }
 
     public String getMaterial() {

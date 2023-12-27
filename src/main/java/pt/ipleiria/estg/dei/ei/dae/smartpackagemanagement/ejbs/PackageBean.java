@@ -19,12 +19,12 @@ public class PackageBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public long create(String material, PackageType packageType)
+    public long create(long code, String material, PackageType packageType)
             throws MyEntityNotFoundException, MyConstraintViolationException {
         try {
-            Package aPackage = new Package(material, packageType);
+            Package aPackage = new Package(code, material, packageType);
             entityManager.persist(aPackage);
-            return aPackage.getId();
+            return aPackage.getCode();
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         }
@@ -34,50 +34,50 @@ public class PackageBean {
         return entityManager.createNamedQuery("getPackages", Package.class).getResultList();
     }
 
-    public Package getPackageProducts(long id) throws MyEntityNotFoundException {
-        if(!this.exists(id)) {
-            throw new MyEntityNotFoundException("The package with the id: " + id + " does not exist");
+    public Package getPackageProducts(long code) throws MyEntityNotFoundException {
+        if(!this.exists(code)) {
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
-        Package aPackage = entityManager.find(Package.class, id);
+        Package aPackage = entityManager.find(Package.class, code);
         Hibernate.initialize(aPackage.getProducts());
         return aPackage;
     }
 
-    public Package getPackageSensors(long id) throws MyEntityNotFoundException {
-        if(!this.exists(id)) {
-            throw new MyEntityNotFoundException("The package with the id: " + id + " does not exist");
+    public Package getPackageSensors(long code) throws MyEntityNotFoundException {
+        if(!this.exists(code)) {
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
-        Package aPackage = entityManager.find(Package.class, id);
+        Package aPackage = entityManager.find(Package.class, code);
         Hibernate.initialize(aPackage.getSensors());
         return aPackage;
     }
 
-    public Package find(long id) throws MyEntityNotFoundException {
-        Package aPackage = entityManager.find(Package.class, id);
+    public Package find(long code) throws MyEntityNotFoundException {
+        Package aPackage = entityManager.find(Package.class, code);
         if (aPackage == null) {
-            throw new MyEntityNotFoundException("The package with the id: " + id + " does not exist");
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
         Hibernate.initialize(aPackage.getProducts());
         Hibernate.initialize(aPackage.getSensors());
         return aPackage;
     }
 
-    public boolean exists(long id) {
+    public boolean exists(long code) {
         Query query = entityManager.createNamedQuery("packageExists", Package.class);
-        query.setParameter("id", id);
+        query.setParameter("code", code);
         return (Long) query.getSingleResult() > 0L;
     }
 
-    public void update(long id, String material, PackageType packageType)
+    public void update(long code, String material, PackageType packageType)
             throws MyEntityNotFoundException, MyConstraintViolationException {
-        Package aPackage = this.find(id);
+        Package aPackage = this.find(code);
         entityManager.lock(aPackage, LockModeType.OPTIMISTIC);
         aPackage.setMaterial(material);
         aPackage.setPackageType(packageType);
     }
 
-    public Package delete(long id) throws MyEntityNotFoundException {
-        Package aPackage = this.find(id);
+    public Package delete(long code) throws MyEntityNotFoundException {
+        Package aPackage = this.find(code);
         entityManager.remove(aPackage);
         return aPackage;
     }

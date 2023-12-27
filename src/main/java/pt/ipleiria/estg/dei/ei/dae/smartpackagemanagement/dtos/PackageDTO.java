@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PackageDTO {
-    private Long id;
+    private long code;
     private String material;
     private PackageType packageType;
     private List<ProductDTO> products;
@@ -17,32 +17,32 @@ public class PackageDTO {
         this.sensors = new ArrayList<>();
     }
 
-    public PackageDTO(Long id, String material, PackageType packageType) {
-        this.id = id;
+    public PackageDTO(long code, String material, PackageType packageType) {
+        this.code = code;
         this.material = material;
         this.packageType = packageType;
         this.products = new ArrayList<>();
         this.sensors = new ArrayList<>();
     }
 
-    public PackageDTO(Long id, String material, PackageType packageType, List<ProductDTO> products) {
-        this(id, material, packageType);
+    public PackageDTO(long code, String material, PackageType packageType, List<ProductDTO> products) {
+        this(code, material, packageType);
         this.products = products;
         this.sensors = new ArrayList<>();
     }
 
-    public PackageDTO(Long id, String material, PackageType packageType, List<SensorDTO> sensors, boolean hasSensors) {
-        this(id, material, packageType);
+    public PackageDTO(long code, String material, PackageType packageType, List<SensorDTO> sensors, boolean hasSensors) {
+        this(code, material, packageType);
         this.products = new ArrayList<>();
         this.sensors = sensors;
     }
 
-    public Long getId() {
-        return id;
+    public long getCode() {
+        return code;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setCode(long code) {
+        this.code = code;
     }
 
     public String getMaterial() {

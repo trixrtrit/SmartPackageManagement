@@ -30,7 +30,7 @@ public class PackageService {
     //TODO: adicionar DTO de orderItems
     private PackageDTO toDTO(Package aPackage) {
         return new PackageDTO(
-                aPackage.getId(),
+                aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType()
         );
@@ -42,7 +42,7 @@ public class PackageService {
 
     private PackageDTO toDTOProducts(Package aPackage) {
         return new PackageDTO(
-                aPackage.getId(),
+                aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
                 productsToDTOs(aPackage.getProducts())
@@ -72,7 +72,7 @@ public class PackageService {
 
     private PackageDTO toDTOSensors(Package aPackage) {
         return new PackageDTO(
-                aPackage.getId(),
+                aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
                 sensorsToDTOs(aPackage.getSensors()),
@@ -100,12 +100,12 @@ public class PackageService {
     }
 
     @GET
-    @Path("{id}")
+    @Path("{code}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response get(@PathParam("id") long id) throws MyEntityNotFoundException {
-        Package aPackage = packageBean.find(id);
+    public Response get(@PathParam("code") long code) throws MyEntityNotFoundException {
+        Package aPackage = packageBean.find(code);
 
         if (aPackage != null) {
             return Response.ok(toDTO(aPackage)).build();
@@ -116,11 +116,11 @@ public class PackageService {
     }
 
     @GET
-    @Path("{id}/products")
+    @Path("{code}/products")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getPackageProducts(@PathParam("id") long id) throws MyEntityNotFoundException{
-        Package aPackage = packageBean.getPackageProducts(id);
+    public Response getPackageProducts(@PathParam("code") long code) throws MyEntityNotFoundException{
+        Package aPackage = packageBean.getPackageProducts(code);
         if (aPackage != null) {
             var dtos = productsToDTOs(aPackage.getProducts());
             return Response.ok(dtos).build();
@@ -131,11 +131,11 @@ public class PackageService {
     }
 
     @GET
-    @Path("{id}/sensors")
+    @Path("{code}/sensors")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getPackageSensors(@PathParam("id") long id) throws MyEntityNotFoundException{
-        Package aPackage = packageBean.getPackageSensors(id);
+    public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException{
+        Package aPackage = packageBean.getPackageSensors(code);
         if (aPackage != null) {
             var dtos = sensorsToDTOs(aPackage.getSensors());
             return Response.ok(dtos).build();
@@ -145,14 +145,13 @@ public class PackageService {
                 .build();
     }
 
-
-    //TODO: swap id for code which can be inserted->unique
     @POST
     @Path("/")
     @RolesAllowed({"LogisticsOperator"})
     public Response create(PackageDTO packageDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long packageId = packageBean.create(
+                packageDTO.getCode(),
                 packageDTO.getMaterial(),
                 packageDTO.getPackageType()
         );
@@ -161,27 +160,27 @@ public class PackageService {
     }
 
     @PUT
-    @Path("{id}")
+    @Path("{code}")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response update(@PathParam("id") long id, PackageDTO packageDTO)
+    public Response update(@PathParam("code") long code, PackageDTO packageDTO)
             throws MyEntityNotFoundException, MyConstraintViolationException {
 
         packageBean.update(
-                id,
+                code,
                 packageDTO.getMaterial(),
                 packageDTO.getPackageType()
         );
-        var aPackage = packageBean.find(id);
+        var aPackage = packageBean.find(code);
         return Response.ok(toDTO(aPackage)).build();
     }
 
     @DELETE
-    @Path("{id}")
+    @Path("{code}")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
-        Package aPackage = packageBean.delete(id);
+    public Response delete(@PathParam("code") long code) throws MyEntityNotFoundException{
+        Package aPackage = packageBean.delete(code);
         return Response.status(Response.Status.OK).entity(toDTO(aPackage)).build();
     }
 }
