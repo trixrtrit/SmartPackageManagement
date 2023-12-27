@@ -43,15 +43,6 @@ public class PackageBean {
         return aPackage;
     }
 
-    public Package getPackageMeasurements(long id) throws MyEntityNotFoundException {
-        if(!this.exists(id)) {
-            throw new MyEntityNotFoundException("The package with the id: " + id + " does not exist");
-        }
-        Package aPackage = entityManager.find(Package.class, id);
-        Hibernate.initialize(aPackage.getMeasurements());
-        return aPackage;
-    }
-
     public Package getPackageSensors(long id) throws MyEntityNotFoundException {
         if(!this.exists(id)) {
             throw new MyEntityNotFoundException("The package with the id: " + id + " does not exist");
@@ -67,7 +58,6 @@ public class PackageBean {
             throw new MyEntityNotFoundException("The package with the id: " + id + " does not exist");
         }
         Hibernate.initialize(aPackage.getProducts());
-        Hibernate.initialize(aPackage.getMeasurements());
         Hibernate.initialize(aPackage.getSensors());
         return aPackage;
     }

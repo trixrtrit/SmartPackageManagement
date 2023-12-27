@@ -55,7 +55,7 @@ public class LogisticsOperatorService {
         return new PackageDTO(
                 aPackage.getId(),
                 aPackage.getMaterial(),
-                aPackage.getType()
+                aPackage.getPackageType()
         );
     }
 

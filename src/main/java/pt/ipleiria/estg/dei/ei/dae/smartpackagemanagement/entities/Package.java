@@ -30,14 +30,11 @@ public class Package extends Versionable{
     @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<Sensor> sensors;
     @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
-    private List<Measurement> measurements;
-    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<Product> products;
 
     public Package() {
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
-        this.measurements = new ArrayList<Measurement>();
     }
 
     public Package(String material, PackageType packageType) {
@@ -45,7 +42,6 @@ public class Package extends Versionable{
         this.packageType = packageType;
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
-        this.measurements = new ArrayList<Measurement>();
     }
 
     public Long getId() {
@@ -78,14 +74,6 @@ public class Package extends Versionable{
 
     public void setSensors(List<Sensor> sensors) {
         this.sensors = sensors;
-    }
-
-    public List<Measurement> getMeasurements() {
-        return measurements;
-    }
-
-    public void setMeasurements(List<Measurement> measurements) {
-        this.measurements = measurements;
     }
 
     public List<Product> getProducts() {
