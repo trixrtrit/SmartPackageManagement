@@ -8,8 +8,11 @@ import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
 import java.util.List;
@@ -20,7 +23,10 @@ public class PackageBean {
     private EntityManager entityManager;
 
     public long create(long code, String material, PackageType packageType)
-            throws MyEntityNotFoundException, MyConstraintViolationException {
+            throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
+        if (exists(code)) {
+            throw new MyEntityExistsException("A package with the code: " + code + " already exists");
+        }
         try {
             Package aPackage = new Package(code, material, packageType);
             entityManager.persist(aPackage);
@@ -81,4 +87,53 @@ public class PackageBean {
         entityManager.remove(aPackage);
         return aPackage;
     }
+
+    public void addProductToPackage(long code, long productId) throws MyEntityNotFoundException {
+        Package aPackage = find(code);
+        if (aPackage == null)
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+
+        Product product = entityManager.find(Product.class, productId);
+        if (product == null)
+            throw new MyEntityNotFoundException("The product with the id: " + productId + " does not exist");
+        aPackage.addProduct(product);
+        product.addPackage(aPackage);
+    }
+
+    public void removeProductFromPackage(long code, long productId) throws MyEntityNotFoundException {
+        Package aPackage = find(code);
+        if (aPackage == null)
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+
+        Product product = entityManager.find(Product.class, productId);
+        if (product == null)
+            throw new MyEntityNotFoundException("The product with the id: " + productId + " does not exist");
+        aPackage.removeProduct(product);
+        product.removePackage(aPackage);
+    }
+
+    public void addSensorToPackage(long code, long sensorId) throws MyEntityNotFoundException {
+        Package aPackage = find(code);
+        if (aPackage == null)
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+
+        Sensor sensor = entityManager.find(Sensor.class, sensorId);
+        if (sensor == null)
+            throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");
+        aPackage.addSensor(sensor);
+        sensor.addPackage(aPackage);
+    }
+
+    public void removeSensorFromPackage(long code, long sensorId) throws MyEntityNotFoundException {
+        Package aPackage = find(code);
+        if (aPackage == null)
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+
+        Sensor sensor = entityManager.find(Sensor.class, sensorId);
+        if (sensor == null)
+            throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");
+        aPackage.removeSensor(sensor);
+        sensor.removePackage(aPackage);
+    }
+
 }

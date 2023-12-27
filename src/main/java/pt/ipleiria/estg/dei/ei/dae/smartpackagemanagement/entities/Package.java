@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
@@ -18,16 +20,19 @@ import java.util.List;
                 query = "SELECT COUNT(p.code) FROM Package p WHERE p.code = :code"
         )
 })
+@SQLDelete(sql="UPDATE packages SET deleted = TRUE, isactive = FALSE WHERE code = ? AND deleted = ?::boolean")
+@Where(clause = "deleted IS FALSE")
 public class Package extends Versionable{
     @Id
     private long code;
     private String material;
     @Enumerated(EnumType.STRING)
     private PackageType packageType;
-    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
+    @ManyToMany(mappedBy = "packages")
     private List<Sensor> sensors;
-    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
+    @ManyToMany(mappedBy = "packages")
     private List<Product> products;
+    private boolean deleted;
 
     public Package() {
         this.sensors = new ArrayList<Sensor>();
@@ -80,5 +85,30 @@ public class Package extends Versionable{
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public void addProduct(Product product) {
+        if (!products.contains(product)) {
+            products.add(product);
+        }
+    }
+    public void removeProduct(Product product) {
+        products.remove(product);
+    }
+
+    public void addSensor(Sensor sensor) {
+        if (!sensors.contains(sensor)) {
+            sensors.add(sensor);
+        }
+    }
+    public void removeSensor(Sensor sensor) {
+        sensors.remove(sensor);
     }
 }
