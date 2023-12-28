@@ -53,10 +53,19 @@ public class Product extends Versionable implements Serializable {
     @NotNull
     private Manufacturer manufacturer;
 
-    @ManyToOne
-    @JoinColumn(name = "package_id")
-    //@NotNull
-    private Package aPackage;
+    @ManyToMany
+    @JoinTable(
+            name = "products_packages",
+            joinColumns = @JoinColumn(
+                    name = "product_id",
+                    referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "package_code",
+                    referencedColumnName = "code"
+            )
+    )
+    private List<Package> packages;
     private boolean deleted;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -68,6 +77,7 @@ public class Product extends Versionable implements Serializable {
     public Product() {
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
+        this.packages = new ArrayList<>();
     }
 
     public Product(
@@ -86,6 +96,7 @@ public class Product extends Versionable implements Serializable {
         this.productReference = productReference;
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
+        this.packages = new ArrayList<>();
     }
 
 
@@ -161,12 +172,20 @@ public class Product extends Versionable implements Serializable {
         this.manufacturer = manufacturer;
     }
 
-    public Package getaPackage() {
-        return aPackage;
+    public List<Package> getPackages() {
+        return packages;
     }
 
-    public void setaPackage(Package aPackage) {
-        this.aPackage = aPackage;
+    public void setPackages(List<Package> packages) {
+        this.packages = packages;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public List<OrderItem> getOrderItems() {
@@ -199,5 +218,14 @@ public class Product extends Versionable implements Serializable {
 
     public void setProductParameters(List<ProductParameter> productParameters) {
         this.productParameters = productParameters;
+    }
+
+    public void addPackage(Package aPackage) {
+        if (!packages.contains(aPackage)) {
+            packages.add(aPackage);
+        }
+    }
+    public void removePackage(Package aPackage) {
+        packages.remove(aPackage);
     }
 }

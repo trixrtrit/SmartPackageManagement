@@ -158,16 +158,6 @@ public class ProductBean {
         product.setContainerStock(containerStock);
     }
 
-    public void setPackage(long id, long packageId) throws MyEntityNotFoundException {
-        Product product = this.find(id);
-        Package aPackage = entityManager.find(Package.class, packageId);
-        if (aPackage == null){
-            throw new MyEntityNotFoundException("Package with id '" + packageId + "' not found.");
-        }
-        entityManager.lock(product, LockModeType.OPTIMISTIC);
-        product.setaPackage(aPackage);
-    }
-
     public Product delete(long id) throws MyEntityNotFoundException {
         Product product = this.find(id);
         entityManager.remove(product);
@@ -237,7 +227,7 @@ public class ProductBean {
             case "ContainerStock":
                 cell.setCellValue(product.getContainerStock());
                 break;
-            case "PackageType":
+            /*case "PackageType":
                 if(product.getaPackage() == null){
                     cell.setCellValue("");
                     break;
@@ -250,7 +240,7 @@ public class ProductBean {
                     break;
                 }
                 cell.setCellValue(product.getaPackage().getMaterial());
-                break;
+                break;*/
             default:
                 break;
         }

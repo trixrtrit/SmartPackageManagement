@@ -17,9 +17,19 @@ public class Sensor extends Versionable{
     private String name;
     @OneToMany(mappedBy = "sensor", cascade = CascadeType.REMOVE)
     private List<Measurement> measurements;
-    @ManyToOne
-    @JoinColumn(name = "package_id")
-    private Package aPackage;
+    @ManyToMany
+    @JoinTable(
+            name = "sensors_packages",
+            joinColumns = @JoinColumn(
+                    name = "sensor_id",
+                    referencedColumnName = "id"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "package_code",
+                    referencedColumnName = "code"
+            )
+    )
+    private List<Package> packages;
 
     @ManyToOne
     @JoinColumn(name = "sensorType_id")
@@ -27,14 +37,15 @@ public class Sensor extends Versionable{
 
     public Sensor() {
         this.measurements = new ArrayList<Measurement>();
+        this.packages = new ArrayList<>();
     }
 
-    public Sensor(Long id, String name, SensorType sensorType, Package aPackage) {
+    public Sensor(Long id, String name, SensorType sensorType) {
         this.id = id;
         this.name = name;
         this.sensorType = sensorType;
         this.measurements = new ArrayList<Measurement>();
-        this.aPackage = aPackage;
+        this.packages = new ArrayList<>();
     }
 
     public Long getId() {
@@ -61,11 +72,20 @@ public class Sensor extends Versionable{
         this.measurements = measurements;
     }
 
-    public Package getaPackage() {
-        return aPackage;
+    public List<Package> getPackages() {
+        return packages;
     }
 
-    public void setaPackage(Package aPackage) {
-        this.aPackage = aPackage;
+    public void setPackages(List<Package> packages) {
+        this.packages = packages;
+    }
+
+    public void addPackage(Package aPackage) {
+        if (!packages.contains(aPackage)) {
+            packages.add(aPackage);
+        }
+    }
+    public void removePackage(Package aPackage) {
+        packages.remove(aPackage);
     }
 }

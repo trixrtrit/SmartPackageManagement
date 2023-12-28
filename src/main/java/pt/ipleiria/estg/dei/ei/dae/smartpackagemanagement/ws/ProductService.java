@@ -200,17 +200,6 @@ public class ProductService {
         return Response.ok(toDTO(product)).build();
     }
 
-    @PUT
-    @Path("{id}/set-package")
-    @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
-    public Response setPackage(@PathParam("id") long id, long packageId)
-            throws MyEntityNotFoundException {
-        productBean.setPackage(id, packageId);
-        var product = productBean.find(id);
-        return Response.ok(toDTO(product)).build();
-    }
-
     @DELETE
     @Path("{id}")
     @Authenticated

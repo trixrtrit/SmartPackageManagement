@@ -175,6 +175,66 @@ public class PackageService {
         return Response.ok(toDTO(aPackage)).build();
     }
 
+    @PUT
+    @Path("{code}/set-product")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response addProduct(@PathParam("code") long code, ProductDTO product)
+            throws MyEntityNotFoundException, MyConstraintViolationException {
+
+        packageBean.addProductToPackage(
+                code,
+                product.getId()
+        );
+        var aPackage = packageBean.find(code);
+        return Response.ok(toDTOProducts(aPackage)).build();
+    }
+
+    @PUT
+    @Path("{code}/unset-product")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response removeProduct(@PathParam("code") long code, ProductDTO product)
+            throws MyEntityNotFoundException, MyConstraintViolationException {
+
+        packageBean.removeProductFromPackage(
+                code,
+                product.getId()
+        );
+        var aPackage = packageBean.find(code);
+        return Response.ok(toDTOProducts(aPackage)).build();
+    }
+
+    @PUT
+    @Path("{code}/set-sensor")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response addSensor(@PathParam("code") long code, SensorDTO sensor)
+            throws MyEntityNotFoundException {
+
+        packageBean.addSensorToPackage(
+                code,
+                sensor.getId()
+        );
+        var aPackage = packageBean.find(code);
+        return Response.ok(toDTOSensors(aPackage)).build();
+    }
+
+    @PUT
+    @Path("{code}/unset-sensor")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response removeSensor(@PathParam("code") long code, SensorDTO sensor)
+            throws MyEntityNotFoundException {
+
+        packageBean.removeProductFromPackage(
+                code,
+                sensor.getId()
+        );
+        var aPackage = packageBean.find(code);
+        return Response.ok(toDTOSensors(aPackage)).build();
+    }
+
     @DELETE
     @Path("{code}")
     @Authenticated

@@ -7,19 +7,19 @@ public class SensorDTO {
     private Long id;
     private String name;
     private List<MeasurementDTO> measurements;
-    private PackageDTO aPackage;
+    private List<PackageDTO> packages;
     private SensorTypeDTO sensorType;
 
     public SensorDTO() {
         this.measurements = new ArrayList<MeasurementDTO>();
     }
 
-    public SensorDTO(Long id, String name, SensorTypeDTO sensorType, PackageDTO aPackage) {
+    public SensorDTO(Long id, String name, SensorTypeDTO sensorType) {
         this.id = id;
         this.name = name;
         this.sensorType = sensorType;
         this.measurements = new ArrayList<MeasurementDTO>();
-        this.aPackage = aPackage;
+        this.packages = new ArrayList<>();
     }
 
     public Long getId() {
@@ -46,11 +46,19 @@ public class SensorDTO {
         this.measurements = measurements;
     }
 
-    public PackageDTO getaPackage() {
-        return aPackage;
+    public List<PackageDTO> getPackages() {
+        return packages;
     }
 
-    public void setaPackage(PackageDTO aPackage) {
-        this.aPackage = aPackage;
+    public void setPackages(List<PackageDTO> packages) {
+        this.packages = packages;
+    }
+
+    public SensorTypeDTO getSensorType() {
+        return sensorType;
+    }
+
+    public void setSensorType(SensorTypeDTO sensorType) {
+        this.sensorType = sensorType;
     }
 }
