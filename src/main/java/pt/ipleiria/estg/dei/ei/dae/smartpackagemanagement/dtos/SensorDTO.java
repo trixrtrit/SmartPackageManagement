@@ -17,8 +17,7 @@ public class SensorDTO {
         this.measurements = new ArrayList<MeasurementDTO>();
     }
 
-    public SensorDTO(Long id, String name, SensorTypeDTO sensorType) {
-        this.id = id;
+    public SensorDTO(String name, SensorTypeDTO sensorType) {
         this.name = name;
         this.sensorType = sensorType;
         this.measurements = new ArrayList<MeasurementDTO>();

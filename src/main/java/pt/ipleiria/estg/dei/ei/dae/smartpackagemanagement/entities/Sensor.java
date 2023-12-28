@@ -46,8 +46,7 @@ public class Sensor extends Versionable{
         this.packages = new ArrayList<>();
     }
 
-    public Sensor(Long id, String name, SensorType sensorType) {
-        this.id = id;
+    public Sensor(String name, SensorType sensorType) {
         this.name = name;
         this.sensorType = sensorType;
         this.measurements = new ArrayList<Measurement>();

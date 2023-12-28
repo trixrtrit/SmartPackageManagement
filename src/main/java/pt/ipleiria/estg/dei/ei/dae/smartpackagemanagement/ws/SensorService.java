@@ -9,8 +9,10 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.SensorBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -31,10 +33,8 @@ public class SensorService {
 
     private SensorDTO toDTO(Sensor sensor) {
         return new SensorDTO(
-                sensor.getId(),
                 sensor.getName(),
-                sensor.getSensorType(),
-                sensor.getaPackage().getId()
+                sensorTypetoDTO(sensor.getSensorType())//sensorToDTO.getSensorType().
         );
     }
 
@@ -68,12 +68,12 @@ public class SensorService {
     @RolesAllowed({"Manufacturer"}) //todo rever
     public Response create(SensorDTO sensorDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
-        sensorBean.create(
+        long sensorId = sensorBean.create(
                 sensorDTO.getName(),
-                sensorDTO.getPackageId(),
-                sensorDTO.getSensorType()
+                //sensorDTO.getPackages(),
+                sensorTypeDTOtoSensorType(sensorDTO.getSensorType())//sensorDTO.getSensorType()
         );
-        var sensor = sensorBean.find(sensorDTO.getPackageId());
+        var sensor = sensorBean.find(sensorId);
         return Response.status(Response.Status.CREATED).entity(toDTO(sensor)).build();
     }
 
@@ -86,6 +86,18 @@ public class SensorService {
         return Response.status(Response.Status.OK).entity(toDTO(sensor)).build();
     }
 
-
+    private SensorTypeDTO sensorTypetoDTO(SensorType sensorType){
+        return new SensorTypeDTO(
+                sensorType.getId(),
+                sensorType.getName(),
+                sensorType.getMeasurementUnit()
+        );
+    }
+    private SensorType sensorTypeDTOtoSensorType(SensorTypeDTO sensorTypeDTO){
+        return new SensorType(
+                sensorTypeDTO.getName(),
+                sensorTypeDTO.getMeasurementUnit()
+        );
+    }
 
 }
