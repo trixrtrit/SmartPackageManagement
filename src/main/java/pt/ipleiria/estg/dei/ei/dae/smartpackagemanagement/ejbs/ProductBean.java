@@ -126,11 +126,11 @@ public class ProductBean {
             if(!packages.isEmpty()) {
                 for (Package aPackage : packages) {
                     Row row = sheet.createRow(rowNum++);
-                    this.parseProductToSheet(product, aPackage, style, row, sheet, productAttributesList);
+                    this.parseProductToSheet(product, aPackage, style, row, productAttributesList);
                 }
             }else{
                 Row row = sheet.createRow(rowNum++);
-                this.parseProductToSheet(product, null, style, row, sheet, productAttributesList);
+                this.parseProductToSheet(product, null, style, row, productAttributesList);
             }
         }
 
@@ -205,7 +205,6 @@ public class ProductBean {
             Package aPackage,
             CellStyle style,
             Row row,
-            Sheet sheet,
             List<String> productAttributesList
     ) {
         Cell cell;
