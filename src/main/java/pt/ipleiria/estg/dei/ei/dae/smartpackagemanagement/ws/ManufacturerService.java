@@ -10,7 +10,6 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ManufacturerBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -36,17 +35,7 @@ public class ManufacturerService {
                 manufacturer.getPassword(),
                 manufacturer.getEmail(),
                 manufacturer.getName(),
-                packagesToDTOs(manufacturer.getPackages()),
                 productsToDTOs(manufacturer.getProducts())
-        );
-    }
-
-    private ManufacturerDTO toDTOnoProductsNoPackages(Manufacturer manufacturer) {
-        return new ManufacturerDTO(
-                manufacturer.getUsername(),
-                manufacturer.getPassword(),
-                manufacturer.getEmail(),
-                manufacturer.getName()
         );
     }
 
@@ -55,27 +44,7 @@ public class ManufacturerService {
                 manufacturer.getUsername(),
                 manufacturer.getPassword(),
                 manufacturer.getEmail(),
-                manufacturer.getName(),
-                packagesToDTOs(manufacturer.getPackages()),
-                false
-        );
-    }
-
-    private ManufacturerDTO toDTOnoPackages(Manufacturer manufacturer) {
-        return new ManufacturerDTO(
-                manufacturer.getUsername(),
-                manufacturer.getPassword(),
-                manufacturer.getEmail(),
-                manufacturer.getName(),
-                productsToDTOs(manufacturer.getProducts())
-        );
-    }
-
-    private PackageDTO packageToDTO(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getId(),
-                aPackage.getMaterial(),
-                aPackage.getType()
+                manufacturer.getName()
         );
     }
 
@@ -86,9 +55,8 @@ public class ManufacturerService {
                 product.getDescription(),
                 product.getPrice(),
                 product.isActive(),
-                product.getStock(),
                 product.getManufacturer().getUsername(),
-                product.getaPackage().getId()
+                product.getProductReference()
         );
     }
 
@@ -96,20 +64,8 @@ public class ManufacturerService {
         return manufacturers.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    private List<ManufacturerDTO> toDTOsNoProductsNoPackages(List<Manufacturer> manufacturers) {
-        return manufacturers.stream().map(this::toDTOnoProductsNoPackages).collect(Collectors.toList());
-    }
-
     private List<ManufacturerDTO> toDTOsNoProducts(List<Manufacturer> manufacturers) {
         return manufacturers.stream().map(this::toDTOnoProducts).collect(Collectors.toList());
-    }
-
-    private List<ManufacturerDTO> toDTOsNoPackages(List<Manufacturer> manufacturers) {
-        return manufacturers.stream().map(this::toDTOnoPackages).collect(Collectors.toList());
-    }
-
-    private List<PackageDTO> packagesToDTOs(List<Package> packages) {
-        return packages.stream().map(this::packageToDTO).collect(Collectors.toList());
     }
 
     private List<ProductDTO> productsToDTOs(List<Product> products) {
@@ -118,8 +74,9 @@ public class ManufacturerService {
 
     @GET
     @Path("/all")
+    @RolesAllowed({"LogisticsOperator"})
     public List<ManufacturerDTO> getAll() {
-        return toDTOsNoProductsNoPackages(manufacturerBean.getManufacturers());
+        return toDTOsNoProducts(manufacturerBean.getManufacturers());
     }
 
     @GET
@@ -164,28 +121,9 @@ public class ManufacturerService {
                 .build();
     }
 
-    @GET
-    @Path("{username}/packages")
-    @Authenticated
-    @RolesAllowed({"Customer", "Manufacturer"})
-    public Response getManufacturerPackages(@PathParam("username") String username) throws MyEntityNotFoundException{
-        var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-
-        Manufacturer manufacturer = manufacturerBean.getManufacturerPackages(username);
-        if (manufacturer != null) {
-            var dtos = packagesToDTOs(manufacturer.getPackages());
-            return Response.ok(dtos).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND)
-                .entity("ERROR_FINDING_MANUFACTURER")
-                .build();
-    }
-
     @POST
     @Path("/")
+    @RolesAllowed({"LogisticsOperator"})
     public Response create(ManufacturerDTO manufacturerDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         manufacturerBean.create(
@@ -195,14 +133,15 @@ public class ManufacturerService {
                 manufacturerDTO.getEmail()
         );
         var manufacturer = manufacturerBean.find(manufacturerDTO.getUsername());
-        return Response.status(Response.Status.CREATED).entity(toDTOnoProductsNoPackages(manufacturer)).build();
+        return Response.status(Response.Status.CREATED).entity(toDTOnoProducts(manufacturer)).build();
     }
 
     @PUT
     @Path("{username}")
     @Authenticated
     @RolesAllowed({"Manufacturer"})
-    public Response update(@PathParam("username") String username, ManufacturerDTO manufacturerDTO) throws MyEntityNotFoundException {
+    public Response update(@PathParam("username") String username, ManufacturerDTO manufacturerDTO)
+            throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
         if (!principal.getName().equals(username)){
             return Response.status(Response.Status.FORBIDDEN).build();
@@ -214,7 +153,7 @@ public class ManufacturerService {
                 manufacturerDTO.getEmail()
         );
         var manufacturer = manufacturerBean.find(username);
-        return Response.ok(toDTOnoProductsNoPackages(manufacturer)).build();
+        return Response.ok(toDTOnoProducts(manufacturer)).build();
     }
 
     @DELETE

@@ -1,36 +1,19 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class ManufacturerDTO {
+public class LogisticsOperatorDTO {
     private String username;
     private String password;
     private String email;
     private String name;
-    private List<ProductDTO> products;
 
-    public ManufacturerDTO() {
-        this.products = new ArrayList<>();
+    public LogisticsOperatorDTO() {
     }
 
-    public ManufacturerDTO(String username, String password, String email, String name) {
+    public LogisticsOperatorDTO(String username, String password, String email, String name) {
         this.username = username;
         this.password = password;
         this.email = email;
         this.name = name;
-        this.products = new ArrayList<>();
-    }
-
-    public ManufacturerDTO(
-            String username,
-            String password,
-            String email,
-            String name,
-            List<ProductDTO> products
-    ) {
-        this(username, password, email, name);
-        this.products = products;
     }
 
     public String getUsername() {
@@ -63,13 +46,5 @@ public class ManufacturerDTO {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public List<ProductDTO> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<ProductDTO> products) {
-        this.products = products;
     }
 }

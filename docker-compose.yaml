@@ -1,0 +1,32 @@
+version: "3.9"
+services:
+  db:
+    image: bitnami/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_DB=${DB_NAME}
+  smtp:
+    image: ghusta/fakesmtp
+    ports:
+      - "2525:25"
+  webserver:
+    build: .
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    environment:
+      - DATASOURCE_JNDI
+      - DATASOURCE_NAME
+      - DB_USER
+      - DB_PASS
+      - DB_HOST
+      - DB_PORT
+      - DB_NAME
+      - WILDFLY_ADMIN_PASSWORD
+      - POSTGRES_DRIVER_VERSION
+    depends_on:
+      - db
+      - smtp

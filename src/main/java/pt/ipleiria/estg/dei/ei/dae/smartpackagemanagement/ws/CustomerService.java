@@ -77,6 +77,7 @@ public class CustomerService {
 
     @GET
     @Path("/all")
+    @RolesAllowed({"LogisticsOperator"})
     public List<CustomerDTO> getAll() {
         return toDTOsNoOrders(customerBean.getCustomers());
     }
@@ -106,7 +107,7 @@ public class CustomerService {
     @GET
     @Path("{username}/orders")
     @Authenticated
-    @RolesAllowed({"Customer"})
+    @RolesAllowed({"Customer, LogisticsOperator"})
     public Response getCustomerOrders(@PathParam("username") String username) throws MyEntityNotFoundException{
         var principal = securityContext.getUserPrincipal();
         if (!principal.getName().equals(username)){

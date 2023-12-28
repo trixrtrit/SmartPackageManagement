@@ -2,7 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderItem;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,15 +15,48 @@ public class ProductDTO {
     @Positive
     private double price;
     private boolean isActive;
-    @PositiveOrZero
-    private float stock;
     private String manufacturerUsername;
-    private long packageId;
+    private String reference;
+    @PositiveOrZero
+    private float unitStock;
+    @PositiveOrZero
+    private float boxStock;
+    @PositiveOrZero
+    private float containerStock;
 
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
 
+    private List<ProductParameter> productParameters;
+
     public ProductDTO() {
+        //this.orderItems = new ArrayList<>();
+        this.productParameters = new ArrayList<>();
+    }
+
+    public ProductDTO(
+            Long id,
+            String name,
+            String description,
+            double price,
+            boolean isActive,
+            String manufacturerUsername,
+            String reference,
+            float unitStock,
+            float boxStock,
+            float containerStock
+    ) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.isActive = isActive;
+        this.reference = reference;
+        this.manufacturerUsername = manufacturerUsername;
+        this.unitStock = unitStock;
+        this.boxStock = boxStock;
+        this.containerStock = containerStock;
+        this.productParameters = new ArrayList<>();
         //this.orderItems = new ArrayList<>();
     }
 
@@ -33,18 +66,16 @@ public class ProductDTO {
             String description,
             double price,
             boolean isActive,
-            float stock,
             String manufacturerUsername,
-            long packageId
+            String reference
     ) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
         this.isActive = isActive;
-        this.stock = stock;
+        this.reference = reference;
         this.manufacturerUsername = manufacturerUsername;
-        this.packageId = packageId;
         //this.orderItems = new ArrayList<>();
     }
 
@@ -99,14 +130,6 @@ public class ProductDTO {
         isActive = active;
     }
 
-    public float getStock() {
-        return stock;
-    }
-
-    public void setStock(float stock) {
-        this.stock = stock;
-    }
-
     public String getManufacturerUsername() {
         return manufacturerUsername;
     }
@@ -115,12 +138,36 @@ public class ProductDTO {
         this.manufacturerUsername = manufacturerUsername;
     }
 
-    public long getPackageId() {
-        return packageId;
+    public String getReference() {
+        return reference;
     }
 
-    public void setPackageId(long packageId) {
-        this.packageId = packageId;
+    public void setReference(String reference) {
+        this.reference = reference;
+    }
+
+    public float getUnitStock() {
+        return unitStock;
+    }
+
+    public void setUnitStock(float unitStock) {
+        this.unitStock = unitStock;
+    }
+
+    public float getBoxStock() {
+        return boxStock;
+    }
+
+    public void setBoxStock(float boxStock) {
+        this.boxStock = boxStock;
+    }
+
+    public float getContainerStock() {
+        return containerStock;
+    }
+
+    public void setContainerStock(float containerStock) {
+        this.containerStock = containerStock;
     }
 
     /*

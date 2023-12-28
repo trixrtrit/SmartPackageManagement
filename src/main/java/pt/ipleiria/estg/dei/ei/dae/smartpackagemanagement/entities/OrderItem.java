@@ -5,7 +5,8 @@ import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "orderItems")
-public class OrderItem extends Versionable{
+public class
+OrderItem extends Versionable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

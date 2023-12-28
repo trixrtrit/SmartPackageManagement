@@ -41,15 +41,6 @@ public class ManufacturerBean {
         return entityManager.createNamedQuery("getManufacturers", Manufacturer.class).getResultList();
     }
 
-    public Manufacturer getManufacturerPackages(String username) throws MyEntityNotFoundException {
-        if(!this.exists(username)) {
-            throw new MyEntityNotFoundException("The manufacturer with the username: " + username + " does not exist");
-        }
-        Manufacturer manufacturer = entityManager.find(Manufacturer.class, username);
-        Hibernate.initialize(manufacturer.getPackages());
-        return manufacturer;
-    }
-
     public Manufacturer getManufacturerProducts(String username) throws MyEntityNotFoundException {
         if(!this.exists(username)) {
             throw new MyEntityNotFoundException("The manufacturer with the username: " + username + " does not exist");
@@ -60,9 +51,7 @@ public class ManufacturerBean {
     }
 
     public boolean exists(String username) {
-        Query query = entityManager.createQuery(
-                "SELECT COUNT(c.username) FROM Customer c WHERE c.username = :username", Long.class
-        );
+        Query query = entityManager.createNamedQuery("manufacturerExists", Manufacturer.class);
         query.setParameter("username", username);
         return (Long) query.getSingleResult() > 0L;
     }
@@ -73,7 +62,6 @@ public class ManufacturerBean {
             throw new MyEntityNotFoundException("The manufacturer with the username: " + username + " does not exist");
         }
         Hibernate.initialize(manufacturer.getProducts());
-        Hibernate.initialize(manufacturer.getPackages());
         return manufacturer;
     }
 

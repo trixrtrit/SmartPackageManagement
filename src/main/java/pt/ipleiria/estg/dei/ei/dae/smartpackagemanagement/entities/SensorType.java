@@ -7,6 +7,12 @@ import java.util.List;
 
 @Entity
 @Table(name = "sensorTypes")
+@NamedQueries({
+        @NamedQuery(
+                name = "getSensorTypes",
+                query = "SELECT st FROM SensorType st"
+        )
+})
 public class SensorType extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,15 +23,19 @@ public class SensorType extends Versionable{
     @OneToMany(mappedBy = "sensorType", cascade = CascadeType.REMOVE)
     private List<Sensor> sensors;
 
+    @OneToMany(mappedBy = "sensorType", cascade = CascadeType.REMOVE)
+    private List<ProductParameter> productParameters;
+
     public SensorType() {
         this.sensors = new ArrayList<Sensor>();
+        this.productParameters = new ArrayList<ProductParameter>();
     }
 
-    public SensorType(Long id, String name, String measurementUnit) {
-        this.id = id;
+    public SensorType(String name, String measurementUnit) {
         this.name = name;
         this.measurementUnit = measurementUnit;
         this.sensors = new ArrayList<Sensor>();
+        this.productParameters = new ArrayList<>();
     }
 
     public Long getId() {
@@ -58,5 +68,13 @@ public class SensorType extends Versionable{
 
     public void setSensors(List<Sensor> sensors) {
         this.sensors = sensors;
+    }
+
+    public List<ProductParameter> getProductParameters() {
+        return productParameters;
+    }
+
+    public void setProductParameters(List<ProductParameter> productParameters) {
+        this.productParameters = productParameters;
     }
 }

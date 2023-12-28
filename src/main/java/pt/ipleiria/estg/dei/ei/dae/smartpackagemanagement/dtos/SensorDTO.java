@@ -7,22 +7,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SensorDTO {
-
     private Long id;
     private String name;
-    private List<Measurement> measurements;
-    private long packageId;
-    private SensorType sensorType;
+    private List<MeasurementDTO> measurements;
+    private List<PackageDTO> packages;
+    private SensorTypeDTO sensorType;
 
     public SensorDTO() {
-        this.measurements = new ArrayList<Measurement>();
+        this.measurements = new ArrayList<MeasurementDTO>();
     }
-    public SensorDTO(Long id, String name, SensorType sensorType, long packageId) {
+
+    public SensorDTO(Long id, String name, SensorTypeDTO sensorType) {
         this.id = id;
         this.name = name;
         this.sensorType = sensorType;
-        this.packageId = packageId;
-        this.measurements = new ArrayList<Measurement>();
+        this.measurements = new ArrayList<MeasurementDTO>();
+        this.packages = new ArrayList<>();
     }
 
     public Long getId() {
@@ -40,25 +40,28 @@ public class SensorDTO {
     public void setName(String name) {
         this.name = name;
     }
-    public long getPackageId() {
-        return packageId;
-    }
 
-    public void setPackageId(long packageId) {
-        this.packageId = packageId;
-    }
-    public List<Measurement> getMeasurements() {
+    public List<MeasurementDTO> getMeasurements() {
         return measurements;
     }
-    public void setMeasurements(List<Measurement> measurements) {
+
+    public void setMeasurements(List<MeasurementDTO> measurements) {
         this.measurements = measurements;
     }
 
-    public SensorType getSensorType() {
+    public List<PackageDTO> getPackages() {
+        return packages;
+    }
+
+    public void setPackages(List<PackageDTO> packages) {
+        this.packages = packages;
+    }
+
+    public SensorTypeDTO getSensorType() {
         return sensorType;
     }
 
-    public void setSensorType(SensorType sensorType) {
+    public void setSensorType(SensorTypeDTO sensorType) {
         this.sensorType = sensorType;
     }
 }
