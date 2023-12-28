@@ -11,6 +11,10 @@ import java.util.List;
         @NamedQuery(
                 name = "getCustomers",
                 query = "SELECT c FROM Customer c ORDER BY c.name"
+        ),
+        @NamedQuery(
+                name = "customerExists",
+                query = "SELECT COUNT(c.username) FROM Customer c WHERE c.username = :username"
         )
 })
 public class Customer extends User implements Serializable {

@@ -40,17 +40,8 @@ public class LogisticsOperatorBean {
         return entityManager.createNamedQuery("getLogisticsOperators", LogisticsOperator.class).getResultList();
     }
 
-    public LogisticsOperator getPackages(String username) throws MyEntityNotFoundException {
-        if(!this.exists(username)) {
-            throw new MyEntityNotFoundException("The logistics operator with the username: " + username + " does not exist");
-        }
-        LogisticsOperator logisticsOperator = entityManager.find(LogisticsOperator.class, username);
-        Hibernate.initialize(logisticsOperator.getPackages());
-        return logisticsOperator;
-    }
-
     public boolean exists(String username) {
-        Query query = entityManager.createNamedQuery("logisticsOperatorsExists", LogisticsOperator.class);
+        Query query = entityManager.createNamedQuery("logisticsOperatorExists", LogisticsOperator.class);
         query.setParameter("username", username);
         return (Long) query.getSingleResult() > 0L;
     }
@@ -60,7 +51,6 @@ public class LogisticsOperatorBean {
         if (logisticsOperator == null) {
             throw new MyEntityNotFoundException("The logistics operator with the username: " + username + " does not exist");
         }
-        Hibernate.initialize(logisticsOperator.getPackages());
         return logisticsOperator;
     }
 

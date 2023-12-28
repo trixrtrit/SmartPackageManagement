@@ -1,66 +1,58 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "packages")
+@NamedQueries({
+        @NamedQuery(
+                name = "getPackages",
+                query = "SELECT p FROM Package p ORDER BY p.packageType, p.material"
+        ),
+        @NamedQuery(
+                name = "packageExists",
+                query = "SELECT COUNT(p.code) FROM Package p WHERE p.code = :code"
+        )
+})
+@SQLDelete(sql="UPDATE packages SET deleted = TRUE, isactive = FALSE WHERE code = ? AND deleted = ?::boolean")
+@Where(clause = "deleted IS FALSE")
 public class Package extends Versionable{
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long code;
     private String material;
-    private String type;
-    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
+    @Enumerated(EnumType.STRING)
+    private PackageType packageType;
+    @ManyToMany(mappedBy = "packages")
     private List<Sensor> sensors;
-    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
-    private List<Measurement> measurements;
-    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
+    @ManyToMany(mappedBy = "packages")
     private List<Product> products;
-
-    @ManyToOne
-    @JoinColumn(name = "logisticsOperator_username")
-    @NotNull
-    private LogisticsOperator logisticsOperator;
-
-    @ManyToOne
-    @JoinColumn(name = "manufacturer_username")
-    @NotNull
-    private Manufacturer manufacturer;
+    private boolean deleted;
 
     public Package() {
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
-        this.measurements = new ArrayList<Measurement>();
     }
 
-    public Package(String material, String type, Manufacturer manufacturer, LogisticsOperator logisticsOperator) {
+    public Package(long code, String material, PackageType packageType) {
+        this.code = code;
         this.material = material;
-        this.type = type;
-        this.manufacturer = manufacturer;
-        this.logisticsOperator = logisticsOperator;
+        this.packageType = packageType;
         this.sensors = new ArrayList<Sensor>();
         this.products = new ArrayList<Product>();
-        this.measurements = new ArrayList<Measurement>();
     }
 
-    public LogisticsOperator getLogisticsOperator() {
-        return logisticsOperator;
+    public long getCode() {
+        return code;
     }
 
-    public void setLogisticsOperator(LogisticsOperator logisticsOperator) {
-        this.logisticsOperator = logisticsOperator;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setCode(long code) {
+        this.code = code;
     }
 
     public String getMaterial() {
@@ -71,20 +63,12 @@ public class Package extends Versionable{
         this.material = material;
     }
 
-    public String getType() {
-        return type;
+    public PackageType getPackageType() {
+        return packageType;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Manufacturer getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(Manufacturer manufacturer) {
-        this.manufacturer = manufacturer;
+    public void setPackageType(PackageType packageType) {
+        this.packageType = packageType;
     }
 
     public List<Sensor> getSensors() {
@@ -95,19 +79,36 @@ public class Package extends Versionable{
         this.sensors = sensors;
     }
 
-    public List<Measurement> getMeasurements() {
-        return measurements;
-    }
-
-    public void setMeasurements(List<Measurement> measurements) {
-        this.measurements = measurements;
-    }
-
     public List<Product> getProducts() {
         return products;
     }
 
     public void setProducts(List<Product> products) {
         this.products = products;
+    }
+
+    public Boolean getDeleted() {
+        return deleted;
+    }
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    public void addProduct(Product product) {
+        if (!products.contains(product)) {
+            products.add(product);
+        }
+    }
+    public void removeProduct(Product product) {
+        products.remove(product);
+    }
+
+    public void addSensor(Sensor sensor) {
+        if (!sensors.contains(sensor)) {
+            sensors.add(sensor);
+        }
+    }
+    public void removeSensor(Sensor sensor) {
+        sensors.remove(sensor);
     }
 }

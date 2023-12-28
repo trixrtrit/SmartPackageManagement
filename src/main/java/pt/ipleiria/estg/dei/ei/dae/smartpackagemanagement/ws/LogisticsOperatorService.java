@@ -9,11 +9,8 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.LogisticsOperatorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ManufacturerDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.LogisticsOperatorBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.LogisticsOperator;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -38,25 +35,7 @@ public class LogisticsOperatorService {
                 logisticsOperator.getUsername(),
                 logisticsOperator.getPassword(),
                 logisticsOperator.getEmail(),
-                logisticsOperator.getName(),
-                packagesToDTOs(logisticsOperator.getPackages())
-        );
-    }
-
-    private LogisticsOperatorDTO toDTOnoPackages(LogisticsOperator logisticsOperator) {
-        return new LogisticsOperatorDTO(
-                logisticsOperator.getUsername(),
-                logisticsOperator.getPassword(),
-                logisticsOperator.getEmail(),
                 logisticsOperator.getName()
-        );
-    }
-
-    private PackageDTO packageToDTO(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getId(),
-                aPackage.getMaterial(),
-                aPackage.getType()
         );
     }
 
@@ -64,18 +43,10 @@ public class LogisticsOperatorService {
         return logisticsOperators.stream().map(this::toDTO).collect(Collectors.toList());
     }
 
-    private List<LogisticsOperatorDTO> toDTOsNoPackages(List<LogisticsOperator> logisticsOperators) {
-        return logisticsOperators.stream().map(this::toDTOnoPackages).collect(Collectors.toList());
-    }
-
-    private List<PackageDTO> packagesToDTOs(List<Package> packages) {
-        return packages.stream().map(this::packageToDTO).collect(Collectors.toList());
-    }
-
     @GET
     @Path("/all")
     public List<LogisticsOperatorDTO> getAll() {
-        return toDTOsNoPackages(logisticsOperatorBean.getLogisticsOperators());
+        return toDTOs(logisticsOperatorBean.getLogisticsOperators());
     }
 
     @GET
@@ -100,26 +71,6 @@ public class LogisticsOperatorService {
                 .build();
     }
 
-    @GET
-    @Path("{username}/packages")
-    @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
-    public Response getPackages(@PathParam("username") String username) throws MyEntityNotFoundException{
-        var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-
-        LogisticsOperator logisticsOperator = logisticsOperatorBean.getPackages(username);
-        if (logisticsOperator != null) {
-            var dtos = packagesToDTOs(logisticsOperator.getPackages());
-            return Response.ok(dtos).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND)
-                .entity("ERROR_FINDING_LOGISTICS_OPERATOR")
-                .build();
-    }
-
     @POST
     @Path("/")
     @RolesAllowed({"LogisticsOperator"})
@@ -132,7 +83,7 @@ public class LogisticsOperatorService {
                 logisticsOperatorDTO.getEmail()
         );
         var logisticsOperator = logisticsOperatorBean.find(logisticsOperatorDTO.getUsername());
-        return Response.status(Response.Status.CREATED).entity(toDTOnoPackages(logisticsOperator)).build();
+        return Response.status(Response.Status.CREATED).entity(toDTO(logisticsOperator)).build();
     }
 
     @PUT
@@ -151,7 +102,7 @@ public class LogisticsOperatorService {
                 manufacturerDTO.getEmail()
         );
         var logisticsOperator = logisticsOperatorBean.find(username);
-        return Response.ok(toDTOnoPackages(logisticsOperator)).build();
+        return Response.ok(toDTO(logisticsOperator)).build();
     }
 
     @DELETE

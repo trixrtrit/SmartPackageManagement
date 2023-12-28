@@ -9,7 +9,6 @@ import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -51,9 +50,7 @@ public class CustomerBean {
     }
 
     public boolean exists(String username) {
-        Query query = entityManager.createQuery(
-                "SELECT COUNT(c.username) FROM Customer c WHERE c.username = :username", Long.class
-        );
+        Query query = entityManager.createNamedQuery("customerExists", Customer.class);
         query.setParameter("username", username);
         return (Long) query.getSingleResult() > 0L;
     }
