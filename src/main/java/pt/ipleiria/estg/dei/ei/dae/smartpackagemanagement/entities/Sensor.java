@@ -10,6 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 @Entity
 @Table(name = "sensors")
+@NamedQueries({
+        @NamedQuery(
+                name = "getSensors",
+                query = "SELECT s FROM Sensor s ORDER BY s.name"
+        )
+})
 public class Sensor extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,8 +35,7 @@ public class Sensor extends Versionable{
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public Sensor(Long id, String name, SensorType sensorType, Package aPackage) {
-        this.id = id;
+    public Sensor(String name, SensorType sensorType, Package aPackage) {
         this.name = name;
         this.sensorType = sensorType;
         this.measurements = new ArrayList<Measurement>();
@@ -67,5 +72,12 @@ public class Sensor extends Versionable{
 
     public void setaPackage(Package aPackage) {
         this.aPackage = aPackage;
+    }
+
+    public SensorType getSensorType() {
+        return sensorType;
+    }
+    public void setSensorType(SensorType sensorType) {
+        this.sensorType = sensorType;
     }
 }
