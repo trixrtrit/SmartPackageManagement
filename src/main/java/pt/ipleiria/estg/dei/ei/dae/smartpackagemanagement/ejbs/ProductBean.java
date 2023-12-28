@@ -4,10 +4,12 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
@@ -55,11 +57,9 @@ public class ProductBean {
     }
 
     public boolean exists(Long id) {
-        var query = entityManager.createQuery(
-                "SELECT COUNT(*) FROM Product p WHERE p.id = :id", Long.class
-        );
+        Query query = entityManager.createNamedQuery("productExists", Product.class);
         query.setParameter("id", id);
-        return query.getSingleResult() > 0L;
+        return (Long) query.getSingleResult() > 0L;
     }
 
     public Product find(long id) throws MyEntityNotFoundException {
@@ -67,6 +67,15 @@ public class ProductBean {
         if (product == null) {
             throw new MyEntityNotFoundException("The product with the id: " + id + " does not exist");
         }
+        return product;
+    }
+
+    public Product getProductPackages(long id) throws MyEntityNotFoundException {
+        if(!this.exists(id)) {
+            throw new MyEntityNotFoundException("The product with the id: " + id + " does not exist");
+        }
+        Product product = entityManager.find(Product.class, id);
+        Hibernate.initialize(product.getPackages());
         return product;
     }
 
@@ -84,7 +93,7 @@ public class ProductBean {
     //TODO: export
     public String export(String fileLocation) throws IOException {
         List<String> productAttributesList = this.getExportableProperties();
-        System.out.println("hi");
+
         Workbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("Products");
         Row header = sheet.createRow(0);
@@ -111,9 +120,18 @@ public class ProductBean {
 
         int rowNum = 1;
         List<Product> productList = getProductsForExport();
+
         for (Product product : productList) {
-            Row row = sheet.createRow(rowNum++);
-            this.parseProductToSheet(product, style, row, sheet, productAttributesList);
+            List<Package> packages = product.getPackages();
+            if(!packages.isEmpty()) {
+                for (Package aPackage : packages) {
+                    Row row = sheet.createRow(rowNum++);
+                    this.parseProductToSheet(product, aPackage, style, row, sheet, productAttributesList);
+                }
+            }else{
+                Row row = sheet.createRow(rowNum++);
+                this.parseProductToSheet(product, null, style, row, sheet, productAttributesList);
+            }
         }
 
         if (fileLocation == null || fileLocation.isEmpty()) {
@@ -184,6 +202,7 @@ public class ProductBean {
 
     private void parseProductToSheet(
             Product product,
+            Package aPackage,
             CellStyle style,
             Row row,
             Sheet sheet,
@@ -192,13 +211,13 @@ public class ProductBean {
         Cell cell;
         for (int i = 0; i < productAttributesList.size(); i++){
             cell = row.createCell(i);
-            setCellValue(productAttributesList.get(i), product, cell);
+            setCellValue(productAttributesList.get(i), product, cell, aPackage);
             cell.setCellStyle(style);
         }
 
     }
 
-    private void setCellValue(String attribute, Product product, Cell cell){
+    private void setCellValue(String attribute, Product product, Cell cell, Package aPackage){
         switch (attribute) {
             case "Reference":
                 cell.setCellValue(product.getProductReference());
@@ -227,20 +246,20 @@ public class ProductBean {
             case "ContainerStock":
                 cell.setCellValue(product.getContainerStock());
                 break;
-            /*case "PackageType":
-                if(product.getaPackage() == null){
+            case "PackageType":
+                if(aPackage == null){
                     cell.setCellValue("");
                     break;
                 }
-                cell.setCellValue(product.getaPackage().getPackageType().getDisplayType());
+                cell.setCellValue(aPackage.getPackageType().getDisplayType());
                 break;
             case "PackageMaterial":
-                if(product.getaPackage() == null){
+                if(aPackage == null){
                     cell.setCellValue("");
                     break;
                 }
-                cell.setCellValue(product.getaPackage().getMaterial());
-                break;*/
+                cell.setCellValue(aPackage.getMaterial());
+                break;
             default:
                 break;
         }

@@ -23,6 +23,10 @@ import java.util.List;
         @NamedQuery(
                 name = "getProductsForExport",
                 query = "SELECT p FROM Product p WHERE p.isActive = true ORDER BY p.name"
+        ),
+        @NamedQuery(
+                name = "productExists",
+                query = "SELECT COUNT(p.id) FROM Product p WHERE p.id = :id"
         )
 })
 @SQLDelete(sql="UPDATE products SET deleted = TRUE, isactive = FALSE WHERE id = ? AND deleted = ?::boolean")
