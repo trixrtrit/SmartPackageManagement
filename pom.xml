@@ -25,6 +25,11 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.jboss.resteasy</groupId>
             <artifactId>resteasy-core</artifactId>
             <version>6.2.6.Final</version>
