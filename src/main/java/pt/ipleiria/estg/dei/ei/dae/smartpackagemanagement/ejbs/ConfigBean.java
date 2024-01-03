@@ -5,6 +5,7 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import net.datafaker.Faker;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.logging.Logger;
 
@@ -19,6 +20,12 @@ public class ConfigBean {
     private CustomerBean customerBean;
     @EJB
     private ProductBean productBean;
+    @EJB
+    private PackageBean packageBean;
+    @EJB
+    private ProductParameterBean productParameterBean;
+    @EJB
+    private SensorTypeBean sensorTypeBean;
 
     private final Faker faker = new Faker();
 
@@ -31,6 +38,31 @@ public class ConfigBean {
         seedManufacturers(seedSize);
         seedProducts(seedSize);
         seedCustomers(seedSize);
+        try {
+            logisticsOperatorBean.create(
+                    "gatoMega",
+                    "123",
+                    "gatoMega",
+                    "gatoMega@mail.pt"
+            );
+            manufacturerBean.create(
+                    "gatoFabricante",
+                    "123",
+                    "gatoFabricante",
+                    "gatoFabricante@mail.pt"
+            );
+            customerBean.create(
+                    "gatoCliente",
+                    "123",
+                    "gatoCliente",
+                    "gatoCliente@mail.pt",
+                    "999999999",
+                    "GatoLandia"
+            );
+        }
+        catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
     }
 
     public void seedLogOperators(int size) {
@@ -110,4 +142,5 @@ public class ConfigBean {
             logger.severe(ex.getMessage());
         }
     }
+    //TODO: package/productparameter/sensortype
 }
