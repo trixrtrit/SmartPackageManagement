@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class Sensor extends Versionable{
 
     @ManyToOne
     @JoinColumn(name = "sensorType_id")
+    @NotNull
     private SensorType sensorType;
 
     public Sensor() {
@@ -75,6 +77,14 @@ public class Sensor extends Versionable{
 
     public void setMeasurements(List<Measurement> measurements) {
         this.measurements = measurements;
+    }
+
+    public SensorType getSensorType() {
+        return sensorType;
+    }
+
+    public void setSensorType(SensorType sensorType) {
+        this.sensorType = sensorType;
     }
 
     public List<Package> getPackages() {
