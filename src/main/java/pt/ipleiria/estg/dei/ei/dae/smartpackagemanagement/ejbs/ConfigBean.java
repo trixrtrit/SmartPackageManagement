@@ -156,8 +156,7 @@ public class ConfigBean {
         sensorUnits.put("Pressure", "Pa");
         sensorUnits.put("Humidity", "%");
         sensorUnits.put("Proximity", "cm");
-        List<String> mapKeys = new ArrayList<>();
-        mapKeys.addAll(sensorUnits.keySet());
+        List<String> mapKeys = new ArrayList<>(sensorUnits.keySet());
 
         try {
             for (String mapKey : mapKeys) {
