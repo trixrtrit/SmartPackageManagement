@@ -119,7 +119,10 @@ public class ConfigBean {
                         faker.lorem().sentence(),
                         Double.parseDouble(faker.commerce().price().replaceAll("[^\\d.]", "")),
                         manufacturer.getUsername(),
-                        faker.number().digits(8)
+                        faker.number().digits(8),
+                        faker.number().numberBetween(1,100),
+                        faker.number().numberBetween(1,100),
+                        faker.number().numberBetween(1,100)
                 );
                 var product = productBean.find(productId);
                 product.setUnitStock(faker.number().numberBetween(0,1000));

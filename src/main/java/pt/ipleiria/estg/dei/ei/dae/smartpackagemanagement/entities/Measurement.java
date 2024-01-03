@@ -23,8 +23,7 @@ public class Measurement extends Versionable{
     public Measurement() {
     }
 
-    public Measurement(Long id, double measurement, Date timestamp, Sensor sensor, Package aPackage) {
-        this.id = id;
+    public Measurement(double measurement, Date timestamp, Sensor sensor, Package aPackage) {
         this.measurement = measurement;
         this.timestamp = timestamp;
         this.sensor = sensor;
