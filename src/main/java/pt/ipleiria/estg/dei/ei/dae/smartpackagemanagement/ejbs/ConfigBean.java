@@ -7,6 +7,10 @@ import jakarta.ejb.Startup;
 import net.datafaker.Faker;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Startup
@@ -29,6 +33,8 @@ public class ConfigBean {
 
     private final Faker faker = new Faker();
 
+    private static final Map<String, String> sensorUnits = new HashMap<>();
+
     private static final Logger logger = Logger.getLogger("ebjs.ConfigBean");
     @PostConstruct
     public void populateDB() {
@@ -38,6 +44,8 @@ public class ConfigBean {
         seedManufacturers(seedSize);
         seedProducts(seedSize);
         seedCustomers(seedSize);
+        seedSensorType();
+        seedProductParameters(seedSize);
         try {
             logisticsOperatorBean.create(
                     "gatoMega",
@@ -105,7 +113,7 @@ public class ConfigBean {
         var manufacturers = manufacturerBean.getManufacturers();
         try {
             for (int i = 0; i < size; i++) {
-                var manufacturer = manufacturers.get(faker.number().numberBetween(0, manufacturers.size()-1));
+                var manufacturer = manufacturers.get(faker.number().numberBetween(0, manufacturers.size()));
                 long productId = productBean.create(
                         faker.commerce().productName(),
                         faker.lorem().sentence(),
@@ -142,5 +150,47 @@ public class ConfigBean {
             logger.severe(ex.getMessage());
         }
     }
-    //TODO: package/productparameter/sensortype
+
+    public void seedSensorType() {
+        sensorUnits.put("Temperature", "°C");
+        sensorUnits.put("Pressure", "Pa");
+        sensorUnits.put("Humidity", "%");
+        sensorUnits.put("Proximity", "cm");
+        List<String> mapKeys = new ArrayList<>();
+        mapKeys.addAll(sensorUnits.keySet());
+
+        try {
+            for (String mapKey : mapKeys) {
+                sensorTypeBean.create(mapKey, sensorUnits.get(mapKey));
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+
+    public void seedProductParameters(int size) {
+        var products = productBean.getProducts();
+        var sensorTypes = sensorTypeBean.getProductParameters();
+        try {
+            int count = 0;
+            while (count < size) {
+                float threshold1 = (float) (0 + Math.random() * (100));
+                float threshold2 = (float) (0 + Math.random() * (100));
+                var product = products.get(faker.number().numberBetween(0, products.size()));
+                var sensorType = sensorTypes.get(faker.number().numberBetween(0, sensorTypes.size()));
+                if(!productParameterBean.exists(product.getId(), sensorType.getId())) {
+                    productParameterBean.create(
+                            product.getId(),
+                            sensorType.getId(),
+                            Math.min(threshold1, threshold2),
+                            Math.max(threshold1, threshold2)
+                    );
+                    count++;
+                }
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+    //TODO: package/sensors
 }
