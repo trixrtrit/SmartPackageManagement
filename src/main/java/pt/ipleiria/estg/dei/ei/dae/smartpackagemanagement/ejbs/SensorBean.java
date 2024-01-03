@@ -73,17 +73,16 @@ public class SensorBean {
         return sensor;
     }
 
-    //package_id como parametro? sensorType?
     public void update(
             long id,
             String name,
-            String description,
-            double price,
-            float stock
+            Long sensorTypeId
     ) throws MyEntityNotFoundException {
         Sensor sensor = this.find(id);
+        //SensorType sensorType = find(sensorTypeId);
         entityManager.lock(sensor, LockModeType.OPTIMISTIC);
         sensor.setName(name);
+        //sensor.setSensorType(sensorType);
     }
 
     public Sensor delete(long id) throws MyEntityNotFoundException {

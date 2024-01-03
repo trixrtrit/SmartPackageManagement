@@ -78,6 +78,21 @@ public class SensorService {
         return Response.status(Response.Status.CREATED).entity(toDTO(sensor)).build();
     }
 
+    @PUT
+    @Path("{id}")
+    @Authenticated
+    @RolesAllowed({"Manufacturer"})
+    public Response update(@PathParam("id") long id, SensorDTO sensorDTO)
+            throws MyEntityNotFoundException, MyConstraintViolationException {
+        sensorBean.update(
+                id,
+                sensorDTO.getName(),
+                sensorDTO.getSensorTypeId()
+        );
+        var sensor = sensorBean.find(id);
+        return Response.ok(toDTO(sensor)).build();
+    }
+
     @DELETE
     @Path("{id}")
     @Authenticated
