@@ -52,6 +52,12 @@ public class Product extends Versionable implements Serializable {
     private float boxStock;
     @PositiveOrZero
     private float containerStock;
+    @PositiveOrZero
+    private int primaryPackQuantity;
+    @PositiveOrZero
+    private int secondaryPackQuantity;
+    @PositiveOrZero
+    private int tertiaryPackQuantity;
     @ManyToOne
     @JoinColumn(name = "manufacturer_username")
     @NotNull
@@ -90,7 +96,10 @@ public class Product extends Versionable implements Serializable {
             double price,
             Manufacturer manufacturer,
             boolean isActive,
-            String productReference
+            String productReference,
+            int primaryPackQuantity,
+            int secondaryPackQuantity,
+            int tertiaryPackQuantity
     ) {
         this.name = name;
         this.description = description;
@@ -101,6 +110,9 @@ public class Product extends Versionable implements Serializable {
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
         this.packages = new ArrayList<>();
+        this.primaryPackQuantity = primaryPackQuantity;
+        this.secondaryPackQuantity = secondaryPackQuantity;
+        this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
 
@@ -222,6 +234,30 @@ public class Product extends Versionable implements Serializable {
 
     public void setProductParameters(List<ProductParameter> productParameters) {
         this.productParameters = productParameters;
+    }
+
+    public int getPrimaryPackQuantity() {
+        return primaryPackQuantity;
+    }
+
+    public void setPrimaryPackQuantity(int primaryPackQuantity) {
+        this.primaryPackQuantity = primaryPackQuantity;
+    }
+
+    public int getSecondaryPackQuantity() {
+        return secondaryPackQuantity;
+    }
+
+    public void setSecondaryPackQuantity(int secondaryPackQuantity) {
+        this.secondaryPackQuantity = secondaryPackQuantity;
+    }
+
+    public int getTertiaryPackQuantity() {
+        return tertiaryPackQuantity;
+    }
+
+    public void setTertiaryPackQuantity(int tertiaryPackQuantity) {
+        this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
     public void addPackage(Package aPackage) {

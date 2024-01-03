@@ -24,6 +24,13 @@ public class ProductDTO {
     @PositiveOrZero
     private float containerStock;
 
+    @PositiveOrZero
+    private int primaryPackQuantity;
+    @PositiveOrZero
+    private int secondaryPackQuantity;
+    @PositiveOrZero
+    private int tertiaryPackQuantity;
+
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
 
@@ -44,7 +51,10 @@ public class ProductDTO {
             String reference,
             float unitStock,
             float boxStock,
-            float containerStock
+            float containerStock,
+            int primaryPackQuantity,
+            int secondaryPackQuantity,
+            int tertiaryPackQuantity
     ) {
         this.id = id;
         this.name = name;
@@ -57,6 +67,9 @@ public class ProductDTO {
         this.boxStock = boxStock;
         this.containerStock = containerStock;
         this.productParameters = new ArrayList<>();
+        this.primaryPackQuantity = primaryPackQuantity;
+        this.secondaryPackQuantity = secondaryPackQuantity;
+        this.tertiaryPackQuantity = tertiaryPackQuantity;
         //this.orderItems = new ArrayList<>();
     }
 
@@ -168,6 +181,30 @@ public class ProductDTO {
 
     public void setContainerStock(float containerStock) {
         this.containerStock = containerStock;
+    }
+
+    public int getPrimaryPackQuantity() {
+        return primaryPackQuantity;
+    }
+
+    public void setPrimaryPackQuantity(int primaryPackQuantity) {
+        this.primaryPackQuantity = primaryPackQuantity;
+    }
+
+    public int getSecondaryPackQuantity() {
+        return secondaryPackQuantity;
+    }
+
+    public void setSecondaryPackQuantity(int secondaryPackQuantity) {
+        this.secondaryPackQuantity = secondaryPackQuantity;
+    }
+
+    public int getTertiaryPackQuantity() {
+        return tertiaryPackQuantity;
+    }
+
+    public void setTertiaryPackQuantity(int tertiaryPackQuantity) {
+        this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
     /*
