@@ -24,14 +24,17 @@ public class SensorBean {
 
             String name,
             //long package_id,
-            SensorType sensorType
+            Long sensorTypeId
     ) throws MyEntityNotFoundException, MyConstraintViolationException {
 
 //        Package aPackage = entityManager.find(Package.class, package_id);
 //        if (aPackage == null){
 //            throw new MyEntityNotFoundException("Package with id '" + package_id + "' not found.");
 //        }
-
+        SensorType sensorType = entityManager.find(SensorType.class, sensorTypeId);
+        if (sensorType == null){
+            throw new MyEntityNotFoundException("SensorType with id '" + sensorTypeId + "' not found.");
+        }
         try {
             Sensor sensor = new Sensor(name, sensorType);
             entityManager.persist(sensor);

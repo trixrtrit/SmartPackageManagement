@@ -104,10 +104,4 @@ public class Sensor extends Versionable{
         packages.remove(aPackage);
     }
 
-    public SensorType getSensorType() {
-        return sensorType;
-    }
-    public void setSensorType(SensorType sensorType) {
-        this.sensorType = sensorType;
-    }
 }

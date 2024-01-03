@@ -33,8 +33,9 @@ public class SensorService {
 
     private SensorDTO toDTO(Sensor sensor) {
         return new SensorDTO(
+                sensor.getId(),
                 sensor.getName(),
-                sensorTypetoDTO(sensor.getSensorType())//sensorToDTO.getSensorType().
+                sensor.getSensorType().getId()
         );
     }
 
@@ -71,8 +72,8 @@ public class SensorService {
         long sensorId = sensorBean.create(
                 sensorDTO.getName(),
                 //sensorDTO.getPackages(),
-                sensorTypeDTOtoSensorType(sensorDTO.getSensorType())//sensorDTO.getSensorType()
-        );
+                sensorDTO.getSensorTypeId()
+                );
         var sensor = sensorBean.find(sensorId);
         return Response.status(Response.Status.CREATED).entity(toDTO(sensor)).build();
     }
