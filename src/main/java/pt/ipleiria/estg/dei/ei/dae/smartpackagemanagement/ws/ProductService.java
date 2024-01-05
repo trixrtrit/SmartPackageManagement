@@ -41,7 +41,10 @@ public class ProductService {
                 product.getProductReference(),
                 product.getUnitStock(),
                 product.getBoxStock(),
-                product.getContainerStock()
+                product.getContainerStock(),
+                product.getPrimaryPackQuantity(),
+                product.getSecondaryPackQuantity(),
+                product.getTertiaryPackQuantity()
         );
     }
 
@@ -154,7 +157,10 @@ public class ProductService {
                 productDTO.getDescription(),
                 productDTO.getPrice(),
                 productDTO.getManufacturerUsername(),
-                productDTO.getReference()
+                productDTO.getReference(),
+                productDTO.getPrimaryPackQuantity(),
+                productDTO.getSecondaryPackQuantity(),
+                productDTO.getTertiaryPackQuantity()
         );
         var product = productBean.find(productId);
         return Response.status(Response.Status.CREATED).entity(toDTO(product)).build();
@@ -190,7 +196,10 @@ public class ProductService {
                 productDTO.getName(),
                 productDTO.getDescription(),
                 productDTO.getPrice(),
-                productDTO.getReference()
+                productDTO.getReference(),
+                productDTO.getPrimaryPackQuantity(),
+                productDTO.getSecondaryPackQuantity(),
+                productDTO.getTertiaryPackQuantity()
         );
         var product = productBean.find(id);
         return Response.ok(toDTO(product)).build();

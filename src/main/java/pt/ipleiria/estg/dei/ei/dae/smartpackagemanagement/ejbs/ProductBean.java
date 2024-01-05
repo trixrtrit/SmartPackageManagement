@@ -33,14 +33,27 @@ public class ProductBean {
             String description,
             double price,
             String manufacturer_username,
-            String reference
+            String reference,
+            int primaryPackQuantity,
+            int secondaryPackQuantity,
+            int tertiaryPackQuantity
     ) throws MyEntityNotFoundException, MyConstraintViolationException {
         Manufacturer manufacturer = entityManager.find(Manufacturer.class, manufacturer_username);
         if (manufacturer == null){
             throw new MyEntityNotFoundException("Manufacturer with username '" + manufacturer_username + "' not found.");
         }
         try {
-            Product product = new Product(name, description, price, manufacturer, true, reference);
+            Product product = new Product(
+                    name,
+                    description,
+                    price,
+                    manufacturer,
+                    true,
+                    reference,
+                    primaryPackQuantity,
+                    secondaryPackQuantity,
+                    tertiaryPackQuantity
+            );
             entityManager.persist(product);
             return product.getId();
         } catch (ConstraintViolationException err) {
@@ -152,7 +165,10 @@ public class ProductBean {
             String name,
             String description,
             double price,
-            String reference
+            String reference,
+            int primaryPackQuantity,
+            int secondaryPackQuantity,
+            int tertiaryPackQuantity
     ) throws MyEntityNotFoundException, MyConstraintViolationException {
         Product product = this.find(id);
         entityManager.lock(product, LockModeType.OPTIMISTIC);
@@ -160,6 +176,9 @@ public class ProductBean {
         product.setDescription(description);
         product.setPrice(price);
         product.setProductReference(reference);
+        product.setPrimaryPackQuantity(primaryPackQuantity);
+        product.setSecondaryPackQuantity(secondaryPackQuantity);
+        product.setTertiaryPackQuantity(tertiaryPackQuantity);
     }
     public void changeActiveStatus(long id) throws MyEntityNotFoundException{
         Product product = this.find(id);
