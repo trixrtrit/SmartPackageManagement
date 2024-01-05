@@ -1,5 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Measurement;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,16 +11,16 @@ public class SensorDTO {
     private String name;
     private List<MeasurementDTO> measurements;
     private List<PackageDTO> packages;
-    private SensorTypeDTO sensorType;
+    private Long sensorTypeId;
 
     public SensorDTO() {
         this.measurements = new ArrayList<MeasurementDTO>();
     }
 
-    public SensorDTO(Long id, String name, SensorTypeDTO sensorType) {
+    public SensorDTO(Long id, String name, Long sensorTypeId) {
         this.id = id;
         this.name = name;
-        this.sensorType = sensorType;
+        this.sensorTypeId = sensorTypeId;
         this.measurements = new ArrayList<MeasurementDTO>();
         this.packages = new ArrayList<>();
     }
@@ -54,11 +57,11 @@ public class SensorDTO {
         this.packages = packages;
     }
 
-    public SensorTypeDTO getSensorType() {
-        return sensorType;
+    public Long getSensorTypeId() {
+        return sensorTypeId;
     }
 
-    public void setSensorType(SensorTypeDTO sensorType) {
-        this.sensorType = sensorType;
+    public void setSensorTypeId(Long sensorTypeId) {
+        this.sensorTypeId = sensorTypeId;
     }
 }

@@ -4,12 +4,19 @@ import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.NotNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 @Entity
 @Table(name = "sensors")
+@NamedQueries({
+        @NamedQuery(
+                name = "getSensors",
+                query = "SELECT s FROM Sensor s ORDER BY s.name"
+        )
+})
 public class Sensor extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,6 +40,7 @@ public class Sensor extends Versionable{
 
     @ManyToOne
     @JoinColumn(name = "sensorType_id")
+    @NotNull
     private SensorType sensorType;
 
     public Sensor() {
@@ -40,8 +48,7 @@ public class Sensor extends Versionable{
         this.packages = new ArrayList<>();
     }
 
-    public Sensor(Long id, String name, SensorType sensorType) {
-        this.id = id;
+    public Sensor(String name, SensorType sensorType) {
         this.name = name;
         this.sensorType = sensorType;
         this.measurements = new ArrayList<Measurement>();
@@ -72,6 +79,14 @@ public class Sensor extends Versionable{
         this.measurements = measurements;
     }
 
+    public SensorType getSensorType() {
+        return sensorType;
+    }
+
+    public void setSensorType(SensorType sensorType) {
+        this.sensorType = sensorType;
+    }
+
     public List<Package> getPackages() {
         return packages;
     }
@@ -88,4 +103,5 @@ public class Sensor extends Versionable{
     public void removePackage(Package aPackage) {
         packages.remove(aPackage);
     }
+
 }
