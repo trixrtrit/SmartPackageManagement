@@ -30,6 +30,8 @@ public class ConfigBean {
     private ProductParameterBean productParameterBean;
     @EJB
     private SensorTypeBean sensorTypeBean;
+    @EJB
+    private SensorBean sensorBean;
 
     private final Faker faker = new Faker();
 
@@ -46,6 +48,7 @@ public class ConfigBean {
         seedCustomers(seedSize);
         seedSensorType();
         seedProductParameters(seedSize);
+        seedSensors(seedSize);
         try {
             logisticsOperatorBean.create(
                     "gatoMega",
@@ -194,5 +197,27 @@ public class ConfigBean {
             logger.severe(ex.getMessage());
         }
     }
-    //TODO: package/sensors
+
+    private void seedSensors(int size) {
+        var sensorTypes = sensorTypeBean.getProductParameters();
+        Map<String, Integer> sensorUnitCount = new HashMap<>();
+        try {
+            int count = 0;
+            int unitCount;
+            while (count < size) {
+                var sensorType = sensorTypes.get(faker.number().numberBetween(0, sensorTypes.size()));
+                if(!sensorUnitCount.containsKey(sensorType.getName())){
+                    sensorUnitCount.put(sensorType.getName(), 1);
+                }
+                unitCount = sensorUnitCount.get(sensorType.getName());
+                sensorBean.create(sensorType.getName() + "Sensor" + unitCount, sensorType.getId());
+                unitCount++;
+                sensorUnitCount.put(sensorType.getName(), unitCount);
+                count++;
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+    //TODO: package
 }
