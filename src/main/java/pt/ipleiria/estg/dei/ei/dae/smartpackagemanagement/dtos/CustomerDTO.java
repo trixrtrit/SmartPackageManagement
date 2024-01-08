@@ -17,6 +17,16 @@ public class CustomerDTO implements Serializable {
         this.orders = new ArrayList<>();
     }
 
+
+    public CustomerDTO(String username, String email, String name, String nif, String address) {
+        this.username = username;
+        this.email = email;
+        this.name = name;
+        this.nif = nif;
+        this.address = address;
+        this.orders = new ArrayList<>();
+    }
+
     public CustomerDTO(String username, String password, String email, String name, String nif, String address) {
         this.username = username;
         this.password = password;

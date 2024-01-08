@@ -9,9 +9,13 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderItemDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.CustomerBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderItem;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -59,7 +63,31 @@ public class CustomerService {
                 order.getAddress(),
                 order.getTotalPrice(),
                 order.getDate(),
-                order.getStatus()
+                order.getStatus(),
+                toDTO(order.getCustomer()),
+                orderItemsToDTOs(order.getOrderItems())
+        );
+    }
+
+    private OrderItemDTO orderItemToDTO(OrderItem orderItem){
+        return new OrderItemDTO(
+                orderItem.getId(),
+                orderItem.getQuantity(),
+                orderItem.getPrice(),
+                orderItem.getOrder().getId(),
+                productDTO(orderItem.getProduct())
+        );
+    }
+
+    public ProductDTO productDTO(Product product){
+        return new ProductDTO(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.isActive(),
+                product.getManufacturer().getName(),
+                product.getProductReference()
         );
     }
 
@@ -73,6 +101,10 @@ public class CustomerService {
 
     private List<OrderDTO> ordersToDTOs(List<Order> orders) {
         return orders.stream().map(this::orderToDTO).collect(Collectors.toList());
+    }
+
+    private List<OrderItemDTO> orderItemsToDTOs(List<OrderItem> orders) {
+        return orders.stream().map(this::orderItemToDTO).collect(Collectors.toList());
     }
 
     @GET
