@@ -2,6 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,6 +10,16 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@NamedQueries({
+        @NamedQuery(
+                name = "getOrders",
+                query = "SELECT c FROM Order c ORDER BY c.date DESC"
+        ),
+        @NamedQuery(
+                name = "getCustomerOrders",
+                query = "SELECT c FROM Order c WHERE c.customer.username = :username ORDER BY c.date DESC"
+        )
+})
 public class Order extends Versionable{
 
     @Id
@@ -17,7 +28,8 @@ public class Order extends Versionable{
     private String address;
     private double totalPrice;
     private Date date;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @ManyToOne
     @JoinColumn(name = "customer_username")
@@ -31,14 +43,14 @@ public class Order extends Versionable{
         this.orderItems = new ArrayList<OrderItem>();
     }
 
-    public Order(long id, String address, double totalPrice, Date date, String status, Customer customer, LogisticsOperator logisticsOperator) {
+    public Order(String address, double totalPrice, Date date, OrderStatus status, Customer customer, List<OrderItem> orderItems) {
         this.id = id;
         this.address = address;
         this.totalPrice = totalPrice;
         this.date = date;
         this.status = status;
         this.customer = customer;
-        this.orderItems = new ArrayList<OrderItem>();
+        this.orderItems = orderItems;
     }
 
     public long getId() {
@@ -73,11 +85,11 @@ public class Order extends Versionable{
         this.date = date;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 

@@ -26,6 +26,14 @@ OrderItem extends Versionable{
     public OrderItem() {
     }
 
+    public OrderItem(float quantity, double price, long productId) {
+        this.quantity = quantity;
+        this.price = price;
+        //hack for order creation
+        this.product = new Product();
+        this.product.setId(productId);
+    }
+
     public OrderItem(Long id, float quantity, double price, Product product, Order order) {
         this.id = id;
         this.quantity = quantity;
