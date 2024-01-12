@@ -28,14 +28,14 @@ public class Package extends Versionable{
     private String material;
     @Enumerated(EnumType.STRING)
     private PackageType packageType;
-    @ManyToMany(mappedBy = "packages")
-    private List<Sensor> sensors;
+    @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
+    private List<SensorPackage> sensorPackageList;
     @ManyToMany(mappedBy = "packages")
     private List<Product> products;
     private boolean deleted;
 
     public Package() {
-        this.sensors = new ArrayList<Sensor>();
+        this.sensorPackageList = new ArrayList<>();
         this.products = new ArrayList<Product>();
     }
 
@@ -43,7 +43,7 @@ public class Package extends Versionable{
         this.code = code;
         this.material = material;
         this.packageType = packageType;
-        this.sensors = new ArrayList<Sensor>();
+        this.sensorPackageList = new ArrayList<>();
         this.products = new ArrayList<Product>();
     }
 
@@ -71,12 +71,20 @@ public class Package extends Versionable{
         this.packageType = packageType;
     }
 
-    public List<Sensor> getSensors() {
-        return sensors;
+    public List<SensorPackage> getSensorPackageList() {
+        return sensorPackageList;
     }
 
-    public void setSensors(List<Sensor> sensors) {
-        this.sensors = sensors;
+    public void setSensorPackageList(List<SensorPackage> sensorPackageList) {
+        this.sensorPackageList = sensorPackageList;
+    }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public List<Product> getProducts() {
@@ -101,14 +109,5 @@ public class Package extends Versionable{
     }
     public void removeProduct(Product product) {
         products.remove(product);
-    }
-
-    public void addSensor(Sensor sensor) {
-        if (!sensors.contains(sensor)) {
-            sensors.add(sensor);
-        }
-    }
-    public void removeSensor(Sensor sensor) {
-        sensors.remove(sensor);
     }
 }

@@ -75,12 +75,12 @@ public class PackageService {
                 aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
-                sensorsToDTOs(aPackage.getSensors()),
+                sensorsToDTOs(packageBean.findPackageCurrentSensors(aPackage.getCode())),
                 true
         );
     }
 
-    private List<PackageDTO> toDTOsSensors(List<Package> aPackages) {
+  private List<PackageDTO> toDTOsSensors(List<Package> aPackages) {
         return aPackages.stream().map(this::toDTOSensors).collect(Collectors.toList());
     }
 
@@ -137,7 +137,7 @@ public class PackageService {
     public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException{
         Package aPackage = packageBean.getPackageSensors(code);
         if (aPackage != null) {
-            var dtos = sensorsToDTOs(aPackage.getSensors());
+            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(aPackage.getCode()));
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)

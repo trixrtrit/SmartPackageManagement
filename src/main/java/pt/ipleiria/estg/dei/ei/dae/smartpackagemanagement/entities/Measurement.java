@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.util.Date;
 
@@ -11,23 +12,19 @@ public class Measurement extends Versionable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private double measurement;
-    private Date timestamp;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date createdAt;
     @ManyToOne
-    @JoinColumn(name = "sensor_id")
-    private Sensor sensor;
-
-    @ManyToOne
-    @JoinColumn(name = "package_id")
-    private Package aPackage;
+    @NotNull
+    @JoinColumn(name = "sensor_package_id")
+    private SensorPackage sensorPackage;
 
     public Measurement() {
     }
 
-    public Measurement(double measurement, Date timestamp, Sensor sensor, Package aPackage) {
+    public Measurement(double measurement, SensorPackage sensorPackage) {
         this.measurement = measurement;
-        this.timestamp = timestamp;
-        this.sensor = sensor;
-        this.aPackage = aPackage;
+        this.sensorPackage = sensorPackage;
     }
 
     public Long getId() {
@@ -46,27 +43,19 @@ public class Measurement extends Versionable{
         this.measurement = measurement;
     }
 
-    public Date getTimestamp() {
-        return timestamp;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Sensor getSensor() {
-        return sensor;
+    public SensorPackage getSensorPackage() {
+        return sensorPackage;
     }
 
-    public void setSensor(Sensor sensor) {
-        this.sensor = sensor;
-    }
-
-    public Package getaPackage() {
-        return aPackage;
-    }
-
-    public void setaPackage(Package aPackage) {
-        this.aPackage = aPackage;
+    public void setSensorPackage(SensorPackage sensorPackage) {
+        this.sensorPackage = sensorPackage;
     }
 }

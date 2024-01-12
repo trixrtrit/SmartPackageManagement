@@ -32,6 +32,8 @@ public class ConfigBean {
     private SensorTypeBean sensorTypeBean;
     @EJB
     private SensorBean sensorBean;
+    @EJB
+    private MeasurementBean measurementBean;
 
     private final Faker faker = new Faker();
 
@@ -49,6 +51,7 @@ public class ConfigBean {
         seedSensorType();
         seedProductParameters(seedSize);
         seedSensors(seedSize);
+        //seedMeasurements(seedSize);
         try {
             logisticsOperatorBean.create(
                     "gatoMega",
@@ -76,6 +79,19 @@ public class ConfigBean {
         }
     }
 
+   /* private void seedMeasurements(int size) {
+        try {
+            for (int i = 0; i < size; i++) {
+                measurementBean.create(
+                        faker.number().randomDouble(2, 0, 100),
+                        i+1
+                );
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+*/
     public void seedLogOperators(int size) {
         try {
             for (int i = 0; i < size; i++) {
