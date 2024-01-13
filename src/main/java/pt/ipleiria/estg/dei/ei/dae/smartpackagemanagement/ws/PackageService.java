@@ -210,7 +210,7 @@ public class PackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response addSensor(@PathParam("code") long code, SensorDTO sensor)
-            throws MyEntityNotFoundException {
+            throws MyEntityNotFoundException, MyEntityExistsException {
 
         packageBean.addSensorToPackage(
                 code,

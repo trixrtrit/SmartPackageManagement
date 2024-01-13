@@ -136,24 +136,34 @@ public class PackageBean {
         product.removePackage(aPackage);
     }
 
-    public void addSensorToPackage(long code, long sensorId) throws MyEntityNotFoundException {
+    public void addSensorToPackage(long code, long sensorId) throws MyEntityNotFoundException, MyEntityExistsException {
         Package aPackage = find(code);
-        if (aPackage == null)
-            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
-
         Sensor sensor = entityManager.find(Sensor.class, sensorId);
         if (sensor == null)
             throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");
+        List<SensorPackage> sensorPackages = findSensorPackageActiveSensor(sensorId);
+        if(!sensorPackages.isEmpty()) {
+            throw new MyEntityExistsException("The sensor with id: " + sensorId + " is already associated to another package");
+        }
         SensorPackage sensorPackage = new SensorPackage(sensor, aPackage, Instant.now());
         aPackage.getSensorPackageList().add(sensorPackage);
         sensor.getSensorPackageList().add(sensorPackage);
+        entityManager.persist(sensorPackage);
+    }
+
+    //TODO: change to counter
+    private List<SensorPackage> findSensorPackageActiveSensor(long sensorId){
+        return entityManager.createQuery(
+                        "SELECT sp FROM SensorPackage sp " +
+                                "WHERE sp.sensor.id = :sensorId " +
+                                "AND sp.removedAt IS NULL",
+                        SensorPackage.class)
+                .setParameter("sensorId", sensorId)
+                .getResultList();
     }
 
     public void removeSensorFromPackage(long code, long sensorId) throws MyEntityNotFoundException {
         Package aPackage = find(code);
-        if (aPackage == null)
-            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
-
         Sensor sensor = entityManager.find(Sensor.class, sensorId);
         if (sensor == null)
             throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");

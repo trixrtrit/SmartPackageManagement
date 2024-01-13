@@ -40,9 +40,13 @@ public class ConfigBean {
     private static final Map<String, String> sensorUnits = new HashMap<>();
 
     private static final Logger logger = Logger.getLogger("ebjs.ConfigBean");
+
+    private int lastAssociatedSensorId = 0;
     @PostConstruct
     public void populateDB() {
         int seedSize = 100;
+        int maxSensorsPerPackage = 4;
+        int packageSize = seedSize/maxSensorsPerPackage;
         System.out.println("Hello Java EE!");
         seedLogOperators(seedSize);
         seedManufacturers(seedSize);
@@ -51,9 +55,10 @@ public class ConfigBean {
         seedSensorType();
         seedProductParameters(seedSize);
         seedSensors(seedSize);
+        seedPackages(packageSize, maxSensorsPerPackage);
         //seedMeasurements(seedSize);
         try {
-            logisticsOperatorBean.create(
+           logisticsOperatorBean.create(
                     "gatoMega",
                     "123",
                     "gatoMega",
@@ -79,19 +84,19 @@ public class ConfigBean {
         }
     }
 
-   /* private void seedMeasurements(int size) {
-        try {
-            for (int i = 0; i < size; i++) {
-                measurementBean.create(
-                        faker.number().randomDouble(2, 0, 100),
-                        i+1
-                );
-            }
-        } catch (Exception ex) {
-            logger.severe(ex.getMessage());
-        }
-    }
-*/
+    /* private void seedMeasurements(int size) {
+         try {
+             for (int i = 0; i < size; i++) {
+                 measurementBean.create(
+                         faker.number().randomDouble(2, 0, 100),
+                         i+1
+                 );
+             }
+         } catch (Exception ex) {
+             logger.severe(ex.getMessage());
+         }
+     }
+ */
     public void seedLogOperators(int size) {
         try {
             for (int i = 0; i < size; i++) {
@@ -235,5 +240,33 @@ public class ConfigBean {
             logger.severe(ex.getMessage());
         }
     }
-    //TODO: package
+
+    private void seedPackages(int size, int maxSensorsPerPackage) {
+        var sensors = sensorBean.getSensors();
+        var products = productBean.getProducts();
+        var packTypes = PackageType.values();
+        int packTypesLength = packTypes.length;
+        try {
+            for (int i = 0; i < size; i++) {
+                int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
+                var packType = packTypes[faker.number().numberBetween(0, packTypesLength)];
+
+                long packId = packageBean.create(
+                        faker.number().randomNumber(9, true),
+                        faker.commerce().material(),
+                        packType
+                );
+                for (int j = 0; j < numberOfSensors; j++) {
+                    packageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
+                    lastAssociatedSensorId++;
+                }
+                packageBean.addProductToPackage(packId, products.get(i).getId());
+
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+
+
 }
