@@ -9,6 +9,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,6 +81,13 @@ public class ConfigBean {
                     "gatoCliente@mail.pt",
                     "999999999",
                     "GatoLandia"
+            );
+            System.out.println("Measurements of sensor 2 \n" + measurementBean.getMeasurements(
+                    2L,
+                    null,
+                    null,
+                    null,
+                    null).toString()
             );
         }
         catch (Exception ex) {

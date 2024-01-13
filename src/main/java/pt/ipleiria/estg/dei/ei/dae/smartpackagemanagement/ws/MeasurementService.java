@@ -54,11 +54,15 @@ public class MeasurementService {
                            @QueryParam("endDate") String endDateStr,
                            @QueryParam("isActive") boolean isActive
     ) {
-        Instant startDate;
-        Instant endDate;
+        Instant startDate = null;
+        Instant endDate = null;
         try {
-            startDate = Instant.parse( startDateStr ) ;
-            endDate = Instant.parse( endDateStr ) ;
+            if(startDateStr != null) {
+                startDate = Instant.parse(startDateStr);
+            }
+            if(endDateStr != null) {
+                endDate = Instant.parse(endDateStr);
+            }
         } catch ( DateTimeParseException e ) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
         }

@@ -1,5 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
@@ -7,6 +9,7 @@ import java.util.Date;
 
 public class MeasurementDTO {
     private double measurement;
+    @Temporal(TemporalType.TIMESTAMP)
     private Instant timestamp;
     @NotBlank
     private long sensorId;

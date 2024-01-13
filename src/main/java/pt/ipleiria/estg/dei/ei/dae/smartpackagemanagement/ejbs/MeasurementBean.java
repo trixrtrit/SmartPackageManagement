@@ -81,7 +81,7 @@ public class MeasurementBean {
             predicates.add(builder.lessThanOrEqualTo(root.get("sensorPackage").get("addedAt"), endDate));
         }
 
-        if(isActive) {
+        if(isActive != null && isActive) {
             predicates.add(builder.isNull(root.get("sensorPackage").get("removedAt")));
         }
 
