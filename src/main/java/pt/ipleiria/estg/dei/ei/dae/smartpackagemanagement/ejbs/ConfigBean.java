@@ -5,6 +5,8 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import net.datafaker.Faker;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
@@ -47,6 +49,7 @@ public class ConfigBean {
         int seedSize = 100;
         int maxSensorsPerPackage = 4;
         int packageSize = seedSize/maxSensorsPerPackage;
+        int measurementSize = 20;
         System.out.println("Hello Java EE!");
         seedLogOperators(seedSize);
         seedManufacturers(seedSize);
@@ -56,7 +59,7 @@ public class ConfigBean {
         seedProductParameters(seedSize);
         seedSensors(seedSize);
         seedPackages(packageSize, maxSensorsPerPackage);
-        //seedMeasurements(seedSize);
+        seedMeasurements(measurementSize);
         try {
            logisticsOperatorBean.create(
                     "gatoMega",
@@ -84,19 +87,6 @@ public class ConfigBean {
         }
     }
 
-    /* private void seedMeasurements(int size) {
-         try {
-             for (int i = 0; i < size; i++) {
-                 measurementBean.create(
-                         faker.number().randomDouble(2, 0, 100),
-                         i+1
-                 );
-             }
-         } catch (Exception ex) {
-             logger.severe(ex.getMessage());
-         }
-     }
- */
     public void seedLogOperators(int size) {
         try {
             for (int i = 0; i < size; i++) {
@@ -267,6 +257,27 @@ public class ConfigBean {
             logger.severe(ex.getMessage());
         }
     }
+
+    private void seedMeasurements(int size) {
+        var packages = packageBean.getPackages();
+        //var activeSensors = packageBean.findPackageCurrentSensors();
+         try {
+             for (Package aPackage: packages) {
+                var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());
+                for(Sensor sensor: sensors) {
+                    for (int i = 0; i < 20; i++) {
+                        measurementBean.create(
+                                faker.number().randomDouble(3,0,100),
+                                aPackage.getCode(),
+                                sensor.getId()
+                        );
+                    }
+                }
+             }
+         } catch (Exception ex) {
+             logger.severe(ex.getMessage());
+         }
+     }
 
 
 }
