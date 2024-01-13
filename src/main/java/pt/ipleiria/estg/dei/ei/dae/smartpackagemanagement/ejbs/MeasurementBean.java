@@ -8,10 +8,13 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,7 +33,7 @@ public class MeasurementBean {
         }
         try {
             var measurementLine = new Measurement(measurement, sensorPackage);
-            measurementLine.setCreatedAt(new Date());
+            measurementLine.setTimestamp(Instant.now());
             entityManager.persist(measurementLine);
             return measurementLine.getId();
         } catch (ConstraintViolationException err) {
@@ -38,7 +41,7 @@ public class MeasurementBean {
         }
     }
 
-    public SensorPackage findSensorPackage(long packageCode, long sensorId){
+    private SensorPackage findSensorPackage(long packageCode, long sensorId){
         return entityManager.createQuery(
                         "SELECT sp FROM SensorPackage sp " +
                                 "WHERE sp.aPackage.code = :packageId AND sp.sensor.id = :sensorId " +
@@ -52,8 +55,8 @@ public class MeasurementBean {
     public List<Measurement> getMeasurements(
             Long sensorId,
             String packageCode,
-            Date startDate,
-            Date endDate,
+            Instant startDate,
+            Instant endDate,
             Boolean isActive
     ) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -90,5 +93,13 @@ public class MeasurementBean {
                 builder.asc(root.get("sensorPackage").get("addedAt")));
 
         return entityManager.createQuery(query).getResultList();
+    }
+
+    public Measurement find(long measurementId)  throws MyEntityNotFoundException {
+        Measurement measurement = entityManager.find(Measurement.class, measurementId);
+        if (measurement == null) {
+            throw new MyEntityNotFoundException("The measurement with the id: " + measurementId + " does not exist");
+        }
+        return measurement;
     }
 }

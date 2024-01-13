@@ -16,6 +16,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstrain
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -143,7 +144,7 @@ public class PackageBean {
         Sensor sensor = entityManager.find(Sensor.class, sensorId);
         if (sensor == null)
             throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");
-        SensorPackage sensorPackage = new SensorPackage(sensor, aPackage, new Date());
+        SensorPackage sensorPackage = new SensorPackage(sensor, aPackage, Instant.now());
         aPackage.getSensorPackageList().add(sensorPackage);
         sensor.getSensorPackageList().add(sensorPackage);
     }
@@ -160,6 +161,6 @@ public class PackageBean {
         SensorPackage sensorPackage = findSensorPackage(code, sensorId);
         aPackage.getSensorPackageList().remove(sensorPackage);
         sensor.getSensorPackageList().remove(sensorPackage);
-        sensorPackage.setRemovedAt(new Date());
+        sensorPackage.setRemovedAt(Instant.now());
     }
 }

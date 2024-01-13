@@ -3,8 +3,8 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -27,15 +27,15 @@ public class SensorPackage {
     private Package aPackage;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date addedAt;
+    private Instant addedAt;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date removedAt;
+    private Instant removedAt;
 
     public SensorPackage() {
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public SensorPackage(Sensor sensor, Package aPackage, Date addedAt) {
+    public SensorPackage(Sensor sensor, Package aPackage, Instant addedAt) {
         this.measurements = new ArrayList<Measurement>();
         this.sensor = sensor;
         this.aPackage = aPackage;
@@ -66,19 +66,19 @@ public class SensorPackage {
         this.aPackage = aPackage;
     }
 
-    public Date getAddedAt() {
+    public Instant getAddedAt() {
         return addedAt;
     }
 
-    public void setAddedAt(Date addedAt) {
+    public void setAddedAt(Instant addedAt) {
         this.addedAt = addedAt;
     }
 
-    public Date getRemovedAt() {
+    public Instant getRemovedAt() {
         return removedAt;
     }
 
-    public void setRemovedAt(Date removedAt) {
+    public void setRemovedAt(Instant removedAt) {
         this.removedAt = removedAt;
     }
 
