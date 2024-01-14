@@ -92,7 +92,6 @@ public class PackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
     public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
-        System.out.println("hihihihih");
         Package aPackage = packageBean.getPackageMeasurements(code);
         if (aPackage != null) {
             var dtos = SensorPackageAssembler.fromWithMeasurements(aPackage.getSensorPackageList());

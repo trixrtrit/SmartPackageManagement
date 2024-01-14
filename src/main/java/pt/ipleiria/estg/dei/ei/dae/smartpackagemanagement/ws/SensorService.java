@@ -8,10 +8,13 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.MeasurementAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.SensorBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -45,6 +48,36 @@ public class SensorService {
 
         if (sensor != null) {
             return Response.ok(SensorAssembler.from(sensor)).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND)
+                .entity("ERROR_FINDING_SENSOR")
+                .build();
+    }
+
+    @GET
+    @Path("{id}/measurements")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getSensorMeasurements(@PathParam("id") long id) throws MyEntityNotFoundException {
+        Sensor sensor = sensorBean.getSensorMeasurements(id);
+        if (sensor != null) {
+            var dtos = SensorPackageAssembler.fromWithMeasurements(sensor.getSensorPackageList());
+            return Response.ok(dtos).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND)
+                .entity("ERROR_FINDING_SENSOR")
+                .build();
+    }
+
+    @GET
+    @Path("{id}/packages")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getSensorPackages(@PathParam("id") long id) throws MyEntityNotFoundException {
+        Sensor sensor = sensorBean.getSensorPackages(id);
+        if (sensor != null) {
+            var dtos = SensorPackageAssembler.fromWithPackages(sensor.getSensorPackageList());
+            return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_SENSOR")

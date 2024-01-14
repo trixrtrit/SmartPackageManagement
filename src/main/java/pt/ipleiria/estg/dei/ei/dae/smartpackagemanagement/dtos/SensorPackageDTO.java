@@ -8,6 +8,7 @@ import java.util.List;
 public class SensorPackageDTO implements Serializable {
 
     private long id;
+    private PackageDTO aPackage;
     private SensorDTO sensor;
     private Instant addedAt;
     private Instant removedAt;
@@ -18,6 +19,13 @@ public class SensorPackageDTO implements Serializable {
     public SensorPackageDTO(long id, SensorDTO sensor, Instant addedAt, Instant removedAt) {
         this.id = id;
         this.sensor = sensor;
+        this.addedAt = addedAt;
+        this.removedAt = removedAt;
+    }
+
+    public SensorPackageDTO(long id, PackageDTO aPackage, Instant addedAt, Instant removedAt) {
+        this.id = id;
+        this.aPackage = aPackage;
         this.addedAt = addedAt;
         this.removedAt = removedAt;
     }
@@ -52,5 +60,13 @@ public class SensorPackageDTO implements Serializable {
 
     public void setRemovedAt(Instant removedAt) {
         this.removedAt = removedAt;
+    }
+
+    public PackageDTO getaPackage() {
+        return aPackage;
+    }
+
+    public void setaPackage(PackageDTO aPackage) {
+        this.aPackage = aPackage;
     }
 }
