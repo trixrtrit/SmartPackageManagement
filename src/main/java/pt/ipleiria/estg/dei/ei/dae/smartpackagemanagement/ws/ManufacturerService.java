@@ -7,17 +7,17 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ManufacturerAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ManufacturerBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("manufacturers")
 @Produces({MediaType.APPLICATION_JSON})
@@ -29,54 +29,11 @@ public class ManufacturerService {
     @Context
     private SecurityContext securityContext;
 
-    private ManufacturerDTO toDTO(Manufacturer manufacturer) {
-        return new ManufacturerDTO(
-                manufacturer.getUsername(),
-                manufacturer.getPassword(),
-                manufacturer.getEmail(),
-                manufacturer.getName(),
-                productsToDTOs(manufacturer.getProducts())
-        );
-    }
-
-    private ManufacturerDTO toDTOnoProducts(Manufacturer manufacturer) {
-        return new ManufacturerDTO(
-                manufacturer.getUsername(),
-                manufacturer.getPassword(),
-                manufacturer.getEmail(),
-                manufacturer.getName()
-        );
-    }
-
-    private ProductDTO productToDTO(Product product) {
-        return new ProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.isActive(),
-                product.getManufacturer().getUsername(),
-                product.getProductReference()
-        );
-    }
-
-    private List<ManufacturerDTO> toDTOs(List<Manufacturer> manufacturers) {
-        return manufacturers.stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
-    private List<ManufacturerDTO> toDTOsNoProducts(List<Manufacturer> manufacturers) {
-        return manufacturers.stream().map(this::toDTOnoProducts).collect(Collectors.toList());
-    }
-
-    private List<ProductDTO> productsToDTOs(List<Product> products) {
-        return products.stream().map(this::productToDTO).collect(Collectors.toList());
-    }
-
     @GET
     @Path("/all")
     @RolesAllowed({"LogisticsOperator"})
     public List<ManufacturerDTO> getAll() {
-        return toDTOsNoProducts(manufacturerBean.getManufacturers());
+        return ManufacturerAssembler.from(manufacturerBean.getManufacturers());
     }
 
     @GET
@@ -94,7 +51,7 @@ public class ManufacturerService {
         Manufacturer manufacturer = manufacturerBean.find(username);
 
         if (manufacturer != null) {
-            return Response.ok(toDTO(manufacturer)).build();
+            return Response.ok(ManufacturerAssembler.fromWithProducts(manufacturer)).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_MANUFACTURER")
@@ -113,7 +70,7 @@ public class ManufacturerService {
 
         Manufacturer manufacturer = manufacturerBean.getManufacturerProducts(username);
         if (manufacturer != null) {
-            var dtos = productsToDTOs(manufacturer.getProducts());
+            var dtos = ProductAssembler.from(manufacturer.getProducts());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -133,7 +90,7 @@ public class ManufacturerService {
                 manufacturerDTO.getEmail()
         );
         var manufacturer = manufacturerBean.find(manufacturerDTO.getUsername());
-        return Response.status(Response.Status.CREATED).entity(toDTOnoProducts(manufacturer)).build();
+        return Response.status(Response.Status.CREATED).entity(ManufacturerAssembler.from(manufacturer)).build();
     }
 
     @PUT
@@ -153,7 +110,7 @@ public class ManufacturerService {
                 manufacturerDTO.getEmail()
         );
         var manufacturer = manufacturerBean.find(username);
-        return Response.ok(toDTOnoProducts(manufacturer)).build();
+        return Response.ok(ManufacturerAssembler.from(manufacturer)).build();
     }
 
     @DELETE
@@ -167,6 +124,6 @@ public class ManufacturerService {
         }
 
         Manufacturer manufacturer = manufacturerBean.delete(username);
-        return Response.status(Response.Status.OK).entity(toDTO(manufacturer)).build();
+        return Response.status(Response.Status.OK).entity(ManufacturerAssembler.from(manufacturer)).build();
     }
 }
