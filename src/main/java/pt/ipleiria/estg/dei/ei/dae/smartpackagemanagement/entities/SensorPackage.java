@@ -9,6 +9,19 @@ import java.util.List;
 
 @Entity
 @Table(name = "sensor_package")
+@NamedQueries({
+        @NamedQuery(
+                name = "sensorPackageExists",
+                query = "SELECT COUNT(sp.id) FROM SensorPackage sp " +
+                        "WHERE sp.sensor.id = :sensorId AND sp.removedAt IS NULL"
+        ),
+        @NamedQuery(
+                name = "findSensorPackage",
+                query = "SELECT sp FROM SensorPackage sp " +
+                        "WHERE sp.aPackage.code = :packageCode AND sp.sensor.id = :sensorId " +
+                        "AND sp.removedAt IS NULL"
+        ),
+})
 public class SensorPackage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

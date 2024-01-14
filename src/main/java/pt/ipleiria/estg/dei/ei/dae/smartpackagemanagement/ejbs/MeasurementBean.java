@@ -42,12 +42,10 @@ public class MeasurementBean {
     }
 
     private SensorPackage findSensorPackage(long packageCode, long sensorId){
-        return entityManager.createQuery(
-                        "SELECT sp FROM SensorPackage sp " +
-                                "WHERE sp.aPackage.code = :packageId AND sp.sensor.id = :sensorId " +
-                                "AND sp.removedAt IS NULL",
+        return entityManager.createNamedQuery(
+                        "findSensorPackage",
                         SensorPackage.class)
-                .setParameter("packageId", packageCode)
+                .setParameter("packageCode", packageCode)
                 .setParameter("sensorId", sensorId)
                 .getSingleResult();
     }

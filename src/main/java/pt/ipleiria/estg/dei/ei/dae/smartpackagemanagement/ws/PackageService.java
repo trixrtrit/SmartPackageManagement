@@ -15,6 +15,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageProductAssociationViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
@@ -180,7 +181,7 @@ public class PackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response addProduct(@PathParam("code") long code, ProductDTO product)
-            throws MyEntityNotFoundException, MyConstraintViolationException {
+            throws MyEntityNotFoundException, MyPackageProductAssociationViolationException {
 
         packageBean.addProductToPackage(
                 code,
