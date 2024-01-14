@@ -105,6 +105,7 @@ public class PackageBean {
 
     public Package delete(long code) throws MyEntityNotFoundException {
         Package aPackage = this.find(code);
+        aPackage.setActive(false);
         entityManager.remove(aPackage);
         return aPackage;
     }
@@ -167,5 +168,11 @@ public class PackageBean {
         aPackage.getSensorPackageList().remove(sensorPackage);
         sensor.getSensorPackageList().remove(sensorPackage);
         sensorPackage.setRemovedAt(Instant.now());
+    }
+
+    public void changeActiveStatus(long id) throws MyEntityNotFoundException{
+        Package aPackage = this.find(id);
+        entityManager.lock(aPackage, LockModeType.OPTIMISTIC);
+        aPackage.setActive(!aPackage.isActive());
     }
 }

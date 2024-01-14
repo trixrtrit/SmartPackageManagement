@@ -11,28 +11,30 @@ public class PackageDTO {
     private PackageType packageType;
     private List<ProductDTO> products;
     private List<SensorDTO> sensors;
+    private boolean isActive;
 
     public PackageDTO() {
         this.products = new ArrayList<>();
         this.sensors = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, PackageType packageType) {
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive) {
         this.code = code;
         this.material = material;
         this.packageType = packageType;
         this.products = new ArrayList<>();
         this.sensors = new ArrayList<>();
+        this.isActive = isActive;
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, List<ProductDTO> products) {
-        this(code, material, packageType);
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<ProductDTO> products) {
+        this(code, material, packageType, isActive);
         this.products = products;
         this.sensors = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, List<SensorDTO> sensors, boolean hasSensors) {
-        this(code, material, packageType);
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorDTO> sensors, boolean hasSensors) {
+        this(code, material, packageType, isActive);
         this.products = new ArrayList<>();
         this.sensors = sensors;
     }
@@ -75,5 +77,13 @@ public class PackageDTO {
 
     public void setSensors(List<SensorDTO> sensors) {
         this.sensors = sensors;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

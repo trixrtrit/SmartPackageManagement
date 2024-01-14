@@ -259,7 +259,6 @@ public class ConfigBean {
                     lastAssociatedSensorId++;
                 }
                 packageBean.addProductToPackage(packId, products.get(i).getId());
-
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
@@ -268,7 +267,6 @@ public class ConfigBean {
 
     private void seedMeasurements(int size) {
         var packages = packageBean.getPackages();
-        //var activeSensors = packageBean.findPackageCurrentSensors();
          try {
              for (Package aPackage: packages) {
                 var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());

@@ -3,8 +3,10 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ws;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
@@ -12,6 +14,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -28,12 +31,16 @@ public class PackageService {
     @EJB
     private PackageBean packageBean;
 
+    @Context
+    private SecurityContext securityContext;
+
     //TODO: adicionar DTO de orderItems
     private PackageDTO toDTO(Package aPackage) {
         return new PackageDTO(
                 aPackage.getCode(),
                 aPackage.getMaterial(),
-                aPackage.getPackageType()
+                aPackage.getPackageType(),
+                aPackage.isActive()
         );
     }
 
@@ -46,6 +53,7 @@ public class PackageService {
                 aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
+                aPackage.isActive(),
                 productsToDTOs(aPackage.getProducts())
         );
     }
@@ -76,6 +84,7 @@ public class PackageService {
                 aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
+                aPackage.isActive(),
                 sensorsToDTOs(packageBean.findPackageCurrentSensors(aPackage.getCode())),
                 true
         );
@@ -243,5 +252,36 @@ public class PackageService {
     public Response delete(@PathParam("code") long code) throws MyEntityNotFoundException{
         Package aPackage = packageBean.delete(code);
         return Response.status(Response.Status.OK).entity(toDTO(aPackage)).build();
+    }
+
+    @PUT
+    @Path("{code}/active-status")
+    @Authenticated
+    @RolesAllowed({"Manufacturer", "LogisticsOperator"})
+    public Response changeActiveStatus(@PathParam("code") long code)
+            throws MyEntityNotFoundException {
+        var aPackage = packageBean.find(code);
+        if(aPackage == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("ERROR_FINDING_PACKAGE")
+                    .build();
+        }
+
+        boolean unauthorizedTertiary = aPackage.getPackageType() == PackageType.TERTIARY && !isRoleAuthorizedTertiary();
+        boolean unauthorizedNonTertiary = (aPackage.getPackageType() == PackageType.PRIMARY ||
+                aPackage.getPackageType() == PackageType.SECONDARY) && isRoleAuthorizedTertiary();
+
+        if(unauthorizedTertiary || unauthorizedNonTertiary){
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("UNAUTHORIZED")
+                    .build();
+        }
+
+        packageBean.changeActiveStatus(code);
+        return Response.ok(toDTO(aPackage)).build();
+    }
+
+    private boolean isRoleAuthorizedTertiary () {
+        return securityContext.isUserInRole("LogisticsOperator");
     }
 }

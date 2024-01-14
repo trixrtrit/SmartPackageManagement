@@ -20,7 +20,7 @@ import java.util.List;
                 query = "SELECT COUNT(p.code) FROM Package p WHERE p.code = :code"
         )
 })
-@SQLDelete(sql="UPDATE packages SET deleted = TRUE, isactive = FALSE WHERE code = ? AND deleted = ?::boolean")
+@SQLDelete(sql="UPDATE packages SET deleted = TRUE WHERE code = ? AND deleted = ?::boolean")
 @Where(clause = "deleted IS FALSE")
 public class Package extends Versionable{
     @Id
@@ -33,6 +33,7 @@ public class Package extends Versionable{
     @ManyToMany(mappedBy = "packages")
     private List<Product> products;
     private boolean deleted;
+    private boolean isActive = true;
 
     public Package() {
         this.sensorPackageList = new ArrayList<>();
@@ -109,5 +110,13 @@ public class Package extends Versionable{
     }
     public void removeProduct(Product product) {
         products.remove(product);
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }
