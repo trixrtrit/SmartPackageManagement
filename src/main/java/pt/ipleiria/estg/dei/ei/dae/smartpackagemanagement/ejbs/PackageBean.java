@@ -149,6 +149,7 @@ public class PackageBean {
         SensorPackage sensorPackage = new SensorPackage(sensor, aPackage, Instant.now());
         aPackage.getSensorPackageList().add(sensorPackage);
         sensor.getSensorPackageList().add(sensorPackage);
+        sensor.setAvailable(false);
         entityManager.persist(sensorPackage);
     }
 
@@ -167,6 +168,7 @@ public class PackageBean {
         SensorPackage sensorPackage = findSensorPackage(code, sensorId);
         aPackage.getSensorPackageList().remove(sensorPackage);
         sensor.getSensorPackageList().remove(sensorPackage);
+        sensor.setAvailable(true);
         sensorPackage.setRemovedAt(Instant.now());
     }
 

@@ -84,6 +84,7 @@ public class SensorBean {
 
     public Sensor delete(long id) throws MyEntityNotFoundException {
         Sensor sensor = this.find(id);
+        sensor.setAvailable(false);
         entityManager.remove(sensor);
         return sensor;
     }

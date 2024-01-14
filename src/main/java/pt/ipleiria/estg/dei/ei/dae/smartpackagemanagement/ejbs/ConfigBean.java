@@ -250,6 +250,7 @@ public class ConfigBean {
                     packageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
                     lastAssociatedSensorId++;
                 }
+                packageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
                 packageBean.addProductToPackage(packId, products.get(i).getId());
             }
         } catch (Exception ex) {
