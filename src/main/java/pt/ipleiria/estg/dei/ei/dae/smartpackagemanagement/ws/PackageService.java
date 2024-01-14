@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
@@ -40,30 +41,13 @@ public class PackageService {
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
                 aPackage.isActive(),
-                productsToDTOs(aPackage.getProducts())
+                ProductAssembler.from(aPackage.getProducts())
         );
     }
 
     private List<PackageDTO> toDTOsProducts(List<Package> aPackages) {
         return aPackages.stream().map(this::toDTOProducts).collect(Collectors.toList());
     }
-
-    private ProductDTO productToDTO(Product product) {
-        return new ProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.isActive(),
-                product.getManufacturer().getUsername(),
-                product.getProductReference()
-        );
-    }
-
-    private List<ProductDTO> productsToDTOs(List<Product> products) {
-        return products.stream().map(this::productToDTO).collect(Collectors.toList());
-    }
-
 
     private PackageDTO toDTOSensors(Package aPackage) {
         return new PackageDTO(
@@ -132,7 +116,7 @@ public class PackageService {
     public Response getPackageProducts(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageProducts(code);
         if (aPackage != null) {
-            var dtos = productsToDTOs(aPackage.getProducts());
+            var dtos = ProductAssembler.from(aPackage.getProducts());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
