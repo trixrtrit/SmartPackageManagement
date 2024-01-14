@@ -24,7 +24,7 @@ public class MeasurementBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public long create(double measurement, long packageCode, long sensorId)
+    public long create(String measurement, long packageCode, long sensorId)
             throws MyConstraintViolationException, MyEntityNotFoundException {
         SensorPackage sensorPackage = findSensorPackage(packageCode, sensorId);
         if (sensorPackage == null){
@@ -63,27 +63,7 @@ public class MeasurementBean {
         CriteriaQuery<Measurement> query = builder.createQuery(Measurement.class);
         Root<Measurement> root = query.from(Measurement.class);
 
-        List<Predicate> predicates = new ArrayList<>();
-
-        if (sensorId != null) {
-            predicates.add(builder.equal(root.get("sensorPackage").get("sensor").get("id"), sensorId));
-        }
-
-        if (packageCode != null) {
-            predicates.add(builder.equal(root.get("sensorPackage").get("aPackage").get("code"), packageCode));
-        }
-
-        if (startDate != null && endDate != null) {
-            predicates.add(builder.between(root.get("sensorPackage").get("addedAt"), startDate, endDate));
-        } else if (startDate != null) {
-            predicates.add(builder.greaterThanOrEqualTo(root.get("sensorPackage").get("addedAt"), startDate));
-        } else if (endDate != null) {
-            predicates.add(builder.lessThanOrEqualTo(root.get("sensorPackage").get("addedAt"), endDate));
-        }
-
-        if(isActive != null && isActive) {
-            predicates.add(builder.isNull(root.get("sensorPackage").get("removedAt")));
-        }
+        List<Predicate> predicates = getPredicates(sensorId, packageCode, startDate, endDate, isActive, builder, root);
 
         query.where(builder.and(predicates.toArray(new Predicate[0])));
 
@@ -108,6 +88,23 @@ public class MeasurementBean {
         CriteriaQuery<Long> query = builder.createQuery(Long.class);
         Root<Measurement> root = query.from(Measurement.class);
 
+        List<Predicate> predicates = getPredicates(sensorId, packageCode, startDate, endDate, isActive, builder, root);
+
+        query.select(builder.count(root));
+        query.where(builder.and(predicates.toArray(new Predicate[0])));
+
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    public Measurement find(long measurementId)  throws MyEntityNotFoundException {
+        Measurement measurement = entityManager.find(Measurement.class, measurementId);
+        if (measurement == null) {
+            throw new MyEntityNotFoundException("The measurement with the id: " + measurementId + " does not exist");
+        }
+        return measurement;
+    }
+
+    private static List<Predicate> getPredicates(Long sensorId, String packageCode, Instant startDate, Instant endDate, Boolean isActive, CriteriaBuilder builder, Root<Measurement> root) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (sensorId != null) {
@@ -129,18 +126,6 @@ public class MeasurementBean {
         if(isActive != null && isActive) {
             predicates.add(builder.isNull(root.get("sensorPackage").get("removedAt")));
         }
-
-        query.select(builder.count(root));
-        query.where(builder.and(predicates.toArray(new Predicate[0])));
-
-        return entityManager.createQuery(query).getSingleResult();
-    }
-
-    public Measurement find(long measurementId)  throws MyEntityNotFoundException {
-        Measurement measurement = entityManager.find(Measurement.class, measurementId);
-        if (measurement == null) {
-            throw new MyEntityNotFoundException("The measurement with the id: " + measurementId + " does not exist");
-        }
-        return measurement;
+        return predicates;
     }
 }

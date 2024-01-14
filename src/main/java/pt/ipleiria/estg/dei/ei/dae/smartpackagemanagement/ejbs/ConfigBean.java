@@ -266,7 +266,7 @@ public class ConfigBean {
                 for(Sensor sensor: sensors) {
                     for (int i = 0; i < 20; i++) {
                         measurementBean.create(
-                                faker.number().randomDouble(3,0,100),
+                                Double.toString(faker.number().randomDouble(3,0,100)),
                                 aPackage.getCode(),
                                 sensor.getId()
                         );
