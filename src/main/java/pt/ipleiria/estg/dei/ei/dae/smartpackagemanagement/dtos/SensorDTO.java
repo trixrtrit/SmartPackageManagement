@@ -12,18 +12,18 @@ public class SensorDTO implements Serializable {
     private String name;
     private List<MeasurementDTO> measurements;
     private List<PackageDTO> packages;
-    private Long sensorTypeId;
+    private SensorTypeDTO sensorType;
 
     public SensorDTO() {
         this.measurements = new ArrayList<MeasurementDTO>();
     }
 
-    public SensorDTO(Long id, String name, Long sensorTypeId) {
+    public SensorDTO(Long id, String name, SensorTypeDTO sensorType) {
         this.id = id;
         this.name = name;
-        this.sensorTypeId = sensorTypeId;
         this.measurements = new ArrayList<MeasurementDTO>();
         this.packages = new ArrayList<>();
+        this.sensorType = sensorType;
     }
 
     public Long getId() {
@@ -58,11 +58,11 @@ public class SensorDTO implements Serializable {
         this.packages = packages;
     }
 
-    public Long getSensorTypeId() {
-        return sensorTypeId;
+    public SensorTypeDTO getSensorType() {
+        return sensorType;
     }
 
-    public void setSensorTypeId(Long sensorTypeId) {
-        this.sensorTypeId = sensorTypeId;
+    public void setSensorType(SensorTypeDTO sensorType) {
+        this.sensorType = sensorType;
     }
 }

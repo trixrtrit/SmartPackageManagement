@@ -18,7 +18,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNot
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageProductAssociationViolationException;
 
 import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 
 @Stateless
@@ -59,7 +58,8 @@ public class PackageBean {
         }
         Package aPackage = entityManager.find(Package.class, code);
         //find from pivot object
-        Hibernate.initialize(findPackageCurrentSensors(aPackage.getCode()));
+        //Hibernate.initialize(findPackageCurrentSensors(aPackage.getCode()));
+        Hibernate.initialize(aPackage.getSensorPackageList());
         return aPackage;
     }
 
@@ -166,10 +166,10 @@ public class PackageBean {
             throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");
         //get pivot object update time
         SensorPackage sensorPackage = findSensorPackage(code, sensorId);
+        sensorPackage.setRemovedAt(Instant.now());
         aPackage.getSensorPackageList().remove(sensorPackage);
         sensor.getSensorPackageList().remove(sensorPackage);
         sensor.setAvailable(true);
-        sensorPackage.setRemovedAt(Instant.now());
     }
 
     public void changeActiveStatus(long id) throws MyEntityNotFoundException{

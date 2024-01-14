@@ -10,10 +10,12 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -90,16 +92,28 @@ public class PackageService {
         );
     }
 
-  private List<PackageDTO> toDTOsSensors(List<Package> aPackages) {
+    private List<PackageDTO> toDTOsSensors(List<Package> aPackages) {
         return aPackages.stream().map(this::toDTOSensors).collect(Collectors.toList());
     }
 
-   private SensorDTO sensorToDTO(Sensor sensor) {
-        return new SensorDTO();
+    private SensorDTO sensorToDTO(Sensor sensor) {
+        return new SensorDTO(
+                sensor.getId(),
+                sensor.getName(),
+                sensorTypeToDTO(sensor.getSensorType())
+        );
     }
 
     private List<SensorDTO> sensorsToDTOs(List<Sensor> sensors) {
         return sensors.stream().map(this::sensorToDTO).collect(Collectors.toList());
+    }
+
+    private SensorTypeDTO sensorTypeToDTO(SensorType sensorType) {
+        return new SensorTypeDTO(
+                sensorType.getId(),
+                sensorType.getName(),
+                sensorType.getMeasurementUnit()
+        );
     }
 
     @GET
@@ -129,7 +143,7 @@ public class PackageService {
     @Path("{code}/products")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getPackageProducts(@PathParam("code") long code) throws MyEntityNotFoundException{
+    public Response getPackageProducts(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageProducts(code);
         if (aPackage != null) {
             var dtos = productsToDTOs(aPackage.getProducts());
@@ -144,10 +158,10 @@ public class PackageService {
     @Path("{code}/sensors")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException{
+    public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageSensors(code);
         if (aPackage != null) {
-            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(aPackage.getCode()));
+            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(code));
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -249,7 +263,7 @@ public class PackageService {
     @Path("{code}")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response delete(@PathParam("code") long code) throws MyEntityNotFoundException{
+    public Response delete(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.delete(code);
         return Response.status(Response.Status.OK).entity(toDTO(aPackage)).build();
     }
@@ -261,7 +275,7 @@ public class PackageService {
     public Response changeActiveStatus(@PathParam("code") long code)
             throws MyEntityNotFoundException {
         var aPackage = packageBean.find(code);
-        if(aPackage == null) {
+        if (aPackage == null) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity("ERROR_FINDING_PACKAGE")
                     .build();
@@ -271,7 +285,7 @@ public class PackageService {
         boolean unauthorizedNonTertiary = (aPackage.getPackageType() == PackageType.PRIMARY ||
                 aPackage.getPackageType() == PackageType.SECONDARY) && isRoleAuthorizedTertiary();
 
-        if(unauthorizedTertiary || unauthorizedNonTertiary){
+        if (unauthorizedTertiary || unauthorizedNonTertiary) {
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("UNAUTHORIZED")
                     .build();
@@ -281,7 +295,7 @@ public class PackageService {
         return Response.ok(toDTO(aPackage)).build();
     }
 
-    private boolean isRoleAuthorizedTertiary () {
+    private boolean isRoleAuthorizedTertiary() {
         return securityContext.isUserInRole("LogisticsOperator");
     }
 }
