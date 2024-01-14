@@ -55,7 +55,9 @@ public class MeasurementBean {
             String packageCode,
             Instant startDate,
             Instant endDate,
-            Boolean isActive
+            Boolean isActive,
+            int pageNumber,
+            int pageSize
     ) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<Measurement> query = builder.createQuery(Measurement.class);
@@ -90,7 +92,48 @@ public class MeasurementBean {
                 builder.asc(root.get("sensorPackage").get("aPackage").get("code")),
                 builder.asc(root.get("sensorPackage").get("addedAt")));
 
-        return entityManager.createQuery(query).getResultList();
+        return entityManager.createQuery(query).
+                setFirstResult((pageNumber - 1) * pageSize).
+                setMaxResults(pageSize).getResultList();
+    }
+
+    public long getMeasurementsCount(
+            Long sensorId,
+            String packageCode,
+            Instant startDate,
+            Instant endDate,
+            Boolean isActive
+    ) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<Measurement> root = query.from(Measurement.class);
+
+        List<Predicate> predicates = new ArrayList<>();
+
+        if (sensorId != null) {
+            predicates.add(builder.equal(root.get("sensorPackage").get("sensor").get("id"), sensorId));
+        }
+
+        if (packageCode != null) {
+            predicates.add(builder.equal(root.get("sensorPackage").get("aPackage").get("code"), packageCode));
+        }
+
+        if (startDate != null && endDate != null) {
+            predicates.add(builder.between(root.get("sensorPackage").get("addedAt"), startDate, endDate));
+        } else if (startDate != null) {
+            predicates.add(builder.greaterThanOrEqualTo(root.get("sensorPackage").get("addedAt"), startDate));
+        } else if (endDate != null) {
+            predicates.add(builder.lessThanOrEqualTo(root.get("sensorPackage").get("addedAt"), endDate));
+        }
+
+        if(isActive != null && isActive) {
+            predicates.add(builder.isNull(root.get("sensorPackage").get("removedAt")));
+        }
+
+        query.select(builder.count(root));
+        query.where(builder.and(predicates.toArray(new Predicate[0])));
+
+        return entityManager.createQuery(query).getSingleResult();
     }
 
     public Measurement find(long measurementId)  throws MyEntityNotFoundException {

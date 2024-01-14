@@ -78,7 +78,8 @@ public class ProductService {
         return new PackageDTO(
                 aPackage.getCode(),
                 aPackage.getMaterial(),
-                aPackage.getPackageType()
+                aPackage.getPackageType(),
+                aPackage.isActive()
         );
     }
 

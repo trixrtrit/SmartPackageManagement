@@ -82,13 +82,6 @@ public class ConfigBean {
                     "999999999",
                     "GatoLandia"
             );
-            System.out.println("Measurements of sensor 2 \n" + measurementBean.getMeasurements(
-                    2L,
-                    null,
-                    null,
-                    null,
-                    null).toString()
-            );
         }
         catch (Exception ex) {
             logger.severe(ex.getMessage());

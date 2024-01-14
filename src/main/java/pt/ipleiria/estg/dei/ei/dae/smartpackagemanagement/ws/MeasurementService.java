@@ -13,6 +13,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Measurement;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.time.Instant;
@@ -52,7 +54,9 @@ public class MeasurementService {
                            @QueryParam("packageCode") String packageCode,
                            @QueryParam("startDate") String startDateStr,
                            @QueryParam("endDate") String endDateStr,
-                           @QueryParam("isActive") boolean isActive
+                           @QueryParam("isActive") boolean isActive,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) {
         Instant startDate = null;
         Instant endDate = null;
@@ -66,8 +70,20 @@ public class MeasurementService {
         } catch ( DateTimeParseException e ) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
         }
-        var dtos = toDTOs(measurementBean.getMeasurements(sensorId, packageCode, startDate, endDate, isActive));
-        return Response.ok(dtos).build();
+        var dtos = toDTOs(measurementBean.getMeasurements(
+                sensorId,
+                packageCode,
+                startDate,
+                endDate,
+                isActive,
+                page,
+                pageSize)
+        );
+        long totalItems = measurementBean.getMeasurementsCount(sensorId, packageCode, startDate, endDate, isActive);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<MeasurementDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @POST
