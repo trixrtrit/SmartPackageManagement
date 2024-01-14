@@ -9,7 +9,6 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
@@ -22,7 +21,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackagePr
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("packages")
 @Produces({MediaType.APPLICATION_JSON})
@@ -88,10 +86,11 @@ public class PackageService {
                 .build();
     }
 
+    //TODO: validar de quem e o pkg para verem as mediçoes
     @GET
     @Path("{code}/measurements")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
     public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
         System.out.println("hihihihih");
         Package aPackage = packageBean.getPackageMeasurements(code);
