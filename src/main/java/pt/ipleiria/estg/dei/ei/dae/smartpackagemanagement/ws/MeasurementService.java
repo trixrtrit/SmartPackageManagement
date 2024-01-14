@@ -7,9 +7,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.MeasurementAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.MeasurementDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.MeasurementBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Measurement;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -19,8 +19,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("measurements")
 @Produces({MediaType.APPLICATION_JSON})
@@ -31,20 +29,6 @@ public class MeasurementService {
 
     @Context
     private SecurityContext securityContext;
-
-    private MeasurementDTO toDTO (Measurement measurement){
-        return new MeasurementDTO(
-                measurement.getMeasurement(),
-                measurement.getTimestamp(),
-                measurement.getSensorPackage().getSensor().getId(),
-                measurement.getSensorPackage().getaPackage().getCode()
-        );
-    }
-
-
-        private List<MeasurementDTO> toDTOs(List<Measurement> measurements) {
-            return measurements.stream().map(this::toDTO).collect(Collectors.toList());
-        }
 
     @GET
     @Path("/all")
@@ -70,7 +54,7 @@ public class MeasurementService {
         } catch ( DateTimeParseException e ) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
         }
-        var dtos = toDTOs(measurementBean.getMeasurements(
+        var dtos = MeasurementAssembler.from(measurementBean.getMeasurements(
                 sensorId,
                 packageCode,
                 startDate,
@@ -96,6 +80,6 @@ public class MeasurementService {
                 measurementDTO.getSensorId()
         );
         var measurement = measurementBean.find(measurementId);
-        return Response.status(Response.Status.CREATED).entity(toDTO(measurement)).build();
+        return Response.status(Response.Status.CREATED).entity(MeasurementAssembler.from(measurement)).build();
     }
 }
