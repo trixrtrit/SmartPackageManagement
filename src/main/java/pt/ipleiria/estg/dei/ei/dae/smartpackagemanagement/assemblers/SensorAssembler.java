@@ -12,6 +12,7 @@ public class SensorAssembler {
         return new SensorDTO(
                 sensor.getId(),
                 sensor.getName(),
+                sensor.isAvailable(),
                 SensorTypeAssembler.from(sensor.getSensorType())
         );
     }

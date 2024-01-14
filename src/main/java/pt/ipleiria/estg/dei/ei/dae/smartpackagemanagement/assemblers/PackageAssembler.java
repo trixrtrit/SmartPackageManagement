@@ -20,4 +20,20 @@ public class PackageAssembler {
     public static List<PackageDTO> from(List<Package> aPackages) {
         return aPackages.stream().map(PackageAssembler::from).collect(Collectors.toList());
     }
+
+    public static PackageDTO fromWithProducts(Package aPackage) {
+        return new PackageDTO(
+                aPackage.getCode(),
+                aPackage.getMaterial(),
+                aPackage.getPackageType(),
+                aPackage.isActive(),
+                ProductAssembler.from(aPackage.getProducts())
+        );
+    }
+
+    public static List<PackageDTO> fromWithProducts(List<Package> aPackages) {
+        return aPackages.stream().map(PackageAssembler::fromWithProducts).collect(Collectors.toList());
+    }
+
+
 }

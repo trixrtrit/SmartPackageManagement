@@ -9,9 +9,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -35,53 +35,19 @@ public class PackageService {
 
     //TODO: adicionar DTO de orderItems
 
-    private PackageDTO toDTOProducts(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getCode(),
-                aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive(),
-                ProductAssembler.from(aPackage.getProducts())
-        );
-    }
-
-    private List<PackageDTO> toDTOsProducts(List<Package> aPackages) {
-        return aPackages.stream().map(this::toDTOProducts).collect(Collectors.toList());
-    }
-
     private PackageDTO toDTOSensors(Package aPackage) {
         return new PackageDTO(
                 aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.getPackageType(),
                 aPackage.isActive(),
-                sensorsToDTOs(packageBean.findPackageCurrentSensors(aPackage.getCode())),
+                SensorAssembler.from(packageBean.findPackageCurrentSensors(aPackage.getCode())),
                 true
         );
     }
 
     private List<PackageDTO> toDTOsSensors(List<Package> aPackages) {
         return aPackages.stream().map(this::toDTOSensors).collect(Collectors.toList());
-    }
-
-    private SensorDTO sensorToDTO(Sensor sensor) {
-        return new SensorDTO(
-                sensor.getId(),
-                sensor.getName(),
-                sensorTypeToDTO(sensor.getSensorType())
-        );
-    }
-
-    private List<SensorDTO> sensorsToDTOs(List<Sensor> sensors) {
-        return sensors.stream().map(this::sensorToDTO).collect(Collectors.toList());
-    }
-
-    private SensorTypeDTO sensorTypeToDTO(SensorType sensorType) {
-        return new SensorTypeDTO(
-                sensorType.getId(),
-                sensorType.getName(),
-                sensorType.getMeasurementUnit()
-        );
     }
 
     @GET
@@ -129,7 +95,7 @@ public class PackageService {
     public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageSensors(code);
         if (aPackage != null) {
-            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(code));
+            var dtos = SensorAssembler.from(packageBean.findPackageCurrentSensors(code));
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -197,7 +163,7 @@ public class PackageService {
                 product.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOProducts(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithProducts(aPackage)).build();
     }
 
     @PUT
@@ -212,7 +178,7 @@ public class PackageService {
                 product.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOProducts(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithProducts(aPackage)).build();
     }
 
     @PUT
