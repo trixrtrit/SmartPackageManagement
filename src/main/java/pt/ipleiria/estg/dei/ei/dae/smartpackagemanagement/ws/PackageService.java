@@ -7,9 +7,11 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -19,7 +21,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackagePr
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("packages")
 @Produces({MediaType.APPLICATION_JSON})
@@ -32,92 +33,11 @@ public class PackageService {
     private SecurityContext securityContext;
 
     //TODO: adicionar DTO de orderItems
-    private PackageDTO toDTO(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getCode(),
-                aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive()
-        );
-    }
-
-    private List<PackageDTO> toDTOs(List<Package> aPackages) {
-        return aPackages.stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
-    private PackageDTO toDTOProducts(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getCode(),
-                aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive(),
-                productsToDTOs(aPackage.getProducts())
-        );
-    }
-
-    private List<PackageDTO> toDTOsProducts(List<Package> aPackages) {
-        return aPackages.stream().map(this::toDTOProducts).collect(Collectors.toList());
-    }
-
-    private ProductDTO productToDTO(Product product) {
-        return new ProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.isActive(),
-                product.getManufacturer().getUsername(),
-                product.getProductReference()
-        );
-    }
-
-    private List<ProductDTO> productsToDTOs(List<Product> products) {
-        return products.stream().map(this::productToDTO).collect(Collectors.toList());
-    }
-
-
-    private PackageDTO toDTOSensors(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getCode(),
-                aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive(),
-                sensorsToDTOs(packageBean.findPackageCurrentSensors(aPackage.getCode())),
-                true
-        );
-    }
-
-    private List<PackageDTO> toDTOsSensors(List<Package> aPackages) {
-        return aPackages.stream().map(this::toDTOSensors).collect(Collectors.toList());
-    }
-
-    private SensorDTO sensorToDTO(Sensor sensor) {
-        return new SensorDTO(
-                sensor.getId(),
-                sensor.getName(),
-                sensorTypeToDTO(sensor.getSensorType())
-        );
-    }
-
-    private List<SensorDTO> sensorsToDTOs(List<Sensor> sensors) {
-        return sensors.stream().map(this::sensorToDTO).collect(Collectors.toList());
-    }
-
-    private SensorTypeDTO sensorTypeToDTO(SensorType sensorType) {
-        return new SensorTypeDTO(
-                sensorType.getId(),
-                sensorType.getName(),
-                sensorType.getMeasurementUnit()
-        );
-    }
-
-
-
     @GET
     @Path("/all")
     @RolesAllowed({"LogisticsOperator"})
     public List<PackageDTO> getAll() {
-        return toDTOs(packageBean.getPackages());
+        return PackageAssembler.from(packageBean.getPackages());
     }
 
     @GET
@@ -129,7 +49,7 @@ public class PackageService {
         Package aPackage = packageBean.find(code);
 
         if (aPackage != null) {
-            return Response.ok(toDTO(aPackage)).build();
+            return Response.ok(PackageAssembler.from(aPackage)).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_PACKAGE")
@@ -143,7 +63,7 @@ public class PackageService {
     public Response getPackageProducts(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageProducts(code);
         if (aPackage != null) {
-            var dtos = productsToDTOs(aPackage.getProducts());
+            var dtos = ProductAssembler.from(aPackage.getProducts());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -158,32 +78,30 @@ public class PackageService {
     public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageSensors(code);
         if (aPackage != null) {
-            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(code));
+            var dtos = SensorPackageAssembler.from(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_PACKAGE")
                 .build();
     }
-/*
+
+    //TODO: validar de quem e o pkg para verem as mediçoes
     @GET
     @Path("{code}/measurements")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator, Manufacturer"})
+    @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
     public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageMeasurements(code);
         if (aPackage != null) {
-            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(code));
-            for (SensorPackage sensorPackage: aPackage.getSensorPackageList()) {
-
-            }
+            var dtos = SensorPackageAssembler.fromWithMeasurements(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_PACKAGE")
                 .build();
     }
-*/
+
     @POST
     @Path("/")
     @RolesAllowed({"LogisticsOperator"})
@@ -195,7 +113,7 @@ public class PackageService {
                 packageDTO.getPackageType()
         );
         var aPackage = packageBean.find(packageId);
-        return Response.status(Response.Status.CREATED).entity(toDTO(aPackage)).build();
+        return Response.status(Response.Status.CREATED).entity(PackageAssembler.from(aPackage)).build();
     }
 
     @PUT
@@ -211,7 +129,7 @@ public class PackageService {
                 packageDTO.getPackageType()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTO(aPackage)).build();
+        return Response.ok(PackageAssembler.from(aPackage)).build();
     }
 
     @PUT
@@ -226,7 +144,7 @@ public class PackageService {
                 product.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOProducts(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithProducts(aPackage)).build();
     }
 
     @PUT
@@ -241,7 +159,7 @@ public class PackageService {
                 product.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOProducts(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithProducts(aPackage)).build();
     }
 
     @PUT
@@ -256,7 +174,7 @@ public class PackageService {
                 sensor.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOSensors(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithSensors(aPackage)).build();
     }
 
     @PUT
@@ -266,12 +184,12 @@ public class PackageService {
     public Response removeSensor(@PathParam("code") long code, SensorDTO sensor)
             throws MyEntityNotFoundException {
 
-        packageBean.removeProductFromPackage(
+        packageBean.removeSensorFromPackage(
                 code,
                 sensor.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOSensors(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithSensors(aPackage)).build();
     }
 
     @DELETE
@@ -280,7 +198,7 @@ public class PackageService {
     @RolesAllowed({"LogisticsOperator"})
     public Response delete(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.delete(code);
-        return Response.status(Response.Status.OK).entity(toDTO(aPackage)).build();
+        return Response.status(Response.Status.OK).entity(PackageAssembler.from(aPackage)).build();
     }
 
     @PUT
@@ -307,7 +225,7 @@ public class PackageService {
         }
 
         packageBean.changeActiveStatus(code);
-        return Response.ok(toDTO(aPackage)).build();
+        return Response.ok(PackageAssembler.from(aPackage)).build();
     }
 
     private boolean isRoleAuthorizedTertiary() {
