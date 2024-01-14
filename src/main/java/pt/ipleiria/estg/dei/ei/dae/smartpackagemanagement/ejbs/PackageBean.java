@@ -67,6 +67,7 @@ public class PackageBean {
         }
         Package aPackage = entityManager.find(Package.class, code);
         Hibernate.initialize(aPackage.getSensorPackageList());
+        aPackage.getSensorPackageList().forEach(sensorPackage -> Hibernate.initialize(sensorPackage.getMeasurements()));
         return aPackage;
     }
 
@@ -92,7 +93,7 @@ public class PackageBean {
             throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
         Hibernate.initialize(aPackage.getProducts());
-        Hibernate.initialize(findPackageCurrentSensors(aPackage.getCode()));
+        Hibernate.initialize(aPackage.getSensorPackageList());
         return aPackage;
     }
 
@@ -173,6 +174,9 @@ public class PackageBean {
             throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");
         //get pivot object update time
         SensorPackage sensorPackage = findSensorPackage(code, sensorId);
+        if (sensorPackage == null)
+            throw new MyEntityNotFoundException("Sensor with id: " + sensorId +
+                    " is not associated to the package code: " + code);
         sensorPackage.setRemovedAt(Instant.now());
         aPackage.getSensorPackageList().remove(sensorPackage);
         sensor.getSensorPackageList().remove(sensorPackage);

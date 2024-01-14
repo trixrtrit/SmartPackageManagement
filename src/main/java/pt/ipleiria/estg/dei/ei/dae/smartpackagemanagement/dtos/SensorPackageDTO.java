@@ -8,23 +8,18 @@ import java.util.List;
 public class SensorPackageDTO implements Serializable {
 
     private long id;
-    private List<MeasurementDTO> measurements;
-    private long sensorId;
-    private long packageId;
+    private SensorDTO sensor;
     private Instant addedAt;
     private Instant removedAt;
 
     public SensorPackageDTO() {
-        this.measurements = new ArrayList<>();
     }
 
-    public SensorPackageDTO(long id, long sensorId, long packageId, Instant addedAt, Instant removedAt) {
+    public SensorPackageDTO(long id, SensorDTO sensor, Instant addedAt, Instant removedAt) {
         this.id = id;
-        this.sensorId = sensorId;
-        this.packageId = packageId;
+        this.sensor = sensor;
         this.addedAt = addedAt;
         this.removedAt = removedAt;
-        this.measurements = new ArrayList<>();
     }
 
     public long getId() {
@@ -35,28 +30,12 @@ public class SensorPackageDTO implements Serializable {
         this.id = id;
     }
 
-    public List<MeasurementDTO> getMeasurements() {
-        return measurements;
+    public SensorDTO getSensor() {
+        return sensor;
     }
 
-    public void setMeasurements(List<MeasurementDTO> measurements) {
-        this.measurements = measurements;
-    }
-
-    public long getSensorId() {
-        return sensorId;
-    }
-
-    public void setSensorId(long sensorId) {
-        this.sensorId = sensorId;
-    }
-
-    public long getPackageId() {
-        return packageId;
-    }
-
-    public void setPackageId(long packageId) {
-        this.packageId = packageId;
+    public void setSensor(SensorDTO sensor) {
+        this.sensor = sensor;
     }
 
     public Instant getAddedAt() {

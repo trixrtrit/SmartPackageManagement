@@ -18,5 +18,4 @@ public class SensorTypeAssembler {
     public static List<SensorTypeDTO> from(List<SensorType> sensorTypes) {
         return sensorTypes.stream().map(SensorTypeAssembler::from).collect(Collectors.toList());
     }
-
 }

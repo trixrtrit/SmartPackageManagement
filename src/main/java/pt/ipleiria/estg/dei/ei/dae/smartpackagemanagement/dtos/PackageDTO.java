@@ -11,12 +11,12 @@ public class PackageDTO implements Serializable {
     private String material;
     private PackageType packageType;
     private List<ProductDTO> products;
-    private List<SensorDTO> sensors;
+    private List<SensorPackageDTO> sensorPackageMetadata;
     private boolean isActive;
 
     public PackageDTO() {
         this.products = new ArrayList<>();
-        this.sensors = new ArrayList<>();
+        this.sensorPackageMetadata = new ArrayList<>();
     }
 
     public PackageDTO(long code, String material, PackageType packageType, boolean isActive) {
@@ -24,20 +24,20 @@ public class PackageDTO implements Serializable {
         this.material = material;
         this.packageType = packageType;
         this.products = new ArrayList<>();
-        this.sensors = new ArrayList<>();
+        this.sensorPackageMetadata = new ArrayList<>();
         this.isActive = isActive;
     }
 
     public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<ProductDTO> products) {
         this(code, material, packageType, isActive);
         this.products = products;
-        this.sensors = new ArrayList<>();
+        this.sensorPackageMetadata = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorDTO> sensors, boolean hasSensors) {
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata, boolean hasSensors) {
         this(code, material, packageType, isActive);
         this.products = new ArrayList<>();
-        this.sensors = sensors;
+        this.sensorPackageMetadata = sensorPackageMetadata;
     }
 
     public long getCode() {
@@ -72,12 +72,12 @@ public class PackageDTO implements Serializable {
         this.products = products;
     }
 
-    public List<SensorDTO> getSensors() {
-        return sensors;
+    public List<SensorPackageDTO> getSensorPackageMetadata() {
+        return sensorPackageMetadata;
     }
 
-    public void setSensors(List<SensorDTO> sensors) {
-        this.sensors = sensors;
+    public void setSensorPackageMetadata(List<SensorPackageDTO> sensorPackageMetadata) {
+        this.sensorPackageMetadata = sensorPackageMetadata;
     }
 
     public boolean isActive() {

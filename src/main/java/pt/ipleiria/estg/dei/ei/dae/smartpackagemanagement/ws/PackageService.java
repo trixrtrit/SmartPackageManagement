@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
@@ -34,22 +35,6 @@ public class PackageService {
     private SecurityContext securityContext;
 
     //TODO: adicionar DTO de orderItems
-
-    private PackageDTO toDTOSensors(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getCode(),
-                aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive(),
-                SensorAssembler.from(packageBean.findPackageCurrentSensors(aPackage.getCode())),
-                true
-        );
-    }
-
-    private List<PackageDTO> toDTOsSensors(List<Package> aPackages) {
-        return aPackages.stream().map(this::toDTOSensors).collect(Collectors.toList());
-    }
-
     @GET
     @Path("/all")
     @RolesAllowed({"LogisticsOperator"})
@@ -95,32 +80,30 @@ public class PackageService {
     public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.getPackageSensors(code);
         if (aPackage != null) {
-            var dtos = SensorAssembler.from(packageBean.findPackageCurrentSensors(code));
+            var dtos = SensorPackageAssembler.from(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_PACKAGE")
                 .build();
     }
-/*
+
     @GET
     @Path("{code}/measurements")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator, Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
+        System.out.println("hihihihih");
         Package aPackage = packageBean.getPackageMeasurements(code);
         if (aPackage != null) {
-            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(code));
-            for (SensorPackage sensorPackage: aPackage.getSensorPackageList()) {
-
-            }
+            var dtos = SensorPackageAssembler.fromWithMeasurements(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_PACKAGE")
                 .build();
     }
-*/
+
     @POST
     @Path("/")
     @RolesAllowed({"LogisticsOperator"})
@@ -193,7 +176,7 @@ public class PackageService {
                 sensor.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOSensors(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithSensors(aPackage)).build();
     }
 
     @PUT
@@ -203,12 +186,12 @@ public class PackageService {
     public Response removeSensor(@PathParam("code") long code, SensorDTO sensor)
             throws MyEntityNotFoundException {
 
-        packageBean.removeProductFromPackage(
+        packageBean.removeSensorFromPackage(
                 code,
                 sensor.getId()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTOSensors(aPackage)).build();
+        return Response.ok(PackageAssembler.fromWithSensors(aPackage)).build();
     }
 
     @DELETE

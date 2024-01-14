@@ -35,5 +35,18 @@ public class PackageAssembler {
         return aPackages.stream().map(PackageAssembler::fromWithProducts).collect(Collectors.toList());
     }
 
+    public static PackageDTO fromWithSensors(Package aPackage) {
+        return new PackageDTO(
+                aPackage.getCode(),
+                aPackage.getMaterial(),
+                aPackage.getPackageType(),
+                aPackage.isActive(),
+                SensorPackageAssembler.from(aPackage.getSensorPackageList()),
+                true
+        );
+    }
 
+    public static List<PackageDTO> fromWithSensors(List<Package> aPackages) {
+        return aPackages.stream().map(PackageAssembler::fromWithSensors).collect(Collectors.toList());
+    }
 }
