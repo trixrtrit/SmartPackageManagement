@@ -8,7 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorTypeAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductParameterAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
@@ -19,7 +19,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @Path("products")
@@ -59,20 +58,7 @@ public class ProductService {
         }
 
         var productParameters = productBean.getProductParametersWithSensorType(id);
-        List<ProductParameterDTO> dtos = new ArrayList<>();
-
-        for (ProductParameter pp : productParameters) {
-            ProductParameterDTO dto = new ProductParameterDTO(
-                    pp.getId(),
-                    id,
-                    pp.getSensorType().getId(),
-                    pp.getMinValue(),
-                    pp.getMaxValue(),
-                    SensorTypeAssembler.from(pp.getSensorType())
-            );
-            dtos.add(dto);
-        }
-
+        var dtos = ProductParameterAssembler.fromWithSensorType(productParameters);
         return Response.ok(dtos).build();
     }
 

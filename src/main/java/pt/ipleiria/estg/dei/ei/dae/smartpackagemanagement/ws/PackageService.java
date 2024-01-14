@@ -84,8 +84,6 @@ public class PackageService {
         );
     }
 
-
-
     @GET
     @Path("/all")
     @RolesAllowed({"LogisticsOperator"})
