@@ -7,15 +7,10 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -116,6 +111,8 @@ public class PackageService {
         );
     }
 
+
+
     @GET
     @Path("/all")
     @RolesAllowed({"LogisticsOperator"})
@@ -168,7 +165,25 @@ public class PackageService {
                 .entity("ERROR_FINDING_PACKAGE")
                 .build();
     }
+/*
+    @GET
+    @Path("{code}/measurements")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator, Manufacturer"})
+    public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
+        Package aPackage = packageBean.getPackageMeasurements(code);
+        if (aPackage != null) {
+            var dtos = sensorsToDTOs(packageBean.findPackageCurrentSensors(code));
+            for (SensorPackage sensorPackage: aPackage.getSensorPackageList()) {
 
+            }
+            return Response.ok(dtos).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND)
+                .entity("ERROR_FINDING_PACKAGE")
+                .build();
+    }
+*/
     @POST
     @Path("/")
     @RolesAllowed({"LogisticsOperator"})

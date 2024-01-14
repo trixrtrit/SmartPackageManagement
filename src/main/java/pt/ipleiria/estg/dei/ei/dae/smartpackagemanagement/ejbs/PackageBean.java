@@ -57,8 +57,15 @@ public class PackageBean {
             throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
         Package aPackage = entityManager.find(Package.class, code);
-        //find from pivot object
-        //Hibernate.initialize(findPackageCurrentSensors(aPackage.getCode()));
+        Hibernate.initialize(aPackage.getSensorPackageList());
+        return aPackage;
+    }
+
+    public Package getPackageMeasurements(long code) throws MyEntityNotFoundException {
+        if(!this.exists(code)) {
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+        }
+        Package aPackage = entityManager.find(Package.class, code);
         Hibernate.initialize(aPackage.getSensorPackageList());
         return aPackage;
     }
