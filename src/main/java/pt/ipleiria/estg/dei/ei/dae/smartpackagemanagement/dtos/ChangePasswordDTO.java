@@ -2,7 +2,9 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class ChangePasswordDTO {
+import java.io.Serializable;
+
+public class ChangePasswordDTO implements Serializable {
     @NotBlank
     private String newPassword;
     @NotBlank

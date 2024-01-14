@@ -1,7 +1,9 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -10,24 +12,20 @@ public class Measurement extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private double measurement;
-    private Date timestamp;
+    private String measurement;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Instant timestamp;
     @ManyToOne
-    @JoinColumn(name = "sensor_id")
-    private Sensor sensor;
-
-    @ManyToOne
-    @JoinColumn(name = "package_id")
-    private Package aPackage;
+    @NotNull
+    @JoinColumn(name = "sensor_package_id")
+    private SensorPackage sensorPackage;
 
     public Measurement() {
     }
 
-    public Measurement(double measurement, Date timestamp, Sensor sensor, Package aPackage) {
+    public Measurement(String measurement, SensorPackage sensorPackage) {
         this.measurement = measurement;
-        this.timestamp = timestamp;
-        this.sensor = sensor;
-        this.aPackage = aPackage;
+        this.sensorPackage = sensorPackage;
     }
 
     public Long getId() {
@@ -38,35 +36,28 @@ public class Measurement extends Versionable{
         this.id = id;
     }
 
-    public double getMeasurement() {
+    public String getMeasurement() {
         return measurement;
     }
 
-    public void setMeasurement(double measurement) {
+    public void setMeasurement(String measurement) {
         this.measurement = measurement;
     }
 
-    public Date getTimestamp() {
+
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 
-    public Sensor getSensor() {
-        return sensor;
+    public SensorPackage getSensorPackage() {
+        return sensorPackage;
     }
 
-    public void setSensor(Sensor sensor) {
-        this.sensor = sensor;
-    }
-
-    public Package getaPackage() {
-        return aPackage;
-    }
-
-    public void setaPackage(Package aPackage) {
-        this.aPackage = aPackage;
+    public void setSensorPackage(SensorPackage sensorPackage) {
+        this.sensorPackage = sensorPackage;
     }
 }

@@ -3,25 +3,40 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Measurement;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SensorDTO {
+public class SensorDTO implements Serializable {
     private Long id;
     private String name;
     private List<MeasurementDTO> measurements;
     private List<PackageDTO> packages;
-    private Long sensorTypeId;
+    private SensorTypeDTO sensorType;
+    private boolean isAvailable;
 
     public SensorDTO() {
         this.measurements = new ArrayList<MeasurementDTO>();
     }
 
-    public SensorDTO(Long id, String name, Long sensorTypeId) {
+    public SensorDTO(Long id, String name, boolean isAvailable, SensorTypeDTO sensorType) {
         this.id = id;
         this.name = name;
-        this.sensorTypeId = sensorTypeId;
         this.measurements = new ArrayList<MeasurementDTO>();
+        this.packages = new ArrayList<>();
+        this.sensorType = sensorType;
+        this.isAvailable = isAvailable;
+    }
+
+    public SensorDTO(Long id, String name, boolean isAvailable, SensorTypeDTO sensorType, List<MeasurementDTO> measurements) {
+        this(id, name, isAvailable, sensorType);
+        this.measurements = measurements;
+        this.packages = new ArrayList<>();
+    }
+
+    public SensorDTO(Long id, String name, boolean isAvailable, SensorTypeDTO sensorType, List<PackageDTO> packages, boolean hasMeasurements) {
+        this(id, name, isAvailable, sensorType);
+        this.measurements = new ArrayList<>();
         this.packages = new ArrayList<>();
     }
 
@@ -57,11 +72,19 @@ public class SensorDTO {
         this.packages = packages;
     }
 
-    public Long getSensorTypeId() {
-        return sensorTypeId;
+    public SensorTypeDTO getSensorType() {
+        return sensorType;
     }
 
-    public void setSensorTypeId(Long sensorTypeId) {
-        this.sensorTypeId = sensorTypeId;
+    public void setSensorType(SensorTypeDTO sensorType) {
+        this.sensorType = sensorType;
+    }
+
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
     }
 }
