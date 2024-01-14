@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-public class ProductParameterDTO {
+import java.io.Serializable;
+
+public class ProductParameterDTO implements Serializable {
     private Long id;
 
     private Long productId;

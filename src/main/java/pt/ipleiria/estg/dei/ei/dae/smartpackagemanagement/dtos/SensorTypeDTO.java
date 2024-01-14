@@ -2,10 +2,11 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Versionable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SensorTypeDTO extends Versionable {
+public class SensorTypeDTO implements Serializable {
     private Long id;
     private String name;
     private String measurementUnit;

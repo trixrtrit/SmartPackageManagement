@@ -1,9 +1,10 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ManufacturerDTO {
+public class ManufacturerDTO implements Serializable {
     private String username;
     private String password;
     private String email;

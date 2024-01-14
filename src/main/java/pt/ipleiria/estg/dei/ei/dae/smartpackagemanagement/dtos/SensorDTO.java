@@ -3,10 +3,11 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Measurement;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SensorDTO {
+public class SensorDTO implements Serializable {
     private Long id;
     private String name;
     private List<MeasurementDTO> measurements;

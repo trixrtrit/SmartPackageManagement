@@ -4,10 +4,11 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
-public class MeasurementDTO {
+public class MeasurementDTO implements Serializable {
     private String measurement;
     @Temporal(TemporalType.TIMESTAMP)
     private Instant timestamp;

@@ -2,10 +2,11 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PackageDTO {
+public class PackageDTO implements Serializable {
     private long code;
     private String material;
     private PackageType packageType;
