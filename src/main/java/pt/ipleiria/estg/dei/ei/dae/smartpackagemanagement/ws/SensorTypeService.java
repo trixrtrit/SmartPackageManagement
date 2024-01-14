@@ -7,16 +7,15 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorTypeAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.SensorTypeBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("sensor-types")
 @Produces({MediaType.APPLICATION_JSON})
@@ -28,22 +27,10 @@ public class SensorTypeService {
     @Context
     private SecurityContext securityContext;
 
-    private SensorTypeDTO toDTO(SensorType sensorType) {
-        return new SensorTypeDTO(
-                sensorType.getId(),
-                sensorType.getName(),
-                sensorType.getMeasurementUnit()
-        );
-    }
-
-    private List<SensorTypeDTO> toDTOs(List<SensorType> sensorTypes) {
-        return sensorTypes.stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
     @GET
     @Path("/all")
     public List<SensorTypeDTO> getAll() {
-        return toDTOs(sensorTypeBean.getProductParameters());
+        return SensorTypeAssembler.from(sensorTypeBean.getProductParameters());
     }
 
     @POST
@@ -57,7 +44,7 @@ public class SensorTypeService {
                 sensorTypeDTO.getMeasurementUnit()
         );
         var sensorType = sensorTypeBean.find(id);
-        return Response.status(Response.Status.CREATED).entity(toDTO(sensorType)).build();
+        return Response.status(Response.Status.CREATED).entity(SensorTypeAssembler.from(sensorType)).build();
     }
 
     @PUT
@@ -72,7 +59,7 @@ public class SensorTypeService {
                 sensorTypeDTO.getMeasurementUnit()
         );
         var sensorType = sensorTypeBean.find(id);
-        return Response.ok(toDTO(sensorType)).build();
+        return Response.ok(SensorTypeAssembler.from(sensorType)).build();
     }
 
     @DELETE
@@ -81,6 +68,6 @@ public class SensorTypeService {
     @RolesAllowed({"Manufacturer"})
     public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
         var sensorType = sensorTypeBean.delete(id);
-        return Response.status(Response.Status.OK).entity(toDTO(sensorType)).build();
+        return Response.status(Response.Status.OK).entity(SensorTypeAssembler.from(sensorType)).build();
     }
 }
