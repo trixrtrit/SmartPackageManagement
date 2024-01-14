@@ -35,7 +35,15 @@ public class SensorService {
         return new SensorDTO(
                 sensor.getId(),
                 sensor.getName(),
-                sensor.getSensorType().getId()
+                sensorTypeToDTO(sensor.getSensorType())
+        );
+    }
+
+    private SensorTypeDTO sensorTypeToDTO(SensorType sensorType) {
+        return new SensorTypeDTO(
+                sensorType.getId(),
+                sensorType.getName(),
+                sensorType.getMeasurementUnit()
         );
     }
 
@@ -72,7 +80,7 @@ public class SensorService {
         long sensorId = sensorBean.create(
                 sensorDTO.getName(),
                 //sensorDTO.getPackages(),
-                sensorDTO.getSensorTypeId()
+                sensorDTO.getSensorType().getId()
                 );
         var sensor = sensorBean.find(sensorId);
         return Response.status(Response.Status.CREATED).entity(toDTO(sensor)).build();
@@ -87,7 +95,7 @@ public class SensorService {
         sensorBean.update(
                 id,
                 sensorDTO.getName(),
-                sensorDTO.getSensorTypeId()
+                sensorDTO.getSensorType().getId()
         );
         var sensor = sensorBean.find(id);
         return Response.ok(toDTO(sensor)).build();

@@ -3,10 +3,12 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.User;
+
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserDTO {
+public class UserDTO implements Serializable {
     @NotNull
     private String username;
     @NotNull

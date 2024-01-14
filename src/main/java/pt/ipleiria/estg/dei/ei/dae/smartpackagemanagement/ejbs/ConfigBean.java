@@ -5,6 +5,8 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import net.datafaker.Faker;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
@@ -32,15 +34,22 @@ public class ConfigBean {
     private SensorTypeBean sensorTypeBean;
     @EJB
     private SensorBean sensorBean;
+    @EJB
+    private MeasurementBean measurementBean;
 
     private final Faker faker = new Faker();
 
     private static final Map<String, String> sensorUnits = new HashMap<>();
 
     private static final Logger logger = Logger.getLogger("ebjs.ConfigBean");
+
+    private int lastAssociatedSensorId = 0;
     @PostConstruct
     public void populateDB() {
         int seedSize = 100;
+        int maxSensorsPerPackage = 4;
+        int packageSize = seedSize/maxSensorsPerPackage;
+        int measurementSize = 20;
         System.out.println("Hello Java EE!");
         seedLogOperators(seedSize);
         seedManufacturers(seedSize);
@@ -49,8 +58,10 @@ public class ConfigBean {
         seedSensorType();
         seedProductParameters(seedSize);
         seedSensors(seedSize);
+        seedPackages(packageSize, maxSensorsPerPackage);
+        seedMeasurements(measurementSize);
         try {
-            logisticsOperatorBean.create(
+           logisticsOperatorBean.create(
                     "gatoMega",
                     "123",
                     "gatoMega",
@@ -219,5 +230,53 @@ public class ConfigBean {
             logger.severe(ex.getMessage());
         }
     }
-    //TODO: package
+
+    private void seedPackages(int size, int maxSensorsPerPackage) {
+        var sensors = sensorBean.getSensors();
+        var products = productBean.getProducts();
+        var packTypes = PackageType.values();
+        int packTypesLength = packTypes.length;
+        try {
+            for (int i = 0; i < size; i++) {
+                int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
+                var packType = packTypes[faker.number().numberBetween(0, packTypesLength)];
+
+                long packId = packageBean.create(
+                        faker.number().randomNumber(9, true),
+                        faker.commerce().material(),
+                        packType
+                );
+                for (int j = 0; j < numberOfSensors; j++) {
+                    packageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
+                    lastAssociatedSensorId++;
+                }
+                packageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
+                packageBean.addProductToPackage(packId, products.get(i).getId());
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+
+    private void seedMeasurements(int size) {
+        var packages = packageBean.getPackages();
+         try {
+             for (Package aPackage: packages) {
+                var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());
+                for(Sensor sensor: sensors) {
+                    for (int i = 0; i < 20; i++) {
+                        measurementBean.create(
+                                Double.toString(faker.number().randomDouble(3,0,100)),
+                                aPackage.getCode(),
+                                sensor.getId()
+                        );
+                    }
+                }
+             }
+         } catch (Exception ex) {
+             logger.severe(ex.getMessage());
+         }
+     }
+
+
 }

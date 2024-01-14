@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-public class LogisticsOperatorDTO {
+import java.io.Serializable;
+
+public class LogisticsOperatorDTO implements Serializable {
     private String username;
     private String password;
     private String email;

@@ -22,21 +22,9 @@ public class Sensor extends Versionable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private boolean isAvailable = true;
     @OneToMany(mappedBy = "sensor", cascade = CascadeType.REMOVE)
-    private List<Measurement> measurements;
-    @ManyToMany
-    @JoinTable(
-            name = "sensors_packages",
-            joinColumns = @JoinColumn(
-                    name = "sensor_id",
-                    referencedColumnName = "id"
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "package_code",
-                    referencedColumnName = "code"
-            )
-    )
-    private List<Package> packages;
+    private List<SensorPackage> sensorPackageList;
 
     @ManyToOne
     @JoinColumn(name = "sensorType_id")
@@ -44,15 +32,13 @@ public class Sensor extends Versionable{
     private SensorType sensorType;
 
     public Sensor() {
-        this.measurements = new ArrayList<Measurement>();
-        this.packages = new ArrayList<>();
+        this.sensorPackageList = new ArrayList<>();
     }
 
     public Sensor(String name, SensorType sensorType) {
         this.name = name;
         this.sensorType = sensorType;
-        this.measurements = new ArrayList<Measurement>();
-        this.packages = new ArrayList<>();
+        this.sensorPackageList = new ArrayList<>();
     }
 
     public Long getId() {
@@ -71,14 +57,6 @@ public class Sensor extends Versionable{
         this.name = name;
     }
 
-    public List<Measurement> getMeasurements() {
-        return measurements;
-    }
-
-    public void setMeasurements(List<Measurement> measurements) {
-        this.measurements = measurements;
-    }
-
     public SensorType getSensorType() {
         return sensorType;
     }
@@ -87,21 +65,19 @@ public class Sensor extends Versionable{
         this.sensorType = sensorType;
     }
 
-    public List<Package> getPackages() {
-        return packages;
+    public List<SensorPackage> getSensorPackageList() {
+        return sensorPackageList;
     }
 
-    public void setPackages(List<Package> packages) {
-        this.packages = packages;
+    public void setSensorPackageList(List<SensorPackage> sensorPackageList) {
+        this.sensorPackageList = sensorPackageList;
     }
 
-    public void addPackage(Package aPackage) {
-        if (!packages.contains(aPackage)) {
-            packages.add(aPackage);
-        }
-    }
-    public void removePackage(Package aPackage) {
-        packages.remove(aPackage);
+    public boolean isAvailable() {
+        return isAvailable;
     }
 
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
 }

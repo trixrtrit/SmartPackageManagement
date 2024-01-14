@@ -1,63 +1,61 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import jakarta.validation.constraints.NotBlank;
+
+import java.io.Serializable;
+import java.time.Instant;
 import java.util.Date;
 
-public class MeasurementDTO {
-    private Long id;
-    private double measurement;
-    private Date timestamp;
-    private SensorDTO sensor;
-
-    private PackageDTO aPackage;
+public class MeasurementDTO implements Serializable {
+    private String measurement;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Instant timestamp;
+    @NotBlank
+    private long sensorId;
+    @NotBlank
+    private long packageCode;
 
     public MeasurementDTO() {
     }
 
-    public MeasurementDTO(Long id, double measurement, Date timestamp, SensorDTO sensor, PackageDTO aPackage) {
-        this.id = id;
+    public MeasurementDTO(String measurement, Instant timestamp, long sensorId, long packageCode) {
         this.measurement = measurement;
         this.timestamp = timestamp;
-        this.sensor = sensor;
-        this.aPackage = aPackage;
+        this.sensorId = sensorId;
+        this.packageCode = packageCode;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public double getMeasurement() {
+    public String getMeasurement() {
         return measurement;
     }
 
-    public void setMeasurement(double measurement) {
+    public void setMeasurement(String measurement) {
         this.measurement = measurement;
     }
 
-    public Date getTimestamp() {
+    public Instant getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(Instant timestamp) {
         this.timestamp = timestamp;
     }
 
-    public SensorDTO getSensor() {
-        return sensor;
+    public long getSensorId() {
+        return sensorId;
     }
 
-    public void setSensor(SensorDTO sensor) {
-        this.sensor = sensor;
+    public void setSensorId(long sensorId) {
+        this.sensorId = sensorId;
     }
 
-    public PackageDTO getaPackage() {
-        return aPackage;
+    public long getPackageCode() {
+        return packageCode;
     }
 
-    public void setaPackage(PackageDTO aPackage) {
-        this.aPackage = aPackage;
+    public void setPackageCode(long packageCode) {
+        this.packageCode = packageCode;
     }
 }
