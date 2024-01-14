@@ -15,6 +15,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
@@ -77,9 +79,18 @@ public class CustomerService {
 
     @GET
     @Path("/all")
+    @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public List<CustomerDTO> getAll() {
-        return toDTOsNoOrders(customerBean.getCustomers());
+    public Response getAll(
+            @QueryParam("page") @DefaultValue("1") int page,
+            @QueryParam("pageSize") @DefaultValue("10") int pageSize) {
+
+        List<Customer> customers = customerBean.getCustomers(page,pageSize);
+        long totalItems = customerBean.getCustomersCount();
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, customers.size());
+        PaginationResponse<CustomerDTO> paginationResponse = new PaginationResponse<>(toDTOsNoOrders(customers), paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @GET
