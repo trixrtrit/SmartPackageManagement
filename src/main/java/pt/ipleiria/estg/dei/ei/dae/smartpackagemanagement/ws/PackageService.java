@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
@@ -32,18 +33,6 @@ public class PackageService {
     private SecurityContext securityContext;
 
     //TODO: adicionar DTO de orderItems
-    private PackageDTO toDTO(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getCode(),
-                aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive()
-        );
-    }
-
-    private List<PackageDTO> toDTOs(List<Package> aPackages) {
-        return aPackages.stream().map(this::toDTO).collect(Collectors.toList());
-    }
 
     private PackageDTO toDTOProducts(Package aPackage) {
         return new PackageDTO(
@@ -117,7 +106,7 @@ public class PackageService {
     @Path("/all")
     @RolesAllowed({"LogisticsOperator"})
     public List<PackageDTO> getAll() {
-        return toDTOs(packageBean.getPackages());
+        return PackageAssembler.from(packageBean.getPackages());
     }
 
     @GET
@@ -129,7 +118,7 @@ public class PackageService {
         Package aPackage = packageBean.find(code);
 
         if (aPackage != null) {
-            return Response.ok(toDTO(aPackage)).build();
+            return Response.ok(PackageAssembler.from(aPackage)).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_PACKAGE")
@@ -195,7 +184,7 @@ public class PackageService {
                 packageDTO.getPackageType()
         );
         var aPackage = packageBean.find(packageId);
-        return Response.status(Response.Status.CREATED).entity(toDTO(aPackage)).build();
+        return Response.status(Response.Status.CREATED).entity(PackageAssembler.from(aPackage)).build();
     }
 
     @PUT
@@ -211,7 +200,7 @@ public class PackageService {
                 packageDTO.getPackageType()
         );
         var aPackage = packageBean.find(code);
-        return Response.ok(toDTO(aPackage)).build();
+        return Response.ok(PackageAssembler.from(aPackage)).build();
     }
 
     @PUT
@@ -280,7 +269,7 @@ public class PackageService {
     @RolesAllowed({"LogisticsOperator"})
     public Response delete(@PathParam("code") long code) throws MyEntityNotFoundException {
         Package aPackage = packageBean.delete(code);
-        return Response.status(Response.Status.OK).entity(toDTO(aPackage)).build();
+        return Response.status(Response.Status.OK).entity(PackageAssembler.from(aPackage)).build();
     }
 
     @PUT
@@ -307,7 +296,7 @@ public class PackageService {
         }
 
         packageBean.changeActiveStatus(code);
-        return Response.ok(toDTO(aPackage)).build();
+        return Response.ok(PackageAssembler.from(aPackage)).build();
     }
 
     private boolean isRoleAuthorizedTertiary() {
