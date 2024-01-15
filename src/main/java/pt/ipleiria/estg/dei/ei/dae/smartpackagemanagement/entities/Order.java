@@ -26,6 +26,9 @@ public class Order extends Versionable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String address;
+    private String phoneNumber;
+    private String postCode;
+    private String city;
     private double totalPrice;
     private Date date;
     @Enumerated(EnumType.STRING)
@@ -43,9 +46,12 @@ public class Order extends Versionable{
         this.orderItems = new ArrayList<OrderItem>();
     }
 
-    public Order(String address, double totalPrice, Date date, OrderStatus status, Customer customer, List<OrderItem> orderItems) {
+    public Order(String address, String phoneNumber, String postCode, String city, double totalPrice, Date date, OrderStatus status, Customer customer, List<OrderItem> orderItems) {
         this.id = id;
         this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.postCode = postCode;
+        this.city = city;
         this.totalPrice = totalPrice;
         this.date = date;
         this.status = status;
@@ -67,6 +73,30 @@ public class Order extends Versionable{
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getPostCode() {
+        return postCode;
+    }
+
+    public void setPostCode(String postCode) {
+        this.postCode = postCode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public double getTotalPrice() {

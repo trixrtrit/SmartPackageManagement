@@ -12,6 +12,9 @@ import java.util.List;
 public class OrderDTO implements Serializable {
     private Long id;
     private String address;
+    private String phoneNumber;
+    private String postCode;
+    private String city;
     private double totalPrice;
     private Date date;
     private OrderStatus status;
@@ -22,13 +25,16 @@ public class OrderDTO implements Serializable {
         orderItems = new ArrayList<>();
     }
 
-    public OrderDTO(Long id, String address, double totalPrice, Date date, OrderStatus status, CustomerDTO customer) {
-        this(id, address, totalPrice, date, status, customer, new ArrayList<>());
+    public OrderDTO(Long id, String address, String phoneNumber, String postCode, String city, double totalPrice, Date date, OrderStatus status, CustomerDTO customer) {
+        this(id, address, phoneNumber, postCode, city, totalPrice, date, status, customer, new ArrayList<>());
     }
 
-    public OrderDTO(Long id, String address, double totalPrice, Date date, OrderStatus status, CustomerDTO customer, List<OrderItemDTO> orderItems) {
+    public OrderDTO(Long id, String address, String phoneNumber, String postCode, String city, double totalPrice, Date date, OrderStatus status, CustomerDTO customer, List<OrderItemDTO> orderItems) {
         this.id = id;
         this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.postCode = postCode;
+        this.city = city;
         this.totalPrice = totalPrice;
         this.date = date;
         this.status = status;
@@ -50,6 +56,30 @@ public class OrderDTO implements Serializable {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getPostCode() {
+        return postCode;
+    }
+
+    public void setPostCode(String postCode) {
+        this.postCode = postCode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     public double getTotalPrice() {
