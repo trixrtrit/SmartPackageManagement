@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -15,6 +16,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNot
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Hasher;
 
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class CustomerBean {
@@ -22,6 +24,8 @@ public class CustomerBean {
     private EntityManager entityManager;
     @Inject
     private Hasher hasher;
+    @EJB
+    private QueryBean<Customer> customerDAO;
 
     public void create(String username, String password, String name, String email, String nif, String address)
             throws MyEntityExistsException, MyConstraintViolationException {
@@ -36,8 +40,14 @@ public class CustomerBean {
         }
     }
 
-    public List<Customer> getCustomers() {
-        return entityManager.createNamedQuery("getCustomers", Customer.class).getResultList();
+    public List<Customer> getCustomers(
+            Map<String, String> filterMap, int pageNumber, int pageSize
+    ) {
+        return customerDAO.getEntities(Customer.class, filterMap, pageNumber, pageSize);
+    }
+
+    public long getCustomersCount(Map<String, String> filterMap) {
+        return customerDAO.getEntitiesCount(Customer.class, filterMap);
     }
 
     public Customer getCustomerOrders(String username) throws MyEntityNotFoundException{

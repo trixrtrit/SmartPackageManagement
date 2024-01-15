@@ -15,9 +15,12 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("manufacturers")
 @Produces({MediaType.APPLICATION_JSON})
@@ -32,8 +35,24 @@ public class ManufacturerService {
     @GET
     @Path("/all")
     @RolesAllowed({"LogisticsOperator"})
-    public List<ManufacturerDTO> getAll() {
-        return ManufacturerAssembler.from(manufacturerBean.getManufacturers());
+    public Response getAll(@QueryParam("username") String username,
+                           @QueryParam("name") String name,
+                           @QueryParam("email") String email,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) {
+
+        Map<String, String> filterMap = new HashMap<>();
+        filterMap.put("username", username);
+        filterMap.put("name", name);
+        filterMap.put("email", email);
+
+        var dtos = ManufacturerAssembler.from(manufacturerBean.getManufacturers(filterMap, page, pageSize));
+        long totalItems = manufacturerBean.getManufacturersCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<ManufacturerDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @GET
