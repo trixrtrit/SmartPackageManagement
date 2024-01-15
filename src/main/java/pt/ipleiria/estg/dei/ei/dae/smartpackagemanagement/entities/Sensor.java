@@ -22,6 +22,7 @@ public class Sensor extends Versionable{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+    private boolean isAvailable = true;
     @OneToMany(mappedBy = "sensor", cascade = CascadeType.REMOVE)
     private List<SensorPackage> sensorPackageList;
 
@@ -72,4 +73,11 @@ public class Sensor extends Versionable{
         this.sensorPackageList = sensorPackageList;
     }
 
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setAvailable(boolean available) {
+        isAvailable = available;
+    }
 }

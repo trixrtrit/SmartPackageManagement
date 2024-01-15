@@ -4,10 +4,11 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ProductDTO {
+public class ProductDTO implements Serializable {
 
     private Long id;
     private String name;

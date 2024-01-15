@@ -9,7 +9,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -82,13 +81,6 @@ public class ConfigBean {
                     "999999999",
                     "GatoLandia"
             );
-            System.out.println("Measurements of sensor 2 \n" + measurementBean.getMeasurements(
-                    2L,
-                    null,
-                    null,
-                    null,
-                    null).toString()
-            );
         }
         catch (Exception ex) {
             logger.severe(ex.getMessage());
@@ -132,7 +124,7 @@ public class ConfigBean {
     }
 
     public void seedProducts(int size) {
-        var manufacturers = manufacturerBean.getManufacturers();
+        var manufacturers = manufacturerBean.getManufacturers(new HashMap<String, String>(), 1, size);
         try {
             for (int i = 0; i < size; i++) {
                 var manufacturer = manufacturers.get(faker.number().numberBetween(0, manufacturers.size()));
@@ -258,8 +250,8 @@ public class ConfigBean {
                     packageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
                     lastAssociatedSensorId++;
                 }
+                packageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
                 packageBean.addProductToPackage(packId, products.get(i).getId());
-
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
@@ -268,14 +260,13 @@ public class ConfigBean {
 
     private void seedMeasurements(int size) {
         var packages = packageBean.getPackages();
-        //var activeSensors = packageBean.findPackageCurrentSensors();
          try {
              for (Package aPackage: packages) {
                 var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());
                 for(Sensor sensor: sensors) {
                     for (int i = 0; i < 20; i++) {
                         measurementBean.create(
-                                faker.number().randomDouble(3,0,100),
+                                Double.toString(faker.number().randomDouble(3,0,100)),
                                 aPackage.getCode(),
                                 sensor.getId()
                         );

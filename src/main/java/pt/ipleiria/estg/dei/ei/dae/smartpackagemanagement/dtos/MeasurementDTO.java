@@ -4,11 +4,12 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
-public class MeasurementDTO {
-    private double measurement;
+public class MeasurementDTO implements Serializable {
+    private String measurement;
     @Temporal(TemporalType.TIMESTAMP)
     private Instant timestamp;
     @NotBlank
@@ -19,18 +20,18 @@ public class MeasurementDTO {
     public MeasurementDTO() {
     }
 
-    public MeasurementDTO(double measurement, Instant timestamp, long sensorId, long packageCode) {
+    public MeasurementDTO(String measurement, Instant timestamp, long sensorId, long packageCode) {
         this.measurement = measurement;
         this.timestamp = timestamp;
         this.sensorId = sensorId;
         this.packageCode = packageCode;
     }
 
-    public double getMeasurement() {
+    public String getMeasurement() {
         return measurement;
     }
 
-    public void setMeasurement(double measurement) {
+    public void setMeasurement(String measurement) {
         this.measurement = measurement;
     }
 

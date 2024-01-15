@@ -2,7 +2,9 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import jakarta.validation.constraints.PositiveOrZero;
 
-public class ProductStockDTO {
+import java.io.Serializable;
+
+public class ProductStockDTO implements Serializable {
     @PositiveOrZero
     private float unitStock;
     @PositiveOrZero

@@ -2,39 +2,42 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PackageDTO {
+public class PackageDTO implements Serializable {
     private long code;
     private String material;
     private PackageType packageType;
     private List<ProductDTO> products;
-    private List<SensorDTO> sensors;
+    private List<SensorPackageDTO> sensorPackageMetadata;
+    private boolean isActive;
 
     public PackageDTO() {
         this.products = new ArrayList<>();
-        this.sensors = new ArrayList<>();
+        this.sensorPackageMetadata = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, PackageType packageType) {
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive) {
         this.code = code;
         this.material = material;
         this.packageType = packageType;
         this.products = new ArrayList<>();
-        this.sensors = new ArrayList<>();
+        this.sensorPackageMetadata = new ArrayList<>();
+        this.isActive = isActive;
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, List<ProductDTO> products) {
-        this(code, material, packageType);
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<ProductDTO> products) {
+        this(code, material, packageType, isActive);
         this.products = products;
-        this.sensors = new ArrayList<>();
+        this.sensorPackageMetadata = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, List<SensorDTO> sensors, boolean hasSensors) {
-        this(code, material, packageType);
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata, boolean hasSensors) {
+        this(code, material, packageType, isActive);
         this.products = new ArrayList<>();
-        this.sensors = sensors;
+        this.sensorPackageMetadata = sensorPackageMetadata;
     }
 
     public long getCode() {
@@ -69,11 +72,19 @@ public class PackageDTO {
         this.products = products;
     }
 
-    public List<SensorDTO> getSensors() {
-        return sensors;
+    public List<SensorPackageDTO> getSensorPackageMetadata() {
+        return sensorPackageMetadata;
     }
 
-    public void setSensors(List<SensorDTO> sensors) {
-        this.sensors = sensors;
+    public void setSensorPackageMetadata(List<SensorPackageDTO> sensorPackageMetadata) {
+        this.sensorPackageMetadata = sensorPackageMetadata;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
     }
 }

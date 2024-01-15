@@ -42,14 +42,25 @@ public class SensorBean {
         return entityManager.createNamedQuery("getSensors", Sensor.class).getResultList();
     }
 
-    /*public Sensor getSensorMeasurements(Long id) throws MyEntityNotFoundException{
+    public Sensor getSensorPackages(long id) throws MyEntityNotFoundException {
         if(!this.exists(id)) {
             throw new MyEntityNotFoundException("The sensor with the id: " + id + " does not exist");
         }
         Sensor sensor = entityManager.find(Sensor.class, id);
-        Hibernate.initialize(sensor.getMeasurements());
+        Hibernate.initialize(sensor.getSensorPackageList());
         return sensor;
-    }*/
+    }
+
+    public Sensor getSensorMeasurements(long id) throws MyEntityNotFoundException {
+        if(!this.exists(id)) {
+            throw new MyEntityNotFoundException("The sensor with the id: " + id + " does not exist");
+        }
+        Sensor sensor = entityManager.find(Sensor.class, id);
+        Hibernate.initialize(sensor.getSensorPackageList());
+        sensor.getSensorPackageList().forEach(sensorPackage -> Hibernate.initialize(sensorPackage.getMeasurements()));
+        return sensor;
+    }
+
     public boolean exists(Long id) {
         Query query = entityManager.createQuery(
                 "SELECT COUNT(s.id) FROM Sensor s WHERE s.id = :id", Long.class
@@ -84,6 +95,7 @@ public class SensorBean {
 
     public Sensor delete(long id) throws MyEntityNotFoundException {
         Sensor sensor = this.find(id);
+        sensor.setAvailable(false);
         entityManager.remove(sensor);
         return sensor;
     }

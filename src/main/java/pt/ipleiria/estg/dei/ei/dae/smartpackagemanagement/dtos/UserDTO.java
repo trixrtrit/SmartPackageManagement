@@ -3,10 +3,12 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 import jakarta.validation.constraints.NotNull;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.User;
+
+import java.io.Serializable;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserDTO {
+public class UserDTO implements Serializable {
     @NotNull
     private String username;
     @NotNull
@@ -23,19 +25,6 @@ public class UserDTO {
         this.name = name;
         this.email = email;
         this.role = role;
-    }
-
-    public static UserDTO from(User user) {
-        return new UserDTO(
-                user.getUsername(),
-                user.getName(),
-                user.getEmail(),
-                Hibernate.getClass(user).getSimpleName()
-        );
-    }
-
-    public static List<UserDTO> from(List<User> users) {
-        return users.stream().map(UserDTO::from).collect(Collectors.toList());
     }
 
     public String getUsername() {

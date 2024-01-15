@@ -7,17 +7,15 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductParameterAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductParameterDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductParameterBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("product-parameters")
 @Produces({MediaType.APPLICATION_JSON})
@@ -29,24 +27,10 @@ public class ProductParameterService {
     @Context
     private SecurityContext securityContext;
 
-    private ProductParameterDTO toDTO(ProductParameter productParameter) {
-        return new ProductParameterDTO(
-                productParameter.getId(),
-                productParameter.getProduct().getId(),
-                productParameter.getSensorType().getId(),
-                productParameter.getMinValue(),
-                productParameter.getMaxValue()
-        );
-    }
-
-    private List<ProductParameterDTO> toDTOs(List<ProductParameter> productParameters) {
-        return productParameters.stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
     @GET
     @Path("/all")
     public List<ProductParameterDTO> getAll() {
-        return toDTOs(productParameterBean.getProductParameters());
+        return ProductParameterAssembler.from(productParameterBean.getProductParameters());
     }
 
     @POST
@@ -62,7 +46,7 @@ public class ProductParameterService {
                 productParameterDTO.getMaxValue()
         );
         var productParameter = productParameterBean.find(id);
-        return Response.status(Response.Status.CREATED).entity(toDTO(productParameter)).build();
+        return Response.status(Response.Status.CREATED).entity(ProductParameterAssembler.from(productParameter)).build();
     }
 
 
@@ -78,7 +62,7 @@ public class ProductParameterService {
                 productParameterDTO.getMaxValue()
         );
         var productParameter = productParameterBean.find(id);
-        return Response.ok(toDTO(productParameter)).build();
+        return Response.ok(ProductParameterAssembler.from(productParameter)).build();
     }
 
     @DELETE
@@ -87,6 +71,6 @@ public class ProductParameterService {
     @RolesAllowed({"Manufacturer"})
     public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
         var productParameter = productParameterBean.delete(id);
-        return Response.status(Response.Status.OK).entity(toDTO(productParameter)).build();
+        return Response.status(Response.Status.OK).entity(ProductParameterAssembler.from(productParameter)).build();
     }
 }

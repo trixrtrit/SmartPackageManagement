@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
-import java.util.Date;
 
 @Entity
 @Table(name = "measurements")
@@ -12,7 +11,7 @@ public class Measurement extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private double measurement;
+    private String measurement;
     @Temporal(TemporalType.TIMESTAMP)
     private Instant timestamp;
     @ManyToOne
@@ -23,7 +22,7 @@ public class Measurement extends Versionable{
     public Measurement() {
     }
 
-    public Measurement(double measurement, SensorPackage sensorPackage) {
+    public Measurement(String measurement, SensorPackage sensorPackage) {
         this.measurement = measurement;
         this.sensorPackage = sensorPackage;
     }
@@ -36,11 +35,11 @@ public class Measurement extends Versionable{
         this.id = id;
     }
 
-    public double getMeasurement() {
+    public String getMeasurement() {
         return measurement;
     }
 
-    public void setMeasurement(double measurement) {
+    public void setMeasurement(String measurement) {
         this.measurement = measurement;
     }
 
