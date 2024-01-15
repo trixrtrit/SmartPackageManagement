@@ -15,6 +15,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExi
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Hasher;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,8 +42,12 @@ public class ManufacturerBean {
         }
     }
 
-    public List<Manufacturer> getManufacturers(Map<String, String> filterMap, int pageNumber, int pageSize) {
-        return manufacturerDAO.getEntities(Manufacturer.class, filterMap, pageNumber, pageSize);
+    public List<Manufacturer> getManufacturers(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("name", "asc");
+        orderMap.put("username", "asc");
+        return manufacturerDAO.getEntities(Manufacturer.class, filterMap, orderMap, pageNumber, pageSize);
     }
 
     public long getManufacturersCount(Map<String, String> filterMap) {
