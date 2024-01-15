@@ -1,10 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Versionable;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 public class
 OrderItemDTO extends Versionable {
@@ -15,15 +12,17 @@ OrderItemDTO extends Versionable {
     private Long orderId;
     private Long productId;
     private ProductDTO product;
+    private PackageType packageType;
 
     public OrderItemDTO() {
     }
 
-    public OrderItemDTO(Long id, float quantity, double price, Long orderId, ProductDTO product) {
+    public OrderItemDTO(Long id, float quantity, double price, Long orderId, PackageType packageType, ProductDTO product) {
         this.id = id;
         this.quantity = quantity;
         this.price = price;
         this.orderId = orderId;
+        this.packageType = packageType;
         this.product = product;
     }
 
@@ -73,5 +72,13 @@ OrderItemDTO extends Versionable {
 
     public void setProduct(ProductDTO product) {
         this.product = product;
+    }
+
+    public PackageType getPackageType() {
+        return packageType;
+    }
+
+    public void setPackageType(PackageType packageType) {
+        this.packageType = packageType;
     }
 }
