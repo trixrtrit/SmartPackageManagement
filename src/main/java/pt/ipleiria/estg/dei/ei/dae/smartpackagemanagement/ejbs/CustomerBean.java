@@ -15,6 +15,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExi
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Hasher;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,10 +42,12 @@ public class CustomerBean {
         }
     }
 
-    public List<Customer> getCustomers(
-            Map<String, String> filterMap, int pageNumber, int pageSize
-    ) {
-        return customerDAO.getEntities(Customer.class, filterMap, pageNumber, pageSize);
+    public List<Customer> getCustomers(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("name", "asc");
+        orderMap.put("username", "asc");
+        return customerDAO.getEntities(Customer.class, filterMap, orderMap, pageNumber, pageSize);
     }
 
     public long getCustomersCount(Map<String, String> filterMap) {

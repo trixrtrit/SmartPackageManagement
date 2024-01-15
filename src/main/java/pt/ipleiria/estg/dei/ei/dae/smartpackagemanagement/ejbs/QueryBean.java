@@ -3,10 +3,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.criteria.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,15 +14,22 @@ public class QueryBean<T> {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<T> getEntities(Class<T> entity, Map<String, String> filterMap, int pageNumber, int pageSize) {
+    public List<T> getEntities(
+            Class<T> entity,
+            Map<String, String> filterMap,
+            Map<String, String> orderMap,
+            int pageNumber,
+            int pageSize
+    )  throws IllegalArgumentException
+    {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<T> query = builder.createQuery(entity);
         Root<T> root = query.from(entity);
         List<Predicate> predicates = getPredicates(filterMap, builder, root);
 
         query.where(builder.and(predicates.toArray(new Predicate[0])));
-
-        query.orderBy(builder.asc(root.get("name")), builder.asc(root.get("username")));
+        List<Order> orderList = getOrderBy(orderMap, builder, root);
+        query.orderBy(orderList);
 
         return entityManager.createQuery(query).
                 setFirstResult((pageNumber - 1) * pageSize).
@@ -44,11 +48,7 @@ public class QueryBean<T> {
         return entityManager.createQuery(query).getSingleResult();
     }
 
-    private List<Predicate> getPredicates(
-            Map<String, String> filterMap,
-            CriteriaBuilder builder,
-            Root<T> root
-    ) {
+    private List<Predicate> getPredicates(Map<String, String> filterMap, CriteriaBuilder builder, Root<T> root) {
         List<Predicate> predicates = new ArrayList<>();
         for (Map.Entry<String, String> entry : filterMap.entrySet()) {
             String fieldName = entry.getKey();
@@ -58,5 +58,24 @@ public class QueryBean<T> {
             }
         }
         return predicates;
+    }
+
+    private List<Order> getOrderBy(Map<String, String> orderMap, CriteriaBuilder builder, Root<T> root)
+        throws IllegalArgumentException {
+        Order order;
+        List<Order> orderList = new ArrayList<>();
+        for (Map.Entry<String, String> entry : orderMap.entrySet()) {
+            String fieldName = entry.getKey();
+            String sortOrder = entry.getValue();
+            if ("asc".equalsIgnoreCase(sortOrder)) {
+                order = builder.asc(root.get(fieldName));
+            } else if ("desc".equalsIgnoreCase(sortOrder)) {
+                order = builder.desc(root.get(fieldName));
+            } else {
+                throw new IllegalArgumentException("Invalid sort order: " + sortOrder);
+            }
+            orderList.add(order);
+        }
+        return orderList;
     }
 }

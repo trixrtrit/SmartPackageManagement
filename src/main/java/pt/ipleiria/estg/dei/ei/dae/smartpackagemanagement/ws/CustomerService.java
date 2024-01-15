@@ -37,13 +37,13 @@ public class CustomerService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("username") String username,
-                                    @QueryParam("name") String name,
-                                    @QueryParam("email") String email,
-                                    @QueryParam("nif") String nif,
-                                    @QueryParam("address") String address,
-                                    @DefaultValue("1") @QueryParam("page") int page,
-                                    @DefaultValue("10") @QueryParam("pageSize") int pageSize
-                                    ) {
+                           @QueryParam("name") String name,
+                           @QueryParam("email") String email,
+                           @QueryParam("nif") String nif,
+                           @QueryParam("address") String address,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) throws IllegalArgumentException {
 
         Map<String, String> filterMap = new HashMap<>();
         filterMap.put("username", username);
@@ -68,7 +68,7 @@ public class CustomerService {
     public Response get(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
 
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -86,9 +86,9 @@ public class CustomerService {
     @Path("{username}/orders")
     @Authenticated
     @RolesAllowed({"Customer, LogisticsOperator"})
-    public Response getCustomerOrders(@PathParam("username") String username) throws MyEntityNotFoundException{
+    public Response getCustomerOrders(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -124,7 +124,7 @@ public class CustomerService {
     @RolesAllowed({"Customer"})
     public Response update(@PathParam("username") String username, CustomerDTO customerDTO) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -143,9 +143,9 @@ public class CustomerService {
     @Path("{username}")
     @Authenticated
     @RolesAllowed({"Customer"})
-    public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException{
+    public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 

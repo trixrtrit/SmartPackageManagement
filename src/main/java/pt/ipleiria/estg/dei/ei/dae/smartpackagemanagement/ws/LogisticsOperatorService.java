@@ -38,11 +38,11 @@ public class LogisticsOperatorService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("username") String username,
-                                             @QueryParam("name") String name,
-                                             @QueryParam("email") String email,
-                                             @DefaultValue("1") @QueryParam("page") int page,
-                                             @DefaultValue("10") @QueryParam("pageSize") int pageSize
-    ) {
+                           @QueryParam("name") String name,
+                           @QueryParam("email") String email,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) throws IllegalArgumentException {
 
         Map<String, String> filterMap = new HashMap<>();
         filterMap.put("username", username);
@@ -65,7 +65,7 @@ public class LogisticsOperatorService {
     public Response get(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
 
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -100,7 +100,7 @@ public class LogisticsOperatorService {
     @RolesAllowed({"LogisticsOperator"})
     public Response update(@PathParam("username") String username, ManufacturerDTO manufacturerDTO) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -117,9 +117,9 @@ public class LogisticsOperatorService {
     @Path("{username}")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException{
+    public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 

@@ -40,7 +40,7 @@ public class ManufacturerService {
                            @QueryParam("email") String email,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
-    ) {
+    ) throws IllegalArgumentException {
 
         Map<String, String> filterMap = new HashMap<>();
         filterMap.put("username", username);
