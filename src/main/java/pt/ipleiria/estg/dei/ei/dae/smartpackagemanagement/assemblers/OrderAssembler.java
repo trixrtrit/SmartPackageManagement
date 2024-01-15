@@ -11,9 +11,13 @@ public class OrderAssembler {
         return new OrderDTO(
                 order.getId(),
                 order.getAddress(),
+                order.getPhoneNumber(),
+                order.getPostCode(),
+                order.getCity(),
                 order.getTotalPrice(),
                 order.getDate(),
-                order.getStatus()
+                order.getStatus(),
+                CustomerAssembler.from(order.getCustomer())
         );
     }
 

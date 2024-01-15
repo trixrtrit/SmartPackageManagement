@@ -16,6 +16,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderItem;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -39,6 +40,9 @@ public class OrderService {
         return new OrderDTO(
             order.getId(),
                 order.getAddress(),
+                order.getPhoneNumber(),
+                order.getPostCode(),
+                order.getCity(),
                 order.getTotalPrice(),
                 order.getDate(),
                 order.getStatus(),
@@ -54,6 +58,9 @@ public class OrderService {
         return new OrderDTO(
                 order.getId(),
                 order.getAddress(),
+                order.getPhoneNumber(),
+                order.getPostCode(),
+                order.getCity(),
                 order.getTotalPrice(),
                 order.getDate(),
                 order.getStatus(),
@@ -82,6 +89,7 @@ public class OrderService {
                 orderItem.getQuantity(),
                 orderItem.getPrice(),
                 orderItem.getOrder().getId(),
+                orderItem.getPackageType(),
                 productToDto(orderItem.getProduct())
         );
     }
@@ -106,6 +114,7 @@ public class OrderService {
         return new OrderItem(
                 orderItemDTO.getQuantity(),
                 orderItemDTO.getPrice(),
+                orderItemDTO.getPackageType(),
                 orderItemDTO.getProductId()
         );
     }
@@ -125,6 +134,9 @@ public class OrderService {
 
         var id = orderBean.create(
                 orderDTO.getAddress(),
+                orderDTO.getPhoneNumber(),
+                orderDTO.getPostCode(),
+                orderDTO.getCity(),
                 orderDTO.getTotalPrice(),
                 orderDTO.getDate(),
                 username,
@@ -158,8 +170,8 @@ public class OrderService {
     @Path("{id}/update-status")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"}) //como é que se vai fazer update automático??
-    public Response updateStatus(@PathParam("id") Long id, String newOrderStatus) throws MyEntityNotFoundException, MyValidationException {
-        orderBean.updateStatus(id, newOrderStatus);
+    public Response updateStatus(@PathParam("id") Long id, OrderStatus orderStatus) throws MyEntityNotFoundException, MyValidationException {
+        orderBean.updateStatus(id, orderStatus);
         return Response.status(Response.Status.OK).build();
     }
 }

@@ -10,6 +10,7 @@ import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -36,7 +37,7 @@ public class OrderBean {
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public long create(String address, double totalPrice, Date date, String username, List<OrderItem> orderItems)
+    public long create(String address, String phoneNumber, String postCode, String city, double totalPrice, Date date, String username, List<OrderItem> orderItems)
             throws MyEntityExistsException, MyConstraintViolationException, MyEntityNotFoundException, MyValidationException {
 
 
@@ -67,7 +68,7 @@ public class OrderBean {
         var customer = (Customer) entityManager.find(Customer.class, username);
 
         try {
-            var order = new Order(address, totalPrice, date, OrderStatus.Pending, customer, orderItems);
+            var order = new Order(address, phoneNumber, postCode, city, totalPrice, date, OrderStatus.PENDING, customer, orderItems);
             entityManager.persist(order);
 
             for (var orderItem : order.getOrderItems()){
@@ -97,25 +98,14 @@ public class OrderBean {
 
     public void updateStatus(
             long id,
-            String status
+            OrderStatus orderStatus
     ) throws MyEntityNotFoundException, MyValidationException {
         var order  = this.find(id);
-        var orderStatus = OrderStatus.Pending;
-        try{
-            orderStatus = OrderStatus.valueOf(status);
-        }
-        catch (IllegalArgumentException exception){
-            throw new MyValidationException("Incorrect value for OrderStatus enum. Received:'" + status + "'");
-        }
 
         var currentStatus = order.getStatus();
 
-        if (currentStatus == OrderStatus.Rejected){
+        if (currentStatus == OrderStatus.REJECTED){
             throw new MyValidationException("Cannot update status of a Rejected Order");
-        }
-
-        if (orderStatus.ordinal() <= currentStatus.ordinal()){
-            throw new MyValidationException("Cannot assign a new status that is less or equal than the current one");
         }
 
         //todo add order log after status changes
