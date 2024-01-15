@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -7,14 +8,15 @@ import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
-import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.LogisticsOperator;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Hasher;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class LogisticsOperatorBean {
@@ -22,6 +24,8 @@ public class LogisticsOperatorBean {
     private EntityManager entityManager;
     @Inject
     private Hasher hasher;
+    @EJB
+    private QueryBean<LogisticsOperator> logisticsOperatorDAO;
 
     public void create(String username, String password, String name, String email)
             throws MyEntityExistsException, MyConstraintViolationException {
@@ -36,8 +40,16 @@ public class LogisticsOperatorBean {
         }
     }
 
-    public List<LogisticsOperator> getLogisticsOperators() {
-        return entityManager.createNamedQuery("getLogisticsOperators", LogisticsOperator.class).getResultList();
+    public List<LogisticsOperator> getLogisticsOperators(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("name", "asc");
+        orderMap.put("username", "asc");
+        return logisticsOperatorDAO.getEntities(LogisticsOperator.class, filterMap, orderMap, pageNumber, pageSize);
+    }
+
+    public long getLogisticsOperatorsCount(Map<String, String> filterMap) {
+        return logisticsOperatorDAO.getEntitiesCount(LogisticsOperator.class, filterMap);
     }
 
     public boolean exists(String username) {

@@ -27,19 +27,6 @@ public class UserDTO implements Serializable {
         this.role = role;
     }
 
-    public static UserDTO from(User user) {
-        return new UserDTO(
-                user.getUsername(),
-                user.getName(),
-                user.getEmail(),
-                Hibernate.getClass(user).getSimpleName()
-        );
-    }
-
-    public static List<UserDTO> from(List<User> users) {
-        return users.stream().map(UserDTO::from).collect(Collectors.toList());
-    }
-
     public String getUsername() {
         return username;
     }

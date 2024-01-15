@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.LogisticsOperatorAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.LogisticsOperatorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ManufacturerDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.LogisticsOperatorBean;
@@ -14,10 +15,12 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.LogisticsOper
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("logistics-operator")
 @Produces({MediaType.APPLICATION_JSON})
@@ -30,23 +33,28 @@ public class LogisticsOperatorService {
     @Context
     private SecurityContext securityContext;
 
-    private LogisticsOperatorDTO toDTO(LogisticsOperator logisticsOperator) {
-        return new LogisticsOperatorDTO(
-                logisticsOperator.getUsername(),
-                logisticsOperator.getPassword(),
-                logisticsOperator.getEmail(),
-                logisticsOperator.getName()
-        );
-    }
-
-    private List<LogisticsOperatorDTO> toDTOs(List<LogisticsOperator> logisticsOperators) {
-        return logisticsOperators.stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
     @GET
     @Path("/all")
-    public List<LogisticsOperatorDTO> getAll() {
-        return toDTOs(logisticsOperatorBean.getLogisticsOperators());
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getAll(@QueryParam("username") String username,
+                           @QueryParam("name") String name,
+                           @QueryParam("email") String email,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) throws IllegalArgumentException {
+
+        Map<String, String> filterMap = new HashMap<>();
+        filterMap.put("username", username);
+        filterMap.put("name", name);
+        filterMap.put("email", email);
+
+        var dtos = LogisticsOperatorAssembler.from(logisticsOperatorBean.getLogisticsOperators(filterMap, page, pageSize));
+        long totalItems = logisticsOperatorBean.getLogisticsOperatorsCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<LogisticsOperatorDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @GET
@@ -57,14 +65,14 @@ public class LogisticsOperatorService {
     public Response get(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
 
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
         LogisticsOperator logisticsOperator = logisticsOperatorBean.find(username);
 
         if (logisticsOperator != null) {
-            return Response.ok(toDTO(logisticsOperator)).build();
+            return Response.ok(LogisticsOperatorAssembler.from(logisticsOperator)).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_LOGISTICS_OPERATOR")
@@ -83,7 +91,7 @@ public class LogisticsOperatorService {
                 logisticsOperatorDTO.getEmail()
         );
         var logisticsOperator = logisticsOperatorBean.find(logisticsOperatorDTO.getUsername());
-        return Response.status(Response.Status.CREATED).entity(toDTO(logisticsOperator)).build();
+        return Response.status(Response.Status.CREATED).entity(LogisticsOperatorAssembler.from(logisticsOperator)).build();
     }
 
     @PUT
@@ -92,7 +100,7 @@ public class LogisticsOperatorService {
     @RolesAllowed({"LogisticsOperator"})
     public Response update(@PathParam("username") String username, ManufacturerDTO manufacturerDTO) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
@@ -102,20 +110,20 @@ public class LogisticsOperatorService {
                 manufacturerDTO.getEmail()
         );
         var logisticsOperator = logisticsOperatorBean.find(username);
-        return Response.ok(toDTO(logisticsOperator)).build();
+        return Response.ok(LogisticsOperatorAssembler.from(logisticsOperator)).build();
     }
 
     @DELETE
     @Path("{username}")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException{
+    public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (!principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
         LogisticsOperator logisticsOperator = logisticsOperatorBean.delete(username);
-        return Response.status(Response.Status.OK).entity(toDTO(logisticsOperator)).build();
+        return Response.status(Response.Status.OK).entity(LogisticsOperatorAssembler.from(logisticsOperator)).build();
     }
 }

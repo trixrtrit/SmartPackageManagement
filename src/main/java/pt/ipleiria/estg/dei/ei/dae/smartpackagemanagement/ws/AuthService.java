@@ -8,9 +8,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.UserAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.AuthDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ChangePasswordDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.UserDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.UserBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.User;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -61,6 +61,6 @@ public class AuthService {
     public Response getAuthenticatedUser() {
         var username = securityContext.getUserPrincipal().getName();
         var user = userBean.findOrFail(username);
-        return Response.ok(UserDTO.from(user)).build();
+        return Response.ok(UserAssembler.from(user)).build();
     }
 }

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
-import java.util.Date;
 
 @Entity
 @Table(name = "measurements")
