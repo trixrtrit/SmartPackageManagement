@@ -78,7 +78,7 @@ public class OrderBean {
             return order.getId();
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
-        }7
+        }
     }
 
     public Order find(Long id) throws MyEntityNotFoundException {

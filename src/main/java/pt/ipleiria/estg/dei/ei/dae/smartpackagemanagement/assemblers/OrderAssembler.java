@@ -13,7 +13,9 @@ public class OrderAssembler {
                 order.getAddress(),
                 order.getTotalPrice(),
                 order.getDate(),
-                order.getStatus()
+                order.getStatus(),
+                null,//todo
+                null//todo
         );
     }
 

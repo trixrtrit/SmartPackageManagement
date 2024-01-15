@@ -28,7 +28,9 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationR
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("customers")
 @Produces({MediaType.APPLICATION_JSON})
