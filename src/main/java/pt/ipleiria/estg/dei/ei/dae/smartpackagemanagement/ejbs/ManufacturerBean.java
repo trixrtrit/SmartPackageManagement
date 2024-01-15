@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
@@ -15,6 +16,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNot
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Hasher;
 
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class ManufacturerBean {
@@ -23,6 +25,8 @@ public class ManufacturerBean {
     private EntityManager entityManager;
     @Inject
     private Hasher hasher;
+    @EJB
+    private QueryBean<Manufacturer> manufacturerDAO;
 
     public void create(String username, String password, String name, String email)
             throws MyEntityExistsException, MyConstraintViolationException {
@@ -37,8 +41,12 @@ public class ManufacturerBean {
         }
     }
 
-    public List<Manufacturer> getManufacturers() {
-        return entityManager.createNamedQuery("getManufacturers", Manufacturer.class).getResultList();
+    public List<Manufacturer> getManufacturers(Map<String, String> filterMap, int pageNumber, int pageSize) {
+        return manufacturerDAO.getEntities(Manufacturer.class, filterMap, pageNumber, pageSize);
+    }
+
+    public long getManufacturersCount(Map<String, String> filterMap) {
+        return manufacturerDAO.getEntitiesCount(Manufacturer.class, filterMap);
     }
 
     public Manufacturer getManufacturerProducts(String username) throws MyEntityNotFoundException {

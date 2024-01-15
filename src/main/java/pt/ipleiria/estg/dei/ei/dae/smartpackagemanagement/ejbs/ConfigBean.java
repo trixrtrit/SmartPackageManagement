@@ -124,7 +124,7 @@ public class ConfigBean {
     }
 
     public void seedProducts(int size) {
-        var manufacturers = manufacturerBean.getManufacturers();
+        var manufacturers = manufacturerBean.getManufacturers(null, 1, size);
         try {
             for (int i = 0; i < size; i++) {
                 var manufacturer = manufacturers.get(faker.number().numberBetween(0, manufacturers.size()));

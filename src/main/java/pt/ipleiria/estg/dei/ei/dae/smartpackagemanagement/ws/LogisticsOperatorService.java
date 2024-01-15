@@ -15,9 +15,12 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.LogisticsOper
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 @Path("logistics-operator")
 @Produces({MediaType.APPLICATION_JSON})
@@ -32,8 +35,26 @@ public class LogisticsOperatorService {
 
     @GET
     @Path("/all")
-    public List<LogisticsOperatorDTO> getAll() {
-        return LogisticsOperatorAssembler.from(logisticsOperatorBean.getLogisticsOperators());
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getAll(@QueryParam("username") String username,
+                                             @QueryParam("name") String name,
+                                             @QueryParam("email") String email,
+                                             @DefaultValue("1") @QueryParam("page") int page,
+                                             @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) {
+
+        Map<String, String> filterMap = new HashMap<>();
+        filterMap.put("username", username);
+        filterMap.put("name", name);
+        filterMap.put("email", email);
+
+        var dtos = LogisticsOperatorAssembler.from(logisticsOperatorBean.getLogisticsOperators(filterMap, page, pageSize));
+        long totalItems = logisticsOperatorBean.getLogisticsOperatorsCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<LogisticsOperatorDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @GET
