@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.CustomerAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductParameterAssembler;
@@ -15,11 +16,16 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("products")
 @Transactional
@@ -32,8 +38,28 @@ public class ProductService {
     //TODO: adicionar DTO de orderItems
     @GET
     @Path("/all")
-    public List<ProductDTO> getAll() {
-        return ProductAssembler.from(productBean.getProducts());
+    public Response getAll(@QueryParam("reference") String reference,
+                           @QueryParam("name") String name,
+                           @QueryParam("description") String description,
+                           @QueryParam("minPrice") double minPrice,
+                           @QueryParam("maxPrice") double maxPrice,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) throws IllegalArgumentException {
+
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(reference, filterMap, "reference", "");
+        GenericFilterMapBuilder.addToFilterMap(name, filterMap, "name", "");
+        GenericFilterMapBuilder.addToFilterMap(description, filterMap, "description", "");
+        GenericFilterMapBuilder.addToFilterMap(minPrice, filterMap, "price", "gte");
+        GenericFilterMapBuilder.addToFilterMap(maxPrice, filterMap, "price", "lte");
+
+        var dtos = ProductAssembler.from(productBean.getProducts(filterMap, page, pageSize));
+        long totalItems = productBean.getProductsCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<ProductDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @GET

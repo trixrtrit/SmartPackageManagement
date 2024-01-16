@@ -27,7 +27,7 @@ public class ManufacturerBean {
     @Inject
     private Hasher hasher;
     @EJB
-    private QueryBean<Manufacturer> manufacturerDAO;
+    private QueryBean<Manufacturer> manufacturerQueryBean;
 
     public void create(String username, String password, String name, String email)
             throws MyEntityExistsException, MyConstraintViolationException {
@@ -47,11 +47,11 @@ public class ManufacturerBean {
         Map<String, String> orderMap = new LinkedHashMap<>();
         orderMap.put("name", "asc");
         orderMap.put("username", "asc");
-        return manufacturerDAO.getEntities(Manufacturer.class, filterMap, orderMap, pageNumber, pageSize);
+        return manufacturerQueryBean.getEntities(Manufacturer.class, filterMap, orderMap, pageNumber, pageSize);
     }
 
     public long getManufacturersCount(Map<String, String> filterMap) {
-        return manufacturerDAO.getEntitiesCount(Manufacturer.class, filterMap);
+        return manufacturerQueryBean.getEntitiesCount(Manufacturer.class, filterMap);
     }
 
     public Manufacturer getManufacturerProducts(String username) throws MyEntityNotFoundException {

@@ -18,6 +18,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNot
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,9 +44,9 @@ public class ManufacturerService {
     ) throws IllegalArgumentException {
 
         Map<String, String> filterMap = new HashMap<>();
-        filterMap.put("username", username);
-        filterMap.put("name", name);
-        filterMap.put("email", email);
+        GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "");
+        GenericFilterMapBuilder.addToFilterMap(name, filterMap, "name", "");
+        GenericFilterMapBuilder.addToFilterMap(email, filterMap, "email", "");
 
         var dtos = ManufacturerAssembler.from(manufacturerBean.getManufacturers(filterMap, page, pageSize));
         long totalItems = manufacturerBean.getManufacturersCount(filterMap);

@@ -27,7 +27,7 @@ public class CustomerBean {
     @Inject
     private Hasher hasher;
     @EJB
-    private QueryBean<Customer> customerDAO;
+    private QueryBean<Customer> customerQueryBean;
 
     public void create(String username, String password, String name, String email, String nif, String address)
             throws MyEntityExistsException, MyConstraintViolationException {
@@ -47,11 +47,11 @@ public class CustomerBean {
         Map<String, String> orderMap = new LinkedHashMap<>();
         orderMap.put("name", "asc");
         orderMap.put("username", "asc");
-        return customerDAO.getEntities(Customer.class, filterMap, orderMap, pageNumber, pageSize);
+        return customerQueryBean.getEntities(Customer.class, filterMap, orderMap, pageNumber, pageSize);
     }
 
     public long getCustomersCount(Map<String, String> filterMap) {
-        return customerDAO.getEntitiesCount(Customer.class, filterMap);
+        return customerQueryBean.getEntitiesCount(Customer.class, filterMap);
     }
 
     public Customer getCustomerOrders(String username) throws MyEntityNotFoundException{

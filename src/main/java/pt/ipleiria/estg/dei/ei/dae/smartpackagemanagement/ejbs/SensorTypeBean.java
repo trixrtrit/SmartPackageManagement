@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -10,12 +11,16 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstrain
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class SensorTypeBean {
     @PersistenceContext
     private EntityManager entityManager;
+    @EJB
+    private QueryBean<SensorType> sensorTypeQueryBean;
 
     public long create(String name, String measurementType)
             throws MyEntityExistsException, MyConstraintViolationException, MyEntityNotFoundException {
@@ -32,10 +37,17 @@ public class SensorTypeBean {
         }
     }
 
-    public List<SensorType> getProductParameters() {
-        return entityManager.createNamedQuery("getSensorTypes", SensorType.class).getResultList();
+    public List<SensorType> getProductParameters(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("name", "asc");
+        orderMap.put("measurementUnit", "asc");
+        return sensorTypeQueryBean.getEntities(SensorType.class, filterMap, orderMap, pageNumber, pageSize);
     }
 
+    public long getSensorTypeCount(Map<String, String> filterMap) {
+        return sensorTypeQueryBean.getEntitiesCount(SensorType.class, filterMap);
+    }
 
     public boolean exists(String name) {
         var query = entityManager.createQuery(
@@ -65,5 +77,4 @@ public class SensorTypeBean {
         entityManager.remove(sensorType);
         return sensorType;
     }
-
 }

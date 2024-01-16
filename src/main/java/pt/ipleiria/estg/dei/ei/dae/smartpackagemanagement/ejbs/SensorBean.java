@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -8,17 +9,20 @@ import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class SensorBean {
 
     @PersistenceContext
     private EntityManager entityManager;
+    @EJB
+    private QueryBean<Sensor> sensorQueryBean;
 
     public long create(
 
@@ -38,8 +42,15 @@ public class SensorBean {
         }
     }
 
-    public List<Sensor> getSensors() {
-        return entityManager.createNamedQuery("getSensors", Sensor.class).getResultList();
+    public List<Sensor> getSensors(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("name", "asc");
+        return sensorQueryBean.getEntities(Sensor.class, filterMap, orderMap, pageNumber, pageSize);
+    }
+
+    public long getSensorsCount(Map<String, String> filterMap) {
+        return sensorQueryBean.getEntitiesCount(Sensor.class, filterMap);
     }
 
     public Sensor getSensorPackages(long id) throws MyEntityNotFoundException {
@@ -99,6 +110,5 @@ public class SensorBean {
         entityManager.remove(sensor);
         return sensor;
     }
-
 
 }
