@@ -36,6 +36,8 @@ public class SensorService {
 
     @GET
     @Path("/all")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
     public List<SensorDTO> getAll() {
         return SensorAssembler.from(sensorBean.getSensors());
     }
@@ -43,6 +45,8 @@ public class SensorService {
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
     public Response get(@PathParam("id") long id) throws MyEntityNotFoundException {
         Sensor sensor = sensorBean.find(id);
 
@@ -87,7 +91,7 @@ public class SensorService {
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"Manufacturer"}) //todo rever
+    @RolesAllowed({"LogisticsOperator"})
     public Response create(SensorDTO sensorDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long sensorId = sensorBean.create(
@@ -102,7 +106,7 @@ public class SensorService {
     @PUT
     @Path("{id}")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response update(@PathParam("id") long id, SensorDTO sensorDTO)
             throws MyEntityNotFoundException, MyConstraintViolationException {
         sensorBean.update(
@@ -117,7 +121,7 @@ public class SensorService {
     @DELETE
     @Path("{id}")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})//todo rever
+    @RolesAllowed({"LogisticsOperator"})
     public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
         Sensor sensor = sensorBean.delete(id);
         return Response.status(Response.Status.OK).entity(SensorAssembler.from(sensor)).build();
