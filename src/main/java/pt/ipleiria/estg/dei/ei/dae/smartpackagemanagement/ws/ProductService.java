@@ -48,7 +48,7 @@ public class ProductService {
     ) throws IllegalArgumentException {
 
         Map<String, String> filterMap = new HashMap<>();
-        GenericFilterMapBuilder.addToFilterMap(reference, filterMap, "reference", "");
+        GenericFilterMapBuilder.addToFilterMap(reference, filterMap, "productReference", "");
         GenericFilterMapBuilder.addToFilterMap(name, filterMap, "name", "");
         GenericFilterMapBuilder.addToFilterMap(description, filterMap, "description", "");
         GenericFilterMapBuilder.addToFilterMap(minPrice, filterMap, "price", "gte");

@@ -11,10 +11,8 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.SensorBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -24,7 +22,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Path("sensors")
@@ -102,12 +99,11 @@ public class SensorService {
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"Manufacturer"}) //todo rever
+    @RolesAllowed({"LogisticsOperator"})
     public Response create(SensorDTO sensorDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long sensorId = sensorBean.create(
                 sensorDTO.getName(),
-                //sensorDTO.getPackages(),
                 sensorDTO.getSensorType().getId()
                 );
         var sensor = sensorBean.find(sensorId);
@@ -117,7 +113,7 @@ public class SensorService {
     @PUT
     @Path("{id}")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response update(@PathParam("id") long id, SensorDTO sensorDTO)
             throws MyEntityNotFoundException, MyConstraintViolationException {
         sensorBean.update(
@@ -132,24 +128,9 @@ public class SensorService {
     @DELETE
     @Path("{id}")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})//todo rever
+    @RolesAllowed({"LogisticsOperator"})
     public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
         Sensor sensor = sensorBean.delete(id);
         return Response.status(Response.Status.OK).entity(SensorAssembler.from(sensor)).build();
     }
-
-    private SensorTypeDTO sensorTypetoDTO(SensorType sensorType){
-        return new SensorTypeDTO(
-                sensorType.getId(),
-                sensorType.getName(),
-                sensorType.getMeasurementUnit()
-        );
-    }
-    private SensorType sensorTypeDTOtoSensorType(SensorTypeDTO sensorTypeDTO){
-        return new SensorType(
-                sensorTypeDTO.getName(),
-                sensorTypeDTO.getMeasurementUnit()
-        );
-    }
-
 }
