@@ -185,7 +185,7 @@ public class ConfigBean {
     }
 
     public void seedProductParameters(int size) {
-        var products = productBean.getProducts();
+        var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
         var sensorTypes = sensorTypeBean.getProductParameters();
         try {
             int count = 0;
@@ -233,7 +233,7 @@ public class ConfigBean {
 
     private void seedPackages(int size, int maxSensorsPerPackage) {
         var sensors = sensorBean.getSensors();
-        var products = productBean.getProducts();
+        var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
         var packTypes = PackageType.values();
         int packTypesLength = packTypes.length;
         try {
