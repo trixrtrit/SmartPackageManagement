@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -10,10 +11,8 @@ import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
@@ -21,12 +20,16 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class ProductBean {
     @PersistenceContext
     private EntityManager entityManager;
+    @EJB
+    private QueryBean<Product> productQueryBean;
 
     public long create(
             String name,
@@ -61,8 +64,16 @@ public class ProductBean {
         }
     }
 
-    public List<Product> getProducts() {
-        return entityManager.createNamedQuery("getProducts", Product.class).getResultList();
+    public List<Product> getProducts(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("price", "asc");
+        orderMap.put("name", "asc");
+        return productQueryBean.getEntities(Product.class, filterMap, orderMap, pageNumber, pageSize);
+    }
+
+    public long getProductsCount(Map<String, String> filterMap) {
+        return productQueryBean.getEntitiesCount(Product.class, filterMap);
     }
 
     public List<Product> getProductsForExport() {

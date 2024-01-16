@@ -18,6 +18,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNot
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,11 +47,11 @@ public class CustomerService {
     ) throws IllegalArgumentException {
 
         Map<String, String> filterMap = new HashMap<>();
-        filterMap.put("username", username);
-        filterMap.put("name", name);
-        filterMap.put("email", email);
-        filterMap.put("nif", nif);
-        filterMap.put("address", address);
+        GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "");
+        GenericFilterMapBuilder.addToFilterMap(name, filterMap, "name", "");
+        GenericFilterMapBuilder.addToFilterMap(email, filterMap, "email", "");
+        GenericFilterMapBuilder.addToFilterMap(nif, filterMap, "nif", "");
+        GenericFilterMapBuilder.addToFilterMap(address, filterMap, "address", "");
 
         var dtos = CustomerAssembler.from(customerBean.getCustomers(filterMap, page, pageSize));
         long totalItems = customerBean.getCustomersCount(filterMap);
