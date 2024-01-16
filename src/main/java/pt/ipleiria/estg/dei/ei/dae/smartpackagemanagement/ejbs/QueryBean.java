@@ -4,6 +4,7 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.*;
 
 import java.time.Instant;
@@ -71,9 +72,6 @@ public class QueryBean<T> {
                 }
 
                 switch (dataType) {
-                    case "String":
-                        specifications.add(new DefaultStringSpecification<T>(fieldName, fieldValue));
-                        break;
                     case "Double":
                         specifications.add(new DoubleSpecification<T>(fieldName, Double.parseDouble(fieldValue), operation));
                         break;
@@ -82,6 +80,16 @@ public class QueryBean<T> {
                         break;
                     case "Instant":
                         specifications.add(new DateSpecification<T>(fieldName, Instant.parse(fieldValue), operation));
+                        break;
+                    case "Long":
+                        specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));
+                        break;
+                    default:
+                        if(operation.equals("enum")) {
+                            specifications.add(new PackageTypeSpecification<T>(fieldName, PackageType.valueOf(fieldValue)));
+                        }
+                        else
+                            specifications.add(new DefaultStringSpecification<T>(fieldName, fieldValue));
                         break;
                 }
             }

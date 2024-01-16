@@ -1,16 +1,19 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications;
 
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
+
 import java.time.Instant;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class GenericFilterMapBuilder {
     private final static String separator = "/_/";
 
     public static <T> void addToFilterMap(T param, Map<String, String> filterMap, String keyField, String operation) {
-        if (param == null || (param.getClass().equals(Double.class)
-                || param.getClass().equals(double.class)) && (Double) param == 0.0) {
+        if (param == null || (param instanceof Number && ((Number) param).doubleValue() == 0.0)) {
             return;
         }
+
         String datatype;
         String valueField;
         if (param.getClass().equals(String.class)) {
@@ -32,11 +35,23 @@ public class GenericFilterMapBuilder {
         } else if (param.getClass().equals(Boolean.class) || param.getClass().equals(boolean.class)) {
             datatype = "Boolean";
             valueField = param.toString();
-        } else {
+        }
+        else {
             datatype = param.getClass().getSimpleName();
             valueField = param.toString();
         }
+        if(operation.equals("enum")) {
+            try {
+                valueField = valueField.toUpperCase();
+                PackageType.valueOf(valueField);
+            } catch (IllegalArgumentException e) {
+                return;
+            }
+        }
         String key = datatype + separator + keyField + separator + operation;
+        Logger logger = Logger.getLogger("GenericFilterMapBuilder");
+        logger.severe(key);
+        logger.severe(valueField);
         filterMap.put(key, valueField);
     }
 

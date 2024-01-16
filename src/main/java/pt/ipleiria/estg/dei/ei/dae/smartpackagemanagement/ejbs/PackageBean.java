@@ -1,5 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
@@ -7,10 +8,8 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -18,12 +17,16 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNot
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageProductAssociationViolationException;
 
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class PackageBean {
     @PersistenceContext
     private EntityManager entityManager;
+    @EJB
+    private QueryBean<Package> packageQueryBean;
 
     public long create(long code, String material, PackageType packageType)
             throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
@@ -39,8 +42,16 @@ public class PackageBean {
         }
     }
 
-    public List<Package> getPackages() {
-        return entityManager.createNamedQuery("getPackages", Package.class).getResultList();
+    public List<Package> getPackages(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("code", "asc");
+        orderMap.put("packageType", "asc");
+        return packageQueryBean.getEntities(Package.class, filterMap, orderMap, pageNumber, pageSize);
+
+    }
+    public long getPackagesCount(Map<String, String> filterMap) {
+        return packageQueryBean.getEntitiesCount(Package.class, filterMap);
     }
 
     public Package getPackageProducts(long code) throws MyEntityNotFoundException {

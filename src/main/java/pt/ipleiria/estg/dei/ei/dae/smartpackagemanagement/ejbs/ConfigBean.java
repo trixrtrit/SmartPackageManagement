@@ -259,7 +259,7 @@ public class ConfigBean {
     }
 
     private void seedMeasurements(int size) {
-        var packages = packageBean.getPackages();
+        var packages = packageBean.getPackages(new HashMap<String, String>(), 1, size);
          try {
              for (Package aPackage: packages) {
                 var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());
