@@ -232,7 +232,7 @@ public class ConfigBean {
     }
 
     private void seedPackages(int size, int maxSensorsPerPackage) {
-        var sensors = sensorBean.getSensors();
+        var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size);
         var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
         var packTypes = PackageType.values();
         int packTypesLength = packTypes.length;

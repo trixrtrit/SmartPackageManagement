@@ -48,8 +48,8 @@ public class PackageBean {
         orderMap.put("code", "asc");
         orderMap.put("packageType", "asc");
         return packageQueryBean.getEntities(Package.class, filterMap, orderMap, pageNumber, pageSize);
-
     }
+
     public long getPackagesCount(Map<String, String> filterMap) {
         return packageQueryBean.getEntitiesCount(Package.class, filterMap);
     }
