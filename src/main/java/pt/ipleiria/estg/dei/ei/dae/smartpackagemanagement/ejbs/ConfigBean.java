@@ -5,6 +5,8 @@ import jakarta.ejb.EJB;
 import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import net.datafaker.Faker;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
@@ -32,15 +34,22 @@ public class ConfigBean {
     private SensorTypeBean sensorTypeBean;
     @EJB
     private SensorBean sensorBean;
+    @EJB
+    private MeasurementBean measurementBean;
 
     private final Faker faker = new Faker();
 
     private static final Map<String, String> sensorUnits = new HashMap<>();
 
     private static final Logger logger = Logger.getLogger("ebjs.ConfigBean");
+
+    private int lastAssociatedSensorId = 0;
     @PostConstruct
     public void populateDB() {
         int seedSize = 100;
+        int maxSensorsPerPackage = 4;
+        int packageSize = seedSize/maxSensorsPerPackage;
+        int measurementSize = 20;
         System.out.println("Hello Java EE!");
         seedLogOperators(seedSize);
         seedManufacturers(seedSize);
@@ -49,6 +58,8 @@ public class ConfigBean {
         seedSensorType();
         seedProductParameters(seedSize);
         seedSensors(seedSize);
+        seedPackages(packageSize, maxSensorsPerPackage);
+        seedMeasurements(measurementSize);
         try {
             logisticsOperatorBean.create(
                     "gatoMega",
@@ -249,8 +260,8 @@ public class ConfigBean {
 
     private void seedMeasurements(int size) {
         var packages = packageBean.getPackages(new HashMap<String, String>(), 1, size);
-         try {
-             for (Package aPackage: packages) {
+        try {
+            for (Package aPackage: packages) {
                 var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());
                 for(Sensor sensor: sensors) {
                     for (int i = 0; i < 20; i++) {
@@ -261,9 +272,9 @@ public class ConfigBean {
                         );
                     }
                 }
-             }
-         } catch (Exception ex) {
-             logger.severe(ex.getMessage());
-         }
-     }
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
 }
