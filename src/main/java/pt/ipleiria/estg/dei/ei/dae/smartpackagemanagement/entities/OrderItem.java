@@ -2,9 +2,12 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 @Entity
-@Table(name = "orderItems")
+@Table(name = "orderItems",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"id", "product_id", "packageType"})
+)
 public class
 OrderItem extends Versionable{
 
@@ -13,6 +16,10 @@ OrderItem extends Versionable{
     private Long id;
     private float quantity;
     private double price;
+
+    @Enumerated(EnumType.STRING)
+    private PackageType packageType;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     @NotNull
@@ -26,10 +33,20 @@ OrderItem extends Versionable{
     public OrderItem() {
     }
 
-    public OrderItem(Long id, float quantity, double price, Product product, Order order) {
+    public OrderItem(float quantity, double price, PackageType packageType, long productId) {
+        this.quantity = quantity;
+        this.price = price;
+        //hack for order creation
+        this.product = new Product();
+        this.packageType = packageType;
+        this.product.setId(productId);
+    }
+
+    public OrderItem(Long id, float quantity, double price, PackageType packageType, Product product, Order order) {
         this.id = id;
         this.quantity = quantity;
         this.price = price;
+        this.packageType = packageType;
         this.product = product;
         this.order = order;
     }
@@ -42,12 +59,12 @@ OrderItem extends Versionable{
         this.id = id;
     }
 
-    public float getQuantity() {
-        return quantity;
+    public void setQuantity(float quantity) {
+        this.quantity = quantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public float getQuantity() {
+        return quantity;
     }
 
     public double getPrice() {
@@ -72,5 +89,12 @@ OrderItem extends Versionable{
 
     public void setOrder(Order order) {
         this.order = order;
+    }
+    public PackageType getPackageType() {
+        return packageType;
+    }
+
+    public void setPackageType(PackageType packageType) {
+        this.packageType = packageType;
     }
 }

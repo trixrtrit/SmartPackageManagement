@@ -2,6 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -9,15 +10,29 @@ import java.util.List;
 
 @Entity
 @Table(name = "orders")
+@NamedQueries({
+        @NamedQuery(
+                name = "getOrders",
+                query = "SELECT c FROM Order c ORDER BY c.date DESC"
+        ),
+        @NamedQuery(
+                name = "getCustomerOrders",
+                query = "SELECT c FROM Order c WHERE c.customer.username = :username ORDER BY c.date DESC"
+        )
+})
 public class Order extends Versionable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String address;
+    private String phoneNumber;
+    private String postCode;
+    private String city;
     private double totalPrice;
     private Date date;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @ManyToOne
     @JoinColumn(name = "customer_username")
@@ -31,14 +46,17 @@ public class Order extends Versionable{
         this.orderItems = new ArrayList<OrderItem>();
     }
 
-    public Order(long id, String address, double totalPrice, Date date, String status, Customer customer, LogisticsOperator logisticsOperator) {
+    public Order(String address, String phoneNumber, String postCode, String city, double totalPrice, Date date, OrderStatus status, Customer customer, List<OrderItem> orderItems) {
         this.id = id;
         this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.postCode = postCode;
+        this.city = city;
         this.totalPrice = totalPrice;
         this.date = date;
         this.status = status;
         this.customer = customer;
-        this.orderItems = new ArrayList<OrderItem>();
+        this.orderItems = orderItems;
     }
 
     public long getId() {
@@ -57,6 +75,30 @@ public class Order extends Versionable{
         this.address = address;
     }
 
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getPostCode() {
+        return postCode;
+    }
+
+    public void setPostCode(String postCode) {
+        this.postCode = postCode;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
     public double getTotalPrice() {
         return totalPrice;
     }
@@ -73,11 +115,11 @@ public class Order extends Versionable{
         this.date = date;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 
