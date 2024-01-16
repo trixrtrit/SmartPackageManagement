@@ -186,7 +186,7 @@ public class ConfigBean {
 
     public void seedProductParameters(int size) {
         var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
-        var sensorTypes = sensorTypeBean.getProductParameters();
+        var sensorTypes = sensorTypeBean.getProductParameters(new HashMap<String, String>(), 1, size);
         try {
             int count = 0;
             while (count < size) {
@@ -210,7 +210,7 @@ public class ConfigBean {
     }
 
     private void seedSensors(int size) {
-        var sensorTypes = sensorTypeBean.getProductParameters();
+        var sensorTypes = sensorTypeBean.getProductParameters(new HashMap<String, String>(), 1, size);
         Map<String, Integer> sensorUnitCount = new HashMap<>();
         try {
             int count = 0;
