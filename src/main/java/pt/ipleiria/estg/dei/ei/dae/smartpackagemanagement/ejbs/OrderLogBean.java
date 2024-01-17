@@ -53,7 +53,10 @@ public class OrderLogBean {
             Long orderId,
             Instant startDate,
             Instant endDate,
-            OrderStatus status
+            OrderStatus status,
+            String customerUsername,
+            String logisticsOperatorUsername
+
     ) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<OrderLog> query = builder.createQuery(OrderLog.class);
@@ -76,6 +79,13 @@ public class OrderLogBean {
 
         if(status != null) {
             predicates.add(builder.isNull(root.get("orderStatus")));
+        }
+
+        if (customerUsername != null) {
+            predicates.add(builder.equal(root.get("customerUsername"), customerUsername));
+        }
+        if (logisticsOperatorUsername != null) {
+            predicates.add(builder.equal(root.get("logisticsOperatorUsername"), logisticsOperatorUsername));
         }
 
         query.where(builder.and(predicates.toArray(new Predicate[0])));
