@@ -24,14 +24,14 @@ public class OrderLogBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public long create(String logEntry, long orderId)
+    public long create(String logEntry, long orderId, OrderStatus newStatus, String logisticsOperatorUsername)
             throws MyConstraintViolationException, MyEntityNotFoundException {
         Order order = entityManager.find(Order.class, orderId);
         if (order == null) {
             throw new MyEntityNotFoundException("No order with id '" + orderId + "' has been found.");
         }
         try {
-            var newEntry = new OrderLog(logEntry, order);
+            var newEntry = new OrderLog(logEntry, order, newStatus, logisticsOperatorUsername);
             newEntry.setTimestamp(Instant.now());
 
             entityManager.persist(newEntry);
@@ -75,14 +75,14 @@ public class OrderLogBean {
         }
 
         if(status != null) {
-            predicates.add(builder.isNull(root.get("order").get("status")));
+            predicates.add(builder.isNull(root.get("orderStatus")));
         }
 
         query.where(builder.and(predicates.toArray(new Predicate[0])));
 
         query.orderBy(builder.asc(root.get("order").get("id")),
-                builder.asc(root.get("order").get("date")),
-                builder.asc(root.get("order").get("status")));
+                builder.asc(root.get("order").get("date"))
+                );
 
         return entityManager.createQuery(query).getResultList();
     }
