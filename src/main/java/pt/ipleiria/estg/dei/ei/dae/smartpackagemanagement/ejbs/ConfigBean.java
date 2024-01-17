@@ -6,8 +6,12 @@ import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import net.datafaker.Faker;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.PrimaryPackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +40,12 @@ public class ConfigBean {
     private SensorBean sensorBean;
     @EJB
     private MeasurementBean measurementBean;
+    @EJB
+    private PrimaryPackageTypeBean primaryPackageTypeBean;
+    @EJB
+    private PrimaryPackageMeasurementUnitBean primaryPackageMeasurementUnitBean;
+    @EJB
+    private ProductCategoryBean productCategoryBean;
 
     private final Faker faker = new Faker();
 
@@ -45,13 +55,16 @@ public class ConfigBean {
 
     private int lastAssociatedSensorId = 0;
     @PostConstruct
-    public void populateDB() {
+    public void populateDB() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
         int seedSize = 100;
         int maxSensorsPerPackage = 4;
         int measurementSize = 20;
         System.out.println("Hello Java EE!");
         seedLogOperators(seedSize);
         seedManufacturers(seedSize);
+        seedPrimaryPackageTypes();
+        seedPrimaryPackageMeasurementUnits();
+        seedProductCategories();
         seedProducts(seedSize);
         seedCustomers(seedSize);
         seedSensorType();
@@ -122,17 +135,95 @@ public class ConfigBean {
         }
     }
 
+    public void seedPrimaryPackageTypes() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
+        var packageTypes = new String[]{
+                "Box",
+                "Container",
+                "Bottle",
+                "Bag",
+                "Barrel"
+        };
+
+        for (var packageType : packageTypes) {
+            primaryPackageTypeBean.create(packageType);
+        }
+    }
+
+    public void seedPrimaryPackageMeasurementUnits() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
+        var measurementUnits = new String[]{
+                "kg",
+                "liter(s)",
+                "meter(s)",
+                "unit(s)"
+        };
+
+        for (var measurementUnit : measurementUnits) {
+            primaryPackageMeasurementUnitBean.create(measurementUnit);
+        }
+    }
+
+    public void seedProductCategories() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
+        var productCategories = new String[]{
+                "Food",
+                "Electronics",
+                "Clothing",
+                "Footwear",
+                "Beauty Products",
+                "Groceries",
+                "Home Appliances",
+                "Furniture",
+                "Toys & Games",
+                "Books",
+                "Sports Equipment",
+                "Jewelry",
+                "Health & Wellness",
+                "Gardening Supplies",
+                "Pet Supplies",
+                "Office Supplies",
+                "Musical Instruments",
+                "Automotive Accessories",
+                "Bakery Items",
+                "Frozen Foods",
+                "Dairy Products",
+                "Snacks & Confectionery",
+                "Beverages",
+                "Baby Products",
+                "Art Supplies",
+                "Photography Equipment",
+                "Travel Accessories",
+                "DIY Tools",
+                "Computer Software",
+                "Video Games",
+                "Mobile Accessories"
+        };
+
+        for (var productCategory : productCategories) {
+            productCategoryBean.create(productCategory);
+        }
+    }
+
     public void seedProducts(int size) {
         var manufacturers = manufacturerBean.getManufacturers(new HashMap<String, String>(), 1, size);
+        var primaryPackageTypes = primaryPackageTypeBean.getTypes();
+        var primaryPackageUnits = primaryPackageMeasurementUnitBean.getUnits();
+        var productCategories = productCategoryBean.getCategories();
+
         try {
             for (int i = 0; i < size; i++) {
                 var manufacturer = manufacturers.get(faker.number().numberBetween(0, manufacturers.size()));
+                var primaryPackageType = primaryPackageTypes.get(faker.number().numberBetween(0, primaryPackageTypes.size()));
+                var primaryPackageUnit = primaryPackageUnits.get(faker.number().numberBetween(0, primaryPackageUnits.size()));
+                var productCategory = productCategories.get(faker.number().numberBetween(0, productCategories.size()));
+                System.out.println("seedProducts:" + i);
                 long productId = productBean.create(
                         faker.commerce().productName(),
                         faker.lorem().sentence(),
                         Double.parseDouble(faker.commerce().price().replaceAll("[^\\d.]", "")),
                         manufacturer.getUsername(),
                         faker.number().digits(8),
+                        primaryPackageUnit.getId(),
+                        primaryPackageType.getId(),
+                        productCategory.getId(),
                         faker.number().numberBetween(1,100),
                         faker.number().numberBetween(1,100),
                         faker.number().numberBetween(1,100)

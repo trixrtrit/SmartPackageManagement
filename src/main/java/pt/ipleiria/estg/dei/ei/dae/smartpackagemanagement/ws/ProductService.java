@@ -6,6 +6,8 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.Hibernate;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.CustomerAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductParameterAssembler;
@@ -53,7 +55,15 @@ public class ProductService {
         GenericFilterMapBuilder.addToFilterMap(minPrice, filterMap, "price", "gte");
         GenericFilterMapBuilder.addToFilterMap(maxPrice, filterMap, "price", "lte");
 
-        var dtos = ProductAssembler.from(productBean.getProducts(filterMap, page, pageSize));
+        var products = productBean.getProducts(filterMap, page, pageSize);
+
+        for (var product : products){
+            Hibernate.initialize(product.getPrimaryPackageMeasurementUnit());
+            Hibernate.initialize(product.getPrimaryPackageType());
+            Hibernate.initialize(product.getProductCategory());
+        }
+
+        var dtos = ProductAssembler.from(products);
         long totalItems = productBean.getProductsCount(filterMap);
         long totalPages = (totalItems + pageSize - 1) / pageSize;
         PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
@@ -66,6 +76,10 @@ public class ProductService {
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     public Response get(@PathParam("id") long id) throws MyEntityNotFoundException {
         Product product = productBean.find(id);
+
+        Hibernate.initialize(product.getPrimaryPackageMeasurementUnit());
+        Hibernate.initialize(product.getPrimaryPackageType());
+        Hibernate.initialize(product.getProductCategory());
 
         if (product != null) {
             return Response.ok(ProductAssembler.from(product)).build();
@@ -114,6 +128,9 @@ public class ProductService {
                 productDTO.getPrice(),
                 productDTO.getManufacturerUsername(),
                 productDTO.getReference(),
+                productDTO.getPrimaryPackageMeasurementUnitId(),
+                productDTO.getProductCategoryId(),
+                productDTO.getPrimaryPackageTypeId(),
                 productDTO.getPrimaryPackQuantity(),
                 productDTO.getSecondaryPackQuantity(),
                 productDTO.getTertiaryPackQuantity()

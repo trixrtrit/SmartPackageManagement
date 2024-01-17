@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 @Entity
-@Table(name = "orderItems",
+@Table(name = "order_items",
         uniqueConstraints = @UniqueConstraint(columnNames = {"id", "product_id", "packageType"})
 )
 public class

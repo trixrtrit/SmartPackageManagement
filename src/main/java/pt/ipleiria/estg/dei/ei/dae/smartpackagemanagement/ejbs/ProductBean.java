@@ -37,6 +37,9 @@ public class ProductBean {
             double price,
             String manufacturer_username,
             String reference,
+            long primaryPackageMeasurementUnitId,
+            long primaryPackageTypeId,
+            long productCategoryId,
             int primaryPackQuantity,
             int secondaryPackQuantity,
             int tertiaryPackQuantity
@@ -45,12 +48,34 @@ public class ProductBean {
         if (manufacturer == null){
             throw new MyEntityNotFoundException("Manufacturer with username '" + manufacturer_username + "' not found.");
         }
+
+        var primaryPackageMeasurementUnit = entityManager.find(PrimaryPackageMeasurementUnit.class, primaryPackageMeasurementUnitId);
+
+        if (primaryPackageMeasurementUnit == null){
+            throw new MyEntityNotFoundException("Primary PackageMeasurement Unit with id '" + primaryPackageMeasurementUnitId + "' not found.");
+        }
+
+        var primaryPackageType = entityManager.find(PrimaryPackageType.class, primaryPackageTypeId);
+
+        if (primaryPackageType == null){
+            throw new MyEntityNotFoundException("Primary Package Type with id '" + primaryPackageTypeId + "' not found.");
+        }
+
+        var productCategory = entityManager.find(ProductCategory.class, productCategoryId);
+
+        if (productCategory == null){
+            throw new MyEntityNotFoundException("Product Category with id '" + productCategoryId + "' not found.");
+        }
+
         try {
             Product product = new Product(
                     name,
                     description,
                     price,
                     manufacturer,
+                    primaryPackageMeasurementUnit,
+                    primaryPackageType,
+                    productCategory,
                     true,
                     reference,
                     primaryPackQuantity,

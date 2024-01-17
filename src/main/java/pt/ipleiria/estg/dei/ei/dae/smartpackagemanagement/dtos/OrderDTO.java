@@ -29,6 +29,7 @@ public class OrderDTO implements Serializable {
         this(id, address, phoneNumber, postCode, city, totalPrice, date, status, customer, new ArrayList<>());
     }
 
+
     public OrderDTO(Long id, String address, String phoneNumber, String postCode, String city, double totalPrice, Date date, OrderStatus status, CustomerDTO customer, List<OrderItemDTO> orderItems) {
         this.id = id;
         this.address = address;

@@ -27,7 +27,9 @@ public class OrderBean {
 
     public List<Order> getOrders() {
         Query query = entityManager.createNamedQuery("getOrders", Order.class);
-        return query.getResultList();
+        var result = query.getResultList();
+
+        return result;
     }
 
     public List<Order> getCustomerOrders(String username) {
@@ -90,9 +92,6 @@ public class OrderBean {
         }
         Hibernate.initialize(order.getOrderItems());
 
-        for (var orderItem : order.getOrderItems()){
-            Hibernate.initialize(orderItem.getProduct());
-        }
         return order;
     }
 

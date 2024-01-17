@@ -31,6 +31,15 @@ public class ProductDTO implements Serializable {
     private int secondaryPackQuantity;
     @PositiveOrZero
     private int tertiaryPackQuantity;
+    @Positive
+    private Long primaryPackageTypeId;
+    private String primaryPackageType;
+    @Positive
+    public Long primaryPackageMeasurementUnitId;
+    private String primaryPackageMeasurementUnit;
+    @Positive
+    public Long productCategoryId;
+    private String productCategory;
 
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
@@ -53,6 +62,9 @@ public class ProductDTO implements Serializable {
             float unitStock,
             float boxStock,
             float containerStock,
+            String primaryPackageType,
+            String primaryPackageMeasurementUnit,
+            String productCategory,
             int primaryPackQuantity,
             int secondaryPackQuantity,
             int tertiaryPackQuantity
@@ -67,6 +79,9 @@ public class ProductDTO implements Serializable {
         this.unitStock = unitStock;
         this.boxStock = boxStock;
         this.containerStock = containerStock;
+        this.primaryPackageType = primaryPackageType;
+        this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+        this.productCategory = productCategory;
         this.productParameters = new ArrayList<>();
         this.primaryPackQuantity = primaryPackQuantity;
         this.secondaryPackQuantity = secondaryPackQuantity;
@@ -81,7 +96,10 @@ public class ProductDTO implements Serializable {
             double price,
             boolean isActive,
             String manufacturerUsername,
-            String reference
+            String reference,
+            String primaryPackageType,
+            String primaryPackageMeasurementUnit,
+            String productCategory
     ) {
         this.id = id;
         this.name = name;
@@ -90,19 +108,11 @@ public class ProductDTO implements Serializable {
         this.isActive = isActive;
         this.reference = reference;
         this.manufacturerUsername = manufacturerUsername;
+        this.primaryPackageType = primaryPackageType;
+        this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+        this.productCategory = productCategory;
         //this.orderItems = new ArrayList<>();
     }
-
-    /*
-    public ProductDTO(Long id, String name, String description, double price, boolean isActive, float stock, List<OrderItem> orderItems) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.isActive = isActive;
-        this.stock = stock;
-        this.orderItems = orderItems;
-    }*/
 
     public Long getId() {
         return id;
@@ -208,12 +218,59 @@ public class ProductDTO implements Serializable {
         this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
-    /*
-    public List<OrderItem> getOrderItems() {
-        return orderItems;
+    public Long getPrimaryPackageTypeId() {
+        return primaryPackageTypeId;
     }
 
-    public void setOrderItems(List<OrderItem> orderItems) {
-        this.orderItems = orderItems;
-    }*/
+    public void setPrimaryPackageTypeId(Long primaryPackageTypeId) {
+        this.primaryPackageTypeId = primaryPackageTypeId;
+    }
+
+    public String getPrimaryPackageType() {
+        return primaryPackageType;
+    }
+
+    public void setPrimaryPackageType(String primaryPackageType) {
+        this.primaryPackageType = primaryPackageType;
+    }
+
+    public Long getPrimaryPackageMeasurementUnitId() {
+        return primaryPackageMeasurementUnitId;
+    }
+
+    public Long getProductCategoryId() {
+        return productCategoryId;
+    }
+
+    public void setProductCategoryId(Long productCategoryId) {
+        this.productCategoryId = productCategoryId;
+    }
+
+    public String getProductCategory() {
+        return productCategory;
+    }
+
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
+    }
+
+    public void setPrimaryPackageMeasurementUnitId(Long primaryPackageMeasurementUnitId) {
+        this.primaryPackageMeasurementUnitId = primaryPackageMeasurementUnitId;
+    }
+
+    public String getPrimaryPackageMeasurementUnit() {
+        return primaryPackageMeasurementUnit;
+    }
+
+    public void setPrimaryPackageMeasurementUnit(String primaryPackageMeasurementUnit) {
+        this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+    }
+
+    public List<ProductParameter> getProductParameters() {
+        return productParameters;
+    }
+
+    public void setProductParameters(List<ProductParameter> productParameters) {
+        this.productParameters = productParameters;
+    }
 }
