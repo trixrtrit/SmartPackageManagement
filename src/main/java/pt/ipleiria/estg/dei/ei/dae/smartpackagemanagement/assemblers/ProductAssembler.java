@@ -19,6 +19,8 @@ public class ProductAssembler {
                 product.getUnitStock(),
                 product.getBoxStock(),
                 product.getContainerStock(),
+                product.getPrimaryPackageType().getType(),
+                product.getPrimaryPackageMeasurementUnit().getUnit(),
                 product.getPrimaryPackQuantity(),
                 product.getSecondaryPackQuantity(),
                 product.getTertiaryPackQuantity()

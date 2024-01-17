@@ -17,11 +17,30 @@ public class OrderAssembler {
                 order.getTotalPrice(),
                 order.getDate(),
                 order.getStatus(),
+                CustomerAssembler.from(order.getCustomer()),
+                OrderItemAssembler.from(order.getOrderItems())
+        );
+    }
+
+    public static OrderDTO fromNoOrderItems(Order order) {
+        return new OrderDTO(
+                order.getId(),
+                order.getAddress(),
+                order.getPhoneNumber(),
+                order.getPostCode(),
+                order.getCity(),
+                order.getTotalPrice(),
+                order.getDate(),
+                order.getStatus(),
                 CustomerAssembler.from(order.getCustomer())
         );
     }
 
     public static List<OrderDTO> from(List<Order> orders) {
+        return orders.stream().map(OrderAssembler::from).collect(Collectors.toList());
+    }
+
+    public static List<OrderDTO> fromNoOrderItems(List<Order> orders) {
         return orders.stream().map(OrderAssembler::from).collect(Collectors.toList());
     }
 }
