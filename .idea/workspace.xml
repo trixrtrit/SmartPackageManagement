@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6ba3170c-2b35-4b1f-a0b8-297e76cb329d" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ejbs/ProductBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ejbs/ProductBean.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ws/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ws/ProductService.java" afterDir="false" />
-    </list>
+    <list default="true" id="6ba3170c-2b35-4b1f-a0b8-297e76cb329d" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,7 +74,7 @@
       <workItem from="1705363457445" duration="5420000" />
       <workItem from="1705445112359" duration="4683000" />
       <workItem from="1705451580001" duration="4923000" />
-      <workItem from="1705513882187" duration="7471000" />
+      <workItem from="1705513882187" duration="7910000" />
     </task>
     <servers />
   </component>
