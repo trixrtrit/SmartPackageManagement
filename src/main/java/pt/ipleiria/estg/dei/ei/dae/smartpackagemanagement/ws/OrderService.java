@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.OrderAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderItemDTO;
@@ -85,6 +86,15 @@ public class OrderService {
     @RolesAllowed({"Customer", "LogisticsOperator"})
     public Response getOrder(@PathParam("id") long id) throws MyEntityNotFoundException {
         var order = orderBean.find(id);
+
+        //não faço a mínima ideia se isto tá correto mas ok
+        for (var orderItem : order.getOrderItems()){
+            Hibernate.initialize(orderItem.getProduct());
+            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageMeasurementUnit());
+            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageType());
+            Hibernate.initialize(orderItem.getProduct().getProductCategory());
+        }
+
         return Response.status(Response.Status.CREATED).entity(OrderAssembler.from(order)).build();
     }
 

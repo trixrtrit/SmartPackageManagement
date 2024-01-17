@@ -92,12 +92,6 @@ public class OrderBean {
         }
         Hibernate.initialize(order.getOrderItems());
 
-        //não faço a mínima ideia se isto tá correto mas ok
-        for (var orderItem : order.getOrderItems()){
-            Hibernate.initialize(orderItem.getProduct());
-            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageMeasurementUnit());
-            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageType());
-        }
         return order;
     }
 
