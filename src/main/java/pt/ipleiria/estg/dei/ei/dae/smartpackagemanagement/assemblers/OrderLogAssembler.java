@@ -11,7 +11,10 @@ public class OrderLogAssembler {
         return new OrderLogDTO(
                 orderLog.getLogEntry(),
                 orderLog.getTimestamp(),
-                orderLog.getOrder().getId()
+                orderLog.getOrder().getId(),
+                orderLog.getOrderStatus(),
+                orderLog.getCustomerUsername(),
+                orderLog.getLogisticsOperatorUsername()
         );
     }
 

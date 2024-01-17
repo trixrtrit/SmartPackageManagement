@@ -37,7 +37,9 @@ public class OrderLogService {
     public Response getAll(@QueryParam("orderId") Long orderId,
                            @QueryParam("startDate") String startDateStr,
                            @QueryParam("endDate") String endDateStr,
-                           @QueryParam("status") OrderStatus status
+                           @QueryParam("status") OrderStatus status,
+                           @QueryParam("customerUsername") String customerUsername,
+                           @QueryParam("logisticsOperatorUsername") String logisticsOperatorUsername
     ) {
         Instant startDate = null;
         Instant endDate = null;
@@ -51,7 +53,7 @@ public class OrderLogService {
         } catch ( DateTimeParseException e ) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
         }
-        var dtos = OrderLogAssembler.from(orderLogBean.getOrderLogs(orderId, startDate, endDate, status));
+        var dtos = OrderLogAssembler.from(orderLogBean.getOrderLogs(orderId, startDate, endDate, status, customerUsername, logisticsOperatorUsername));
         return Response.ok(dtos).build();
     }
 
@@ -61,7 +63,9 @@ public class OrderLogService {
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long orderLogId = orderLogBean.create(
                 orderLogDTO.getLogEntry(),
-                orderLogDTO.getOrderId()
+                orderLogDTO.getOrderId(),
+                orderLogDTO.getOrderStatus(),
+                orderLogDTO.getLogisticsOperatorUsername()
         );
         var orderLog = orderLogBean.find(orderLogId);
         return Response.status(Response.Status.CREATED).entity(OrderLogAssembler.from(orderLog)).build();
