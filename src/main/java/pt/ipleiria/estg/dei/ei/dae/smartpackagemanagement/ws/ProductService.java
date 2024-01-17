@@ -6,7 +6,6 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.CustomerAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductParameterAssembler;
