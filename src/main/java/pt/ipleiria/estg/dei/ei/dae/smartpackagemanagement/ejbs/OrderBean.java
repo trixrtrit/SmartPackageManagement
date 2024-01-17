@@ -76,6 +76,9 @@ public class OrderBean {
                 entityManager.persist(orderItem);
             }
 
+            var orderLog = new OrderLogBean().create("Order created", order.getId(), OrderStatus.PENDING, null);
+
+
             return order.getId();
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
@@ -99,7 +102,7 @@ public class OrderBean {
     public void updateStatus(
             long id,
             OrderStatus orderStatus
-    ) throws MyEntityNotFoundException, MyValidationException {
+    ) throws MyEntityNotFoundException, MyValidationException, MyConstraintViolationException {
         var order  = this.find(id);
 
         var currentStatus = order.getStatus();
@@ -108,9 +111,10 @@ public class OrderBean {
             throw new MyValidationException("Cannot update status of a Rejected Order");
         }
 
-        //todo add order log after status changes
         entityManager.lock(order, LockModeType.OPTIMISTIC);
 
         order.setStatus(orderStatus);
+
+        var orderLog = new OrderLogBean().create("Order status updated", order.getId(), orderStatus, null);
     }
 }
