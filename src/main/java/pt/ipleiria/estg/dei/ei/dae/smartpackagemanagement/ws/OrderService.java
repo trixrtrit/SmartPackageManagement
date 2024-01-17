@@ -7,15 +7,11 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.OrderAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderItemDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.OrderBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderItem;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -35,80 +31,6 @@ public class OrderService {
 
     @Context
     private SecurityContext securityContext;
-
-    private OrderDTO toDTO(Order order){
-        return new OrderDTO(
-            order.getId(),
-                order.getAddress(),
-                order.getPhoneNumber(),
-                order.getPostCode(),
-                order.getCity(),
-                order.getTotalPrice(),
-                order.getDate(),
-                order.getStatus(),
-                customerToDTO(order.getCustomer())
-        );
-    }
-
-    private List<OrderDTO> toDTOs(List<Order> orders){
-        return orders.stream().map(this::toDTO).collect(Collectors.toList());
-    }
-
-    private OrderDTO orderItemToDto(Order order){
-        return new OrderDTO(
-                order.getId(),
-                order.getAddress(),
-                order.getPhoneNumber(),
-                order.getPostCode(),
-                order.getCity(),
-                order.getTotalPrice(),
-                order.getDate(),
-                order.getStatus(),
-                customerToDTO(order.getCustomer()),
-                orderItemsToDTOS(order.getOrderItems())
-        );
-    }
-
-    private List<OrderDTO> orderItemsToDtos(List<Order> orders){
-        return orders.stream().map(this::orderItemToDto).collect(Collectors.toList());
-    }
-
-    private CustomerDTO customerToDTO(Customer customer){
-        return new CustomerDTO(
-                customer.getUsername(),
-                customer.getEmail(),
-                customer.getName(),
-                customer.getNif(),
-                customer.getAddress()
-        );
-    }
-
-    private OrderItemDTO orderItemToDTO(OrderItem orderItem){
-        return new OrderItemDTO(
-                orderItem.getId(),
-                orderItem.getQuantity(),
-                orderItem.getPrice(),
-                orderItem.getOrder().getId(),
-                orderItem.getPackageType(),
-                productToDto(orderItem.getProduct())
-        );
-    }
-
-    private List<OrderItemDTO> orderItemsToDTOS(List<OrderItem> orderItems){
-        return orderItems.stream().map(this::orderItemToDTO).collect(Collectors.toList());
-    }
-
-    private ProductDTO productToDto(Product product) {
-        return new ProductDTO(
-                product.getId(),
-                product.getName(),
-                product.getDescription(),
-                product.getPrice(),
-                product.isActive(),
-                product.getManufacturer().getName(),
-                product.getProductReference()
-        );
-    }
 
     private OrderItem orderItemDTOToEntity(OrderItemDTO orderItemDTO){
         return new OrderItem(
@@ -145,7 +67,7 @@ public class OrderService {
 
         var order = orderBean.find(id);
 
-        return Response.status(Response.Status.CREATED).entity(orderItemToDto(order)).build();
+        return Response.status(Response.Status.CREATED).entity(OrderAssembler.fromNoOrderItems(order)).build();
     }
 
     @GET
@@ -154,7 +76,7 @@ public class OrderService {
     @RolesAllowed({"LogisticsOperator"})
     public Response getOrders() {
         var orders = orderBean.getOrders();
-        return Response.status(Response.Status.CREATED).entity(toDTOs(orders)).build();
+        return Response.status(Response.Status.CREATED).entity(OrderAssembler.fromNoOrderItems(orders)).build();
     }
 
     @GET
@@ -163,7 +85,7 @@ public class OrderService {
     @RolesAllowed({"Customer", "LogisticsOperator"})
     public Response getOrder(@PathParam("id") long id) throws MyEntityNotFoundException {
         var order = orderBean.find(id);
-        return Response.status(Response.Status.CREATED).entity(orderItemToDto(order)).build();
+        return Response.status(Response.Status.CREATED).entity(OrderAssembler.from(order)).build();
     }
 
     @PATCH

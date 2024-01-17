@@ -27,7 +27,9 @@ public class OrderBean {
 
     public List<Order> getOrders() {
         Query query = entityManager.createNamedQuery("getOrders", Order.class);
-        return query.getResultList();
+        var result = query.getResultList();
+
+        return result;
     }
 
     public List<Order> getCustomerOrders(String username) {
@@ -90,8 +92,11 @@ public class OrderBean {
         }
         Hibernate.initialize(order.getOrderItems());
 
+        //não faço a mínima ideia se isto tá correto mas ok
         for (var orderItem : order.getOrderItems()){
             Hibernate.initialize(orderItem.getProduct());
+            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageMeasurementUnit());
+            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageType());
         }
         return order;
     }
