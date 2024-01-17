@@ -52,12 +52,25 @@ public class Product extends Versionable implements Serializable {
     private float boxStock;
     @PositiveOrZero
     private float containerStock;
+
+
     @PositiveOrZero
     private int primaryPackQuantity;
     @PositiveOrZero
     private int secondaryPackQuantity;
     @PositiveOrZero
     private int tertiaryPackQuantity;
+
+    @ManyToOne
+    @JoinColumn(name = "primaryPackageMeasurementUnit")
+    @NotNull
+    private PrimaryPackageMeasurementUnit primaryPackageMeasurementUnit;
+
+    @ManyToOne
+    @JoinColumn(name = "primaryPackageType")
+    @NotNull
+    private PrimaryPackageType primaryPackageType;
+
     @ManyToOne
     @JoinColumn(name = "manufacturer_username")
     @NotNull
@@ -95,6 +108,8 @@ public class Product extends Versionable implements Serializable {
             String description,
             double price,
             Manufacturer manufacturer,
+            PrimaryPackageMeasurementUnit primaryPackageMeasurementUnit,
+            PrimaryPackageType primaryPackageType,
             boolean isActive,
             String productReference,
             int primaryPackQuantity,
@@ -105,6 +120,8 @@ public class Product extends Versionable implements Serializable {
         this.description = description;
         this.price = price;
         this.manufacturer = manufacturer;
+        this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+        this.primaryPackageType = primaryPackageType;
         this.isActive = isActive;
         this.productReference = productReference;
         this.orderItems = new ArrayList<OrderItem>();
@@ -186,6 +203,22 @@ public class Product extends Versionable implements Serializable {
 
     public void setManufacturer(Manufacturer manufacturer) {
         this.manufacturer = manufacturer;
+    }
+
+    public PrimaryPackageMeasurementUnit getPrimaryPackageMeasurementUnit() {
+        return primaryPackageMeasurementUnit;
+    }
+
+    public void setPrimaryPackageMeasurementUnit(PrimaryPackageMeasurementUnit primaryPackageMeasurementUnit) {
+        this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+    }
+
+    public PrimaryPackageType getPrimaryPackageType() {
+        return primaryPackageType;
+    }
+
+    public void setPrimaryPackageType(PrimaryPackageType primaryPackageType) {
+        this.primaryPackageType = primaryPackageType;
     }
 
     public List<Package> getPackages() {
