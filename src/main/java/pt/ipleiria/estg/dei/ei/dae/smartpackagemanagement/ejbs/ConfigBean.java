@@ -48,7 +48,6 @@ public class ConfigBean {
     public void populateDB() {
         int seedSize = 100;
         int maxSensorsPerPackage = 4;
-        int packageSize = seedSize/maxSensorsPerPackage;
         int measurementSize = 20;
         System.out.println("Hello Java EE!");
         seedLogOperators(seedSize);
@@ -58,7 +57,7 @@ public class ConfigBean {
         seedSensorType();
         seedProductParameters(seedSize);
         seedSensors(seedSize);
-        seedPackages(packageSize, maxSensorsPerPackage);
+        seedPackages(seedSize, maxSensorsPerPackage);
         seedMeasurements(measurementSize);
         try {
             logisticsOperatorBean.create(
@@ -232,15 +231,16 @@ public class ConfigBean {
     }
 
     private void seedPackages(int size, int maxSensorsPerPackage) {
+        int packageSize = size/maxSensorsPerPackage;
         var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size);
         var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
         var packTypes = PackageType.values();
         int packTypesLength = packTypes.length;
         try {
-            for (int i = 0; i < size; i++) {
+            for (int i = 0; i < packageSize; i++) {
                 int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
-                var packType = packTypes[faker.number().numberBetween(0, packTypesLength)];
-
+                int packageTypeNumber = faker.number().numberBetween(0, packTypesLength);
+                var packType = packTypes[packageTypeNumber];
                 long packId = packageBean.create(
                         faker.number().randomNumber(9, true),
                         faker.commerce().material(),

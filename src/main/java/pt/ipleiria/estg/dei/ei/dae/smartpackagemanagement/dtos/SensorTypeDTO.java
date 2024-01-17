@@ -1,7 +1,5 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Versionable;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
