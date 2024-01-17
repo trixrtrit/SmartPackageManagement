@@ -2,6 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ws;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
+import jakarta.mail.MessagingException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -10,6 +11,7 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ManufacturerAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.EmailBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ManufacturerBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -29,7 +31,8 @@ import java.util.Map;
 public class ManufacturerService {
     @EJB
     private ManufacturerBean manufacturerBean;
-
+    @EJB
+    private EmailBean emailBean;
     @Context
     private SecurityContext securityContext;
 
@@ -145,5 +148,20 @@ public class ManufacturerService {
 
         Manufacturer manufacturer = manufacturerBean.delete(username);
         return Response.status(Response.Status.OK).entity(ManufacturerAssembler.from(manufacturer)).build();
+    }
+
+    @POST
+    @Path("/{username}/email/send")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response sendEmail(@PathParam("username") String username, EmailDTO email)
+            throws MyEntityNotFoundException, MessagingException {
+        Manufacturer manufacturer = manufacturerBean.find(username);
+        if (manufacturer == null) {
+            throw new MyEntityNotFoundException("Manufacturer with username '" + username
+                    + "' not found in our records.");
+        }
+        emailBean.send(manufacturer.getEmail(), email.getSubject(), email.getMessage());
+        return Response.status(Response.Status.OK).entity("E-mail sent").build();
     }
 }

@@ -35,6 +35,8 @@ public class Package extends Versionable{
     private boolean deleted;
     private boolean isActive = true;
 
+
+
     public Package() {
         this.sensorPackageList = new ArrayList<>();
         this.products = new ArrayList<Product>();
