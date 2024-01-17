@@ -72,6 +72,11 @@ public class Product extends Versionable implements Serializable {
     private PrimaryPackageType primaryPackageType;
 
     @ManyToOne
+    @JoinColumn(name = "productCategory")
+    @NotNull
+    private ProductCategory productCategory;
+
+    @ManyToOne
     @JoinColumn(name = "manufacturer_username")
     @NotNull
     private Manufacturer manufacturer;
@@ -110,6 +115,7 @@ public class Product extends Versionable implements Serializable {
             Manufacturer manufacturer,
             PrimaryPackageMeasurementUnit primaryPackageMeasurementUnit,
             PrimaryPackageType primaryPackageType,
+            ProductCategory category,
             boolean isActive,
             String productReference,
             int primaryPackQuantity,
@@ -122,6 +128,7 @@ public class Product extends Versionable implements Serializable {
         this.manufacturer = manufacturer;
         this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
         this.primaryPackageType = primaryPackageType;
+        this.productCategory = category;
         this.isActive = isActive;
         this.productReference = productReference;
         this.orderItems = new ArrayList<OrderItem>();
@@ -219,6 +226,14 @@ public class Product extends Versionable implements Serializable {
 
     public void setPrimaryPackageType(PrimaryPackageType primaryPackageType) {
         this.primaryPackageType = primaryPackageType;
+    }
+
+    public ProductCategory getProductCategory() {
+        return productCategory;
+    }
+
+    public void setProductCategory(ProductCategory productCategory) {
+        this.productCategory = productCategory;
     }
 
     public List<Package> getPackages() {
