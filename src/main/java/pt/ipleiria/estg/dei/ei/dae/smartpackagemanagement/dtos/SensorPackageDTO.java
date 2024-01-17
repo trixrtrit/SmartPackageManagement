@@ -30,6 +30,14 @@ public class SensorPackageDTO implements Serializable {
         this.removedAt = removedAt;
     }
 
+    public SensorPackageDTO(long id, PackageDTO aPackage, SensorDTO sensor, Instant addedAt, Instant removedAt) {
+        this.id = id;
+        this.aPackage = aPackage;
+        this.sensor = sensor;
+        this.addedAt = addedAt;
+        this.removedAt = removedAt;
+    }
+
     public long getId() {
         return id;
     }

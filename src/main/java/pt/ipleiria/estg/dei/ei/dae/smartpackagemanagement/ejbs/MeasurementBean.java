@@ -72,9 +72,13 @@ public class MeasurementBean {
                 builder.asc(root.get("sensorPackage").get("aPackage").get("code")),
                 builder.asc(root.get("sensorPackage").get("addedAt")));
 
-        return entityManager.createQuery(query).
+        var measurements = entityManager.createQuery(query).
                 setFirstResult((pageNumber - 1) * pageSize).
                 setMaxResults(pageSize).getResultList();
+        for(Measurement measurement: measurements) {
+            Hibernate.initialize(measurement.getSensorPackage().getaPackage().getProducts());
+        }
+        return measurements;
     }
 
     public long getMeasurementsCount(

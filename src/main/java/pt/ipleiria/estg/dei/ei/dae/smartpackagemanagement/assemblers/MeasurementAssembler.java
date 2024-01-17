@@ -11,8 +11,7 @@ public class MeasurementAssembler {
         return new MeasurementDTO(
                 measurement.getMeasurement(),
                 measurement.getTimestamp(),
-                measurement.getSensorPackage().getSensor().getId(),
-                measurement.getSensorPackage().getaPackage().getCode()
+                SensorPackageAssembler.fromWithPackageAndSensor(measurement.getSensorPackage())
         );
     }
 
