@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="6ba3170c-2b35-4b1f-a0b8-297e76cb329d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ejbs/ProductBean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ejbs/ProductBean.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ws/ProductService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pt/ipleiria/estg/dei/ei/dae/smartpackagemanagement/ws/ProductService.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 6
+}</component>
+  <component name="ProjectId" id="2ZBfFnEA0EH8xJXdmFcQgpYu0L9" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Trabalhos/EI/3A1S/4. Desenvolvimento de Aplicacoes Empresariais/Projeto/DAEProject/SmartPackageManagement&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6ba3170c-2b35-4b1f-a0b8-297e76cb329d" name="Changes" comment="" />
+      <created>1701900291493</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1701900291493</updated>
+      <workItem from="1701900292633" duration="1232000" />
+      <workItem from="1702501065835" duration="4004000" />
+      <workItem from="1703026344275" duration="2639000" />
+      <workItem from="1703177336968" duration="164000" />
+      <workItem from="1703177517275" duration="56000" />
+      <workItem from="1703177583779" duration="54000" />
+      <workItem from="1703177651791" duration="227000" />
+      <workItem from="1703177906229" duration="2007000" />
+      <workItem from="1703351246646" duration="1986000" />
+      <workItem from="1703703987613" duration="600000" />
+      <workItem from="1703787424116" duration="8466000" />
+      <workItem from="1704314800889" duration="824000" />
+      <workItem from="1704316298802" duration="7573000" />
+      <workItem from="1704542693110" duration="3907000" />
+      <workItem from="1705016628948" duration="2747000" />
+      <workItem from="1705097551911" duration="9222000" />
+      <workItem from="1705346519309" duration="5167000" />
+      <workItem from="1705363457445" duration="5420000" />
+      <workItem from="1705445112359" duration="4683000" />
+      <workItem from="1705451580001" duration="4923000" />
+      <workItem from="1705513882187" duration="7471000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
