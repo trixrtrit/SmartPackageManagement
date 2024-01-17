@@ -6,8 +6,12 @@ import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import net.datafaker.Faker;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.PrimaryPackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,6 +40,10 @@ public class ConfigBean {
     private SensorBean sensorBean;
     @EJB
     private MeasurementBean measurementBean;
+    @EJB
+    private PrimaryPackageTypeBean primaryPackageTypeBean;
+    @EJB
+    private PrimaryPackageMeasurementUnitBean primaryPackageMeasurementUnitBean;
 
     private final Faker faker = new Faker();
 
@@ -43,9 +51,8 @@ public class ConfigBean {
 
     private static final Logger logger = Logger.getLogger("ebjs.ConfigBean");
 
-    private int lastAssociatedSensorId = 0;
     @PostConstruct
-    public void populateDB() {
+    public void populateDB() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
         int seedSize = 100;
         int maxSensorsPerPackage = 4;
         int packageSize = seedSize/maxSensorsPerPackage;
@@ -53,6 +60,8 @@ public class ConfigBean {
         System.out.println("Hello Java EE!");
         seedLogOperators(seedSize);
         seedManufacturers(seedSize);
+        seedPrimaryPackageTypes();
+        seedPrimaryPackageMeasurementUnits();
         seedProducts(seedSize);
         seedCustomers(seedSize);
         seedSensorType();
@@ -123,17 +132,52 @@ public class ConfigBean {
         }
     }
 
+    public void seedPrimaryPackageTypes() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
+        var packageTypes = new String[]{
+                "Box",
+                "Container",
+                "Bottle",
+                "Bag",
+                "Barrel"
+        };
+
+        for (var packageType : packageTypes) {
+            primaryPackageTypeBean.create(packageType);
+        }
+    }
+
+    public void seedPrimaryPackageMeasurementUnits() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
+        var measurementUnits = new String[]{
+                "kg",
+                "liter(s)",
+                "meter(s)",
+                "unit(s)"
+        };
+
+        for (var measurementUnit : measurementUnits) {
+            primaryPackageMeasurementUnitBean.create(measurementUnit);
+        }
+    }
+
     public void seedProducts(int size) {
         var manufacturers = manufacturerBean.getManufacturers(new HashMap<String, String>(), 1, size);
+        var primaryPackageTypes = primaryPackageTypeBean.getTypes();
+        var primaryPackageUnits = primaryPackageMeasurementUnitBean.getUnits();
+
         try {
             for (int i = 0; i < size; i++) {
                 var manufacturer = manufacturers.get(faker.number().numberBetween(0, manufacturers.size()));
+                var primaryPackageType = primaryPackageTypes.get(faker.number().numberBetween(0, primaryPackageTypes.size()));
+                var primaryPackageUnit = primaryPackageUnits.get(faker.number().numberBetween(0, primaryPackageUnits.size()));
+                System.out.println("seedProducts:" + i);
                 long productId = productBean.create(
                         faker.commerce().productName(),
                         faker.lorem().sentence(),
                         Double.parseDouble(faker.commerce().price().replaceAll("[^\\d.]", "")),
                         manufacturer.getUsername(),
                         faker.number().digits(8),
+                        primaryPackageUnit.getId(),
+                        primaryPackageType.getId(),
                         faker.number().numberBetween(1,100),
                         faker.number().numberBetween(1,100),
                         faker.number().numberBetween(1,100)
@@ -151,6 +195,7 @@ public class ConfigBean {
     public void seedCustomers(int size) {
         try {
             for (int i = 0; i < size; i++) {
+                System.out.println("seedCustomers:" + i);
                 String firstName = faker.name().firstName();
                 String lastName = faker.name().lastName();
                 String username = firstName.toLowerCase()+"."+lastName.toLowerCase();
@@ -177,6 +222,7 @@ public class ConfigBean {
 
         try {
             for (String mapKey : mapKeys) {
+                System.out.println("seedSensorType:" + mapKey);
                 sensorTypeBean.create(mapKey, sensorUnits.get(mapKey));
             }
         } catch (Exception ex) {
@@ -190,6 +236,7 @@ public class ConfigBean {
         try {
             int count = 0;
             while (count < size) {
+                System.out.println("seedProductParameters:" + count);
                 float threshold1 = (float) (0 + Math.random() * (100));
                 float threshold2 = (float) (0 + Math.random() * (100));
                 var product = products.get(faker.number().numberBetween(0, products.size()));
@@ -216,6 +263,7 @@ public class ConfigBean {
             int count = 0;
             int unitCount;
             while (count < size) {
+                System.out.println("seedSensors:" + count);
                 var sensorType = sensorTypes.get(faker.number().numberBetween(0, sensorTypes.size()));
                 if(!sensorUnitCount.containsKey(sensorType.getName())){
                     sensorUnitCount.put(sensorType.getName(), 1);
@@ -237,7 +285,9 @@ public class ConfigBean {
         var packTypes = PackageType.values();
         int packTypesLength = packTypes.length;
         try {
+            var lastAssociatedSensorId = 0;
             for (int i = 0; i < size; i++) {
+                System.out.println("seedPackages:" + i);
                 int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
                 var packType = packTypes[faker.number().numberBetween(0, packTypesLength)];
 
@@ -247,6 +297,7 @@ public class ConfigBean {
                         packType
                 );
                 for (int j = 0; j < numberOfSensors; j++) {
+                    System.out.println("addSensorToPackage:" + j);
                     packageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
                     lastAssociatedSensorId++;
                 }
