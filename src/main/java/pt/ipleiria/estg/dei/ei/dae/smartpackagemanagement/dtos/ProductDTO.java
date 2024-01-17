@@ -34,8 +34,12 @@ public class ProductDTO implements Serializable {
     @Positive
     private Long primaryPackageTypeId;
     private String primaryPackageType;
+    @Positive
     public Long primaryPackageMeasurementUnitId;
     private String primaryPackageMeasurementUnit;
+    @Positive
+    public Long productCategoryId;
+    private String productCategory;
 
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
@@ -60,6 +64,7 @@ public class ProductDTO implements Serializable {
             float containerStock,
             String primaryPackageType,
             String primaryPackageMeasurementUnit,
+            String productCategory,
             int primaryPackQuantity,
             int secondaryPackQuantity,
             int tertiaryPackQuantity
@@ -76,6 +81,7 @@ public class ProductDTO implements Serializable {
         this.containerStock = containerStock;
         this.primaryPackageType = primaryPackageType;
         this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+        this.productCategory = productCategory;
         this.productParameters = new ArrayList<>();
         this.primaryPackQuantity = primaryPackQuantity;
         this.secondaryPackQuantity = secondaryPackQuantity;
@@ -92,7 +98,8 @@ public class ProductDTO implements Serializable {
             String manufacturerUsername,
             String reference,
             String primaryPackageType,
-            String primaryPackageMeasurementUnit
+            String primaryPackageMeasurementUnit,
+            String productCategory
     ) {
         this.id = id;
         this.name = name;
@@ -103,6 +110,7 @@ public class ProductDTO implements Serializable {
         this.manufacturerUsername = manufacturerUsername;
         this.primaryPackageType = primaryPackageType;
         this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+        this.productCategory = productCategory;
         //this.orderItems = new ArrayList<>();
     }
 
@@ -228,6 +236,22 @@ public class ProductDTO implements Serializable {
 
     public Long getPrimaryPackageMeasurementUnitId() {
         return primaryPackageMeasurementUnitId;
+    }
+
+    public Long getProductCategoryId() {
+        return productCategoryId;
+    }
+
+    public void setProductCategoryId(Long productCategoryId) {
+        this.productCategoryId = productCategoryId;
+    }
+
+    public String getProductCategory() {
+        return productCategory;
+    }
+
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
     }
 
     public void setPrimaryPackageMeasurementUnitId(Long primaryPackageMeasurementUnitId) {
