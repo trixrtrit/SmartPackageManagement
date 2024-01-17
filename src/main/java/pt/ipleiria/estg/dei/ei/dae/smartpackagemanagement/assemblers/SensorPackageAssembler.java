@@ -51,7 +51,7 @@ public class SensorPackageAssembler {
     public static SensorPackageDTO fromWithPackageAndSensor(SensorPackage sensorPackage) {
         return new SensorPackageDTO(
                 sensorPackage.getId(),
-                PackageAssembler.fromWithProducts(sensorPackage.getaPackage()),
+                PackageAssembler.fromWithProductsAndParameters(sensorPackage.getaPackage()),
                 SensorAssembler.from(sensorPackage.getSensor()),
                 sensorPackage.getAddedAt(),
                 sensorPackage.getRemovedAt()

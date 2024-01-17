@@ -31,4 +31,30 @@ public class ProductAssembler {
     public static List<ProductDTO> from(List<Product> products) {
         return products.stream().map(ProductAssembler::from).collect(Collectors.toList());
     }
+
+    public static ProductDTO fromWithProductParameters(Product product) {
+        return new ProductDTO(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.getPrice(),
+                product.isActive(),
+                product.getManufacturer().getUsername(),
+                product.getProductReference(),
+                product.getUnitStock(),
+                product.getBoxStock(),
+                product.getContainerStock(),
+                product.getPrimaryPackageType().getType(),
+                product.getPrimaryPackageMeasurementUnit().getUnit(),
+                product.getProductCategory().getCategory(),
+                product.getPrimaryPackQuantity(),
+                product.getSecondaryPackQuantity(),
+                product.getTertiaryPackQuantity(),
+                ProductParameterAssembler.from(product.getProductParameters())
+        );
+    }
+
+    public static List<ProductDTO> fromWithProductParameters(List<Product> products) {
+        return products.stream().map(ProductAssembler::fromWithProductParameters).collect(Collectors.toList());
+    }
 }
