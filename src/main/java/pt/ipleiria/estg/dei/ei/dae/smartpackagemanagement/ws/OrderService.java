@@ -102,7 +102,7 @@ public class OrderService {
     @Path("{id}/update-status")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"}) //como é que se vai fazer update automático??
-    public Response updateStatus(@PathParam("id") Long id, OrderStatus orderStatus) throws MyEntityNotFoundException, MyValidationException {
+    public Response updateStatus(@PathParam("id") Long id, OrderStatus orderStatus) throws MyEntityNotFoundException, MyValidationException, MyConstraintViolationException {
         orderBean.updateStatus(id, orderStatus);
         return Response.status(Response.Status.OK).build();
     }
