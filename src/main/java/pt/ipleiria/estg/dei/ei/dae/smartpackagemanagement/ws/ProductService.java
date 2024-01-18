@@ -129,8 +129,8 @@ public class ProductService {
                 productDTO.getManufacturerUsername(),
                 productDTO.getReference(),
                 productDTO.getPrimaryPackageMeasurementUnitId(),
-                productDTO.getProductCategoryId(),
                 productDTO.getPrimaryPackageTypeId(),
+                productDTO.getProductCategoryId(),
                 productDTO.getPrimaryPackQuantity(),
                 productDTO.getSecondaryPackQuantity(),
                 productDTO.getTertiaryPackQuantity()
