@@ -2,14 +2,17 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ws;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
+import jakarta.mail.MessagingException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.LogisticsOperatorAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.EmailDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.LogisticsOperatorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ManufacturerDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.EmailBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.LogisticsOperatorBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.LogisticsOperator;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -30,7 +33,8 @@ public class LogisticsOperatorService {
 
     @EJB
     private LogisticsOperatorBean logisticsOperatorBean;
-
+    @EJB
+    private EmailBean emailBean;
     @Context
     private SecurityContext securityContext;
 
@@ -126,5 +130,19 @@ public class LogisticsOperatorService {
 
         LogisticsOperator logisticsOperator = logisticsOperatorBean.delete(username);
         return Response.status(Response.Status.OK).entity(LogisticsOperatorAssembler.from(logisticsOperator)).build();
+    }
+
+    @POST
+    @Path("/{username}/email/send")
+    @Authenticated
+    public Response sendEmail(@PathParam("username") String username, EmailDTO email)
+            throws MyEntityNotFoundException, MessagingException {
+        LogisticsOperator logisticsOperator = logisticsOperatorBean.find(username);
+        if (logisticsOperator == null) {
+            throw new MyEntityNotFoundException("LogisticsOperator with username '" + username
+                    + "' not found in our records.");
+        }
+        emailBean.send(logisticsOperator.getEmail(), email.getSubject(), email.getMessage());
+        return Response.status(Response.Status.OK).entity("E-mail sent").build();
     }
 }

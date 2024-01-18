@@ -7,9 +7,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorTypeAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.SensorTypeBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -21,7 +19,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Path("sensor-types")

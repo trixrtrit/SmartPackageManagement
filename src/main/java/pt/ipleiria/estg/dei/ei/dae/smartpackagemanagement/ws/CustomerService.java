@@ -2,6 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ws;
 
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ejb.EJB;
+import jakarta.mail.MessagingException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
@@ -13,6 +14,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.CustomerBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.OrderBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.EmailDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.EmailBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -32,7 +35,8 @@ import java.util.Map;
 public class CustomerService {
     @EJB
     private CustomerBean customerBean;
-
+    @EJB
+    private EmailBean emailBean;
     @Context
     private SecurityContext securityContext;
 
@@ -159,5 +163,20 @@ public class CustomerService {
 
         Customer customer = customerBean.delete(username);
         return Response.status(Response.Status.OK).entity(CustomerAssembler.from(customer)).build();
+    }
+
+    @POST
+    @Path("/{username}/email/send")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response sendEmail(@PathParam("username") String username, EmailDTO email)
+            throws MyEntityNotFoundException, MessagingException {
+        Customer customer = customerBean.find(username);
+        if (customer == null) {
+            throw new MyEntityNotFoundException("Customer with username '" + username
+                    + "' not found in our records.");
+        }
+        emailBean.send(customer.getEmail(), email.getSubject(), email.getMessage());
+        return Response.status(Response.Status.OK).entity("E-mail sent").build();
     }
 }
