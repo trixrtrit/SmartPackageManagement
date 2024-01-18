@@ -9,7 +9,9 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.TransportPackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.TransportPackageStandardPackagesAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.TransportPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.TransportPackageBean;
@@ -106,6 +108,22 @@ public class TransportPackageService {
                 .build();
     }
 
+    @GET
+    @Path("{code}/packages")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getTransportStandardPackages(@PathParam("code") long code) throws MyEntityNotFoundException {
+        TransportPackage transportPackage = transportPackageBean.getTransportStandardPackages(code);
+        if (transportPackage != null) {
+            var dtos =
+                    TransportPackageStandardPackagesAssembler.from(transportPackage.getTransportPackageStandardPackages());
+            return Response.ok(dtos).build();
+        }
+        return Response.status(Response.Status.NOT_FOUND)
+                .entity("ERROR_FINDING_PACKAGE")
+                .build();
+    }
+
     @POST
     @Path("/")
     @Authenticated
@@ -162,6 +180,36 @@ public class TransportPackageService {
         );
         var transportPackage = transportPackageBean.find(code);
         return Response.ok(TransportPackageAssembler.fromWithSensors(transportPackage)).build();
+    }
+
+    @PUT
+    @Path("{code}/set-package")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response addStandardPkgToTransportPkg(@PathParam("code") long code, StandardPackageDTO standardPackage)
+            throws MyEntityNotFoundException, MyEntityExistsException {
+
+        transportPackageBean.addStandardPkgToTransportPkg(
+                code,
+                standardPackage.getCode()
+        );
+        var transportPackage = transportPackageBean.find(code);
+        return Response.ok(TransportPackageAssembler.fromWithPackages(transportPackage)).build();
+    }
+
+    @PUT
+    @Path("{code}/unset-package")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response removeStandardPkgFromTransportPkg(@PathParam("code") long code, StandardPackageDTO standardPackage)
+            throws MyEntityNotFoundException {
+
+        transportPackageBean.removeStandardPkgFromTransportPkg(
+                code,
+                standardPackage.getCode()
+        );
+        var transportPackage = transportPackageBean.find(code);
+        return Response.ok(TransportPackageAssembler.fromWithPackages(transportPackage)).build();
     }
 
     @DELETE

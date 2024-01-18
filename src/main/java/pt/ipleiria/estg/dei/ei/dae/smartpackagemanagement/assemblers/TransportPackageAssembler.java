@@ -33,4 +33,18 @@ public class TransportPackageAssembler {
     public static List<TransportPackageDTO> fromWithSensors(List<TransportPackage> transportPackages) {
         return transportPackages.stream().map(TransportPackageAssembler::fromWithSensors).collect(Collectors.toList());
     }
+
+    public static TransportPackageDTO fromWithPackages(TransportPackage transportPackage) {
+        return new TransportPackageDTO(
+                transportPackage.getCode(),
+                transportPackage.getMaterial(),
+                transportPackage.isActive(),
+                TransportPackageStandardPackagesAssembler.from(transportPackage.getTransportPackageStandardPackages()),
+                false
+        );
+    }
+
+    public static List<TransportPackageDTO> fromWithPackages(List<TransportPackage> transportPackages) {
+        return transportPackages.stream().map(TransportPackageAssembler::fromWithPackages).collect(Collectors.toList());
+    }
 }

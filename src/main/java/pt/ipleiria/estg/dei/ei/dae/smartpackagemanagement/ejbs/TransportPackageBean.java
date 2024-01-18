@@ -79,6 +79,15 @@ public class TransportPackageBean {
         return transportPackage;
     }
 
+    public TransportPackage getTransportStandardPackages(long code) throws MyEntityNotFoundException {
+        if(!this.exists(code)) {
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+        }
+        TransportPackage transportPackage = entityManager.find(TransportPackage.class, code);
+        Hibernate.initialize(transportPackage.getTransportPackageStandardPackages());
+        return transportPackage;
+    }
+
     public boolean exists(long code) {
         Query query = entityManager.createNamedQuery("packageExists", TransportPackage.class);
         query.setParameter("code", code);
