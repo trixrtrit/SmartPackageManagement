@@ -3,6 +3,8 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCustomSerialization;
+
 
 import java.time.Instant;
 
@@ -20,14 +22,14 @@ public class OrderLog {
     @NotNull
     @JoinColumn(name = "order_id")
     private Order order;
-    private OrderStatus orderStatus;
+    private String orderStatus;
     private String customerUsername;
     private String logisticsOperatorUsername;
     public OrderLog(){
 
     }
 
-    public OrderLog(String logEntry, Order order, OrderStatus newStatus, String logisticsOperatorUsername) {
+    public OrderLog(String logEntry, Order order, String newStatus, String logisticsOperatorUsername) {
         this.logEntry = logEntry;
         this.order = order;
         this.orderStatus = newStatus;
@@ -67,7 +69,8 @@ public class OrderLog {
 //        this.order = order;
 //    }
 
-    public OrderStatus getOrderStatus() {
+    public String getOrderStatus() {
+
         return orderStatus;
     }
 
