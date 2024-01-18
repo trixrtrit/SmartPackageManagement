@@ -28,6 +28,8 @@ public class DeliveryBean {
 
     @EJB
     private QueryBean<Delivery> deliveryQueryBean;
+    @EJB
+    private OrderLogBean orderLogBean;
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public long create(Long orderId, ArrayList<Long> packageCodes)
@@ -150,7 +152,7 @@ public class DeliveryBean {
         return delivery;
     }
 
-    public void updateStatus(Long id, DeliveryStatus deliveryStatus) throws MyEntityNotFoundException, MyIllegalConstraintException {
+    public void updateStatus(Long id, DeliveryStatus deliveryStatus) throws MyEntityNotFoundException, MyIllegalConstraintException, MyConstraintViolationException {
         var delivery = find(id);
 
         if (delivery.getStatus() == DeliveryStatus.DELIVERED){
@@ -162,6 +164,6 @@ public class DeliveryBean {
         }
         entityManager.lock(delivery, LockModeType.OPTIMISTIC);
         delivery.setStatus(deliveryStatus);
-        //todo add order log
+        var orderLog = orderLogBean.create("Delivery status updated to " + deliveryStatus.toString(), delivery.getOrder().getId(), deliveryStatus.toString(), null);
     }
 }
