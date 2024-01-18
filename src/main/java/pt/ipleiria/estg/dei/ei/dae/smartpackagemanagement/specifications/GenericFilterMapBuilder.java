@@ -16,7 +16,10 @@ public class GenericFilterMapBuilder {
 
         String datatype;
         String valueField;
-        if (param.getClass().equals(String.class)) {
+        if (param instanceof Enum<?>) {
+            datatype = "Enum";
+            valueField = ((Enum<?>) param).name();
+        } else if (param.getClass().equals(String.class)) {
             datatype = "String";
             valueField = (String) param;
         } else if (param.getClass().equals(Instant.class)) {
