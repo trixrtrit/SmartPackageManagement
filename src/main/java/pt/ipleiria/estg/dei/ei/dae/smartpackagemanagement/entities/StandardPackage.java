@@ -12,7 +12,7 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(
-                name = "packageExists",
+                name = "standardPackageExists",
                 query = "SELECT COUNT(p.code) FROM StandardPackage p WHERE p.code = :code"
         )
 })

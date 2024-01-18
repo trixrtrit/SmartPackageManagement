@@ -86,7 +86,7 @@ public class StandardPackageBean {
     }
 
     public boolean exists(long code) {
-        Query query = entityManager.createNamedQuery("packageExists", StandardPackage.class);
+        Query query = entityManager.createNamedQuery("standardPackageExists", StandardPackage.class);
         query.setParameter("code", code);
         return (Long) query.getSingleResult() > 0L;
     }

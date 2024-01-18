@@ -10,7 +10,7 @@ import java.util.List;
 @Entity
 @NamedQueries({
         @NamedQuery(
-                name = "packageExists",
+                name = "transportPackageExists",
                 query = "SELECT COUNT(p.code) FROM TransportPackage p WHERE p.code = :code"
         )
 })

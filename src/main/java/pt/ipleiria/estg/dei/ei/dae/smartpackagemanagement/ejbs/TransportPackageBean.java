@@ -89,7 +89,7 @@ public class TransportPackageBean {
     }
 
     public boolean exists(long code) {
-        Query query = entityManager.createNamedQuery("packageExists", TransportPackage.class);
+        Query query = entityManager.createNamedQuery("transportPackageExists", TransportPackage.class);
         query.setParameter("code", code);
         return (Long) query.getSingleResult() > 0L;
     }

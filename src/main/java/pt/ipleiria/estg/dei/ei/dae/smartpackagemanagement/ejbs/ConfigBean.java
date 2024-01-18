@@ -35,6 +35,8 @@ public class ConfigBean {
     @EJB
     private StandardPackageBean standardPackageBean;
     @EJB
+    private TransportPackageBean transportPackageBean;
+    @EJB
     private ProductParameterBean productParameterBean;
     @EJB
     private SensorTypeBean sensorTypeBean;
@@ -73,6 +75,7 @@ public class ConfigBean {
         seedProductParameters(seedSize);
         seedSensors(seedSize);
         seedPackages(seedSize, maxSensorsPerPackage);
+        seedTransportPackages(seedSize, maxSensorsPerPackage);
         seedMeasurements(measurementSize);
         try {
             logisticsOperatorBean.create(
@@ -345,6 +348,44 @@ public class ConfigBean {
                 }
                 standardPackageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
                 standardPackageBean.addProductToPackage(packId, products.get(i).getId());
+            }
+        } catch (Exception ex) {
+            logger.severe(ex.getMessage());
+        }
+    }
+
+    private void seedTransportPackages(int size, int maxSensorsPerPackage) {
+        var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size);
+        var standardPkgs = standardPackageBean.getStandardPackages(new HashMap<String, String>(), 1, size);
+        int stdPkgsToTransport = 5;
+        int packageSize = standardPkgs.size()/stdPkgsToTransport;
+        int lastAssociatedPkgCode = 0;
+        try {
+            for (int i = 0; i < packageSize; i++) {
+                int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
+                long packId = transportPackageBean.create(
+                        faker.number().randomNumber(9, true),
+                        faker.commerce().material()
+                );
+                for (int j = 0; j < numberOfSensors; j++) {
+                    transportPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
+                    lastAssociatedSensorId++;
+                }
+                for (int k = 0; k < stdPkgsToTransport; k++) {
+                    transportPackageBean.addStandardPkgToTransportPkg(
+                            packId,
+                            standardPkgs.get(lastAssociatedPkgCode).getCode()
+                    );
+                    lastAssociatedPkgCode++;
+                }
+                transportPackageBean.removeSensorFromPackage(
+                        packId,
+                        sensors.get(lastAssociatedSensorId - numberOfSensors).getId()
+                );
+                transportPackageBean.removeStandardPkgFromTransportPkg(
+                        packId,
+                        standardPkgs.get(lastAssociatedPkgCode - stdPkgsToTransport).getCode()
+                );
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
