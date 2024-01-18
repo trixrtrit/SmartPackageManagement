@@ -38,6 +38,10 @@ public class Package extends Versionable {
     @ManyToMany(mappedBy = "packages")
     private List<Product> products;
 
+    @ManyToOne
+    @JoinColumn(name = "stock_id")
+    private Stock stock;
+
     @ManyToMany
     @JoinTable(
             name = "deliveries_packages",
