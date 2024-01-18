@@ -10,12 +10,10 @@ public class PackageDTO implements Serializable {
     private long code;
     private String material;
     private PackageType packageType;
-    private List<ProductDTO> products;
     private List<SensorPackageDTO> sensorPackageMetadata;
     private boolean isActive;
 
     public PackageDTO() {
-        this.products = new ArrayList<>();
         this.sensorPackageMetadata = new ArrayList<>();
     }
 
@@ -23,20 +21,12 @@ public class PackageDTO implements Serializable {
         this.code = code;
         this.material = material;
         this.packageType = packageType;
-        this.products = new ArrayList<>();
         this.sensorPackageMetadata = new ArrayList<>();
         this.isActive = isActive;
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<ProductDTO> products) {
+    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata) {
         this(code, material, packageType, isActive);
-        this.products = products;
-        this.sensorPackageMetadata = new ArrayList<>();
-    }
-
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata, boolean hasSensors) {
-        this(code, material, packageType, isActive);
-        this.products = new ArrayList<>();
         this.sensorPackageMetadata = sensorPackageMetadata;
     }
 
@@ -62,14 +52,6 @@ public class PackageDTO implements Serializable {
 
     public void setPackageType(PackageType packageType) {
         this.packageType = packageType;
-    }
-
-    public List<ProductDTO> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<ProductDTO> products) {
-        this.products = products;
     }
 
     public List<SensorPackageDTO> getSensorPackageMetadata() {

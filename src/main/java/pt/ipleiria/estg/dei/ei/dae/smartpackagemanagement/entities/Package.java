@@ -30,16 +30,11 @@ public class Package extends Versionable{
     private PackageType packageType;
     @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<SensorPackage> sensorPackageList;
-    @ManyToMany(mappedBy = "packages")
-    private List<Product> products;
     private boolean deleted;
     private boolean isActive = true;
 
-
-
     public Package() {
         this.sensorPackageList = new ArrayList<>();
-        this.products = new ArrayList<Product>();
     }
 
     public Package(long code, String material, PackageType packageType) {
@@ -47,7 +42,6 @@ public class Package extends Versionable{
         this.material = material;
         this.packageType = packageType;
         this.sensorPackageList = new ArrayList<>();
-        this.products = new ArrayList<Product>();
     }
 
     public long getCode() {
@@ -90,28 +84,11 @@ public class Package extends Versionable{
         this.deleted = deleted;
     }
 
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
     public Boolean getDeleted() {
         return deleted;
     }
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
-    }
-
-    public void addProduct(Product product) {
-        if (!products.contains(product)) {
-            products.add(product);
-        }
-    }
-    public void removeProduct(Product product) {
-        products.remove(product);
     }
 
     public boolean isActive() {

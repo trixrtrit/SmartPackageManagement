@@ -76,9 +76,13 @@ public class MeasurementBean {
                 setFirstResult((pageNumber - 1) * pageSize).
                 setMaxResults(pageSize).getResultList();
         for(Measurement measurement: measurements) {
-            Hibernate.initialize(measurement.getSensorPackage().getaPackage().getProducts());
-            for(Product product: measurement.getSensorPackage().getaPackage().getProducts()) {
-                Hibernate.initialize(product.getProductParameters());
+            Package pkg = measurement.getSensorPackage().getaPackage();
+            if (pkg instanceof StandardPackage) {
+                StandardPackage standardPkg = (StandardPackage) pkg;
+                Hibernate.initialize(standardPkg.getProducts());
+                for (Product product : standardPkg.getProducts()) {
+                    Hibernate.initialize(product.getProductParameters());
+                }
             }
         }
         return measurements;

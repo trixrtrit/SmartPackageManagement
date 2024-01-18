@@ -124,7 +124,7 @@ public class ProductBean {
             throw new MyEntityNotFoundException("The product with the id: " + id + " does not exist");
         }
         Product product = entityManager.find(Product.class, id);
-        Hibernate.initialize(product.getPackages());
+        Hibernate.initialize(product.getStandardPackages());
         return product;
     }
 
@@ -171,11 +171,11 @@ public class ProductBean {
         List<Product> productList = getProductsForExport();
 
         for (Product product : productList) {
-            List<Package> packages = product.getPackages();
-            if(!packages.isEmpty()) {
-                for (Package aPackage : packages) {
+            List<StandardPackage> standardPackages = product.getStandardPackages();
+            if(!standardPackages.isEmpty()) {
+                for (StandardPackage standardPackage : standardPackages) {
                     Row row = sheet.createRow(rowNum++);
-                    this.parseProductToSheet(product, aPackage, style, row, productAttributesList);
+                    this.parseProductToSheet(product, standardPackage, style, row, productAttributesList);
                 }
             }else{
                 Row row = sheet.createRow(rowNum++);
@@ -257,7 +257,7 @@ public class ProductBean {
 
     private void parseProductToSheet(
             Product product,
-            Package aPackage,
+            StandardPackage standardPackage,
             CellStyle style,
             Row row,
             List<String> productAttributesList
@@ -265,13 +265,13 @@ public class ProductBean {
         Cell cell;
         for (int i = 0; i < productAttributesList.size(); i++){
             cell = row.createCell(i);
-            setCellValue(productAttributesList.get(i), product, cell, aPackage);
+            setCellValue(productAttributesList.get(i), product, cell, standardPackage);
             cell.setCellStyle(style);
         }
 
     }
 
-    private void setCellValue(String attribute, Product product, Cell cell, Package aPackage){
+    private void setCellValue(String attribute, Product product, Cell cell, StandardPackage standardPackage){
         switch (attribute) {
             case "Reference":
                 cell.setCellValue(product.getProductReference());
@@ -301,18 +301,18 @@ public class ProductBean {
                 cell.setCellValue(product.getContainerStock());
                 break;
             case "PackageType":
-                if(aPackage == null){
+                if(standardPackage == null){
                     cell.setCellValue("");
                     break;
                 }
-                cell.setCellValue(aPackage.getPackageType().getDisplayType());
+                cell.setCellValue(standardPackage.getPackageType().getDisplayType());
                 break;
             case "PackageMaterial":
-                if(aPackage == null){
+                if(standardPackage == null){
                     cell.setCellValue("");
                     break;
                 }
-                cell.setCellValue(aPackage.getMaterial());
+                cell.setCellValue(standardPackage.getMaterial());
                 break;
             default:
                 break;

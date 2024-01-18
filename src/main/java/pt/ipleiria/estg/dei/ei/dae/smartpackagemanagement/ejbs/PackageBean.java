@@ -28,20 +28,6 @@ public class PackageBean {
     @EJB
     private QueryBean<Package> packageQueryBean;
 
-    public long create(long code, String material, PackageType packageType)
-            throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
-        if (exists(code)) {
-            throw new MyEntityExistsException("A package with the code: " + code + " already exists");
-        }
-        try {
-            Package aPackage = new Package(code, material, packageType);
-            entityManager.persist(aPackage);
-            return aPackage.getCode();
-        } catch (ConstraintViolationException err) {
-            throw new MyConstraintViolationException(err);
-        }
-    }
-
     public List<Package> getPackages(Map<String, String> filterMap, int pageNumber, int pageSize)
             throws IllegalArgumentException {
         Map<String, String> orderMap = new LinkedHashMap<>();
@@ -52,15 +38,6 @@ public class PackageBean {
 
     public long getPackagesCount(Map<String, String> filterMap) {
         return packageQueryBean.getEntitiesCount(Package.class, filterMap);
-    }
-
-    public Package getPackageProducts(long code) throws MyEntityNotFoundException {
-        if(!this.exists(code)) {
-            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
-        }
-        Package aPackage = entityManager.find(Package.class, code);
-        Hibernate.initialize(aPackage.getProducts());
-        return aPackage;
     }
 
     public Package getPackageSensors(long code) throws MyEntityNotFoundException {
@@ -103,7 +80,6 @@ public class PackageBean {
         if (aPackage == null) {
             throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
-        Hibernate.initialize(aPackage.getProducts());
         Hibernate.initialize(aPackage.getSensorPackageList());
         return aPackage;
     }
@@ -127,34 +103,6 @@ public class PackageBean {
         aPackage.setActive(false);
         entityManager.remove(aPackage);
         return aPackage;
-    }
-
-    public void addProductToPackage(long code, long productId)
-            throws MyEntityNotFoundException, MyPackageProductAssociationViolationException {
-        Package aPackage = find(code);
-        if (aPackage == null)
-            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
-
-        Product product = entityManager.find(Product.class, productId);
-        if (product == null)
-            throw new MyEntityNotFoundException("The product with the id: " + productId + " does not exist");
-        if (aPackage.getPackageType() != PackageType.TERTIARY && !aPackage.getProducts().isEmpty()) {
-            throw new MyPackageProductAssociationViolationException("Non-tertiary packages cannot have more than one product");
-        }
-        aPackage.addProduct(product);
-        product.addPackage(aPackage);
-    }
-
-    public void removeProductFromPackage(long code, long productId) throws MyEntityNotFoundException {
-        Package aPackage = find(code);
-        if (aPackage == null)
-            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
-
-        Product product = entityManager.find(Product.class, productId);
-        if (product == null)
-            throw new MyEntityNotFoundException("The product with the id: " + productId + " does not exist");
-        aPackage.removeProduct(product);
-        product.removePackage(aPackage);
     }
 
     public void addSensorToPackage(long code, long sensorId) throws MyEntityNotFoundException, MyEntityExistsException {

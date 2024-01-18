@@ -33,6 +33,8 @@ public class ConfigBean {
     @EJB
     private PackageBean packageBean;
     @EJB
+    private StandardPackageBean standardPackageBean;
+    @EJB
     private ProductParameterBean productParameterBean;
     @EJB
     private SensorTypeBean sensorTypeBean;
@@ -332,17 +334,17 @@ public class ConfigBean {
                 int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
                 int packageTypeNumber = faker.number().numberBetween(0, packTypesLength);
                 var packType = packTypes[packageTypeNumber];
-                long packId = packageBean.create(
+                long packId = standardPackageBean.create(
                         faker.number().randomNumber(9, true),
                         faker.commerce().material(),
                         packType
                 );
                 for (int j = 0; j < numberOfSensors; j++) {
-                    packageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
+                    standardPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
                     lastAssociatedSensorId++;
                 }
-                packageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
-                packageBean.addProductToPackage(packId, products.get(i).getId());
+                standardPackageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
+                standardPackageBean.addProductToPackage(packId, products.get(i).getId());
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());

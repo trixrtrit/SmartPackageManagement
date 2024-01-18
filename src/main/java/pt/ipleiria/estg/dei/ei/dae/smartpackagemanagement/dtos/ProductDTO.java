@@ -2,7 +2,6 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
