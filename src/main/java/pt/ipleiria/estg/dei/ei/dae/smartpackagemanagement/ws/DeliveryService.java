@@ -80,7 +80,7 @@ public class DeliveryService {
     @Path("{id}/update-status")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response updateStatus(@PathParam("id") Long id, DeliveryStatus deliveryStatus) throws MyEntityNotFoundException, MyIllegalConstraintException {
+    public Response updateStatus(@PathParam("id") Long id, DeliveryStatus deliveryStatus) throws MyEntityNotFoundException, MyIllegalConstraintException, MyConstraintViolationException {
         deliveryBean.updateStatus(id, deliveryStatus);
         return Response.status(Response.Status.OK).build();
     }

@@ -13,6 +13,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderLog;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCustomSerialization;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class OrderLogBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public long create(String logEntry, long orderId, OrderStatus newStatus, String logisticsOperatorUsername)
+    public long create(String logEntry, long orderId, String newStatus, String logisticsOperatorUsername)
             throws MyConstraintViolationException, MyEntityNotFoundException {
         Order order = entityManager.find(Order.class, orderId);
         if (order == null) {

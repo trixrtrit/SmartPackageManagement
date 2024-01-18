@@ -4,6 +4,7 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCustomSerialization;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -14,14 +15,14 @@ public class OrderLogDTO  implements Serializable {
     private Instant timestamp;
     @NotBlank
     private long orderId;
-    @NotBlank
-    private OrderStatus orderStatus;
+
+    private String orderStatus;
     private String customerUsername;
     private String logisticsOperatorUsername;
 
     public OrderLogDTO() {
     }
-    public OrderLogDTO(String logEntry, Instant timestamp, long orderId, OrderStatus newStatus, String customerUsername, String logisticsOperatorUsername) {
+    public OrderLogDTO(String logEntry, Instant timestamp, long orderId, String newStatus, String customerUsername, String logisticsOperatorUsername) {
         this.logEntry = logEntry;
         this.timestamp = timestamp;
         this.orderId = orderId;
@@ -53,7 +54,7 @@ public class OrderLogDTO  implements Serializable {
 //    public void setOrderId(long orderId) {
 //        this.orderId = orderId;
 //    }
-public OrderStatus getOrderStatus() {
+public String getOrderStatus() {
     return orderStatus;
 }
 
