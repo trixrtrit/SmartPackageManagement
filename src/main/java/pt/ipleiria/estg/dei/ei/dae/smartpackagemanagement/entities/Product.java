@@ -52,8 +52,9 @@ public class Product extends Versionable implements Serializable {
     private float boxStock;
     @PositiveOrZero
     private float containerStock;
-
-
+    @OneToOne
+    @JoinColumn(name = "stock_id")
+    private Stock stock;
     @PositiveOrZero
     private int primaryPackQuantity;
     @PositiveOrZero
@@ -106,6 +107,7 @@ public class Product extends Versionable implements Serializable {
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
         this.packages = new ArrayList<>();
+        this.stock = new Stock(this);
     }
 
     public Product(
@@ -137,6 +139,7 @@ public class Product extends Versionable implements Serializable {
         this.primaryPackQuantity = primaryPackQuantity;
         this.secondaryPackQuantity = secondaryPackQuantity;
         this.tertiaryPackQuantity = tertiaryPackQuantity;
+        this.stock = new Stock(this);
     }
 
 
@@ -171,6 +174,7 @@ public class Product extends Versionable implements Serializable {
     public void setContainerStock(float containerStock) {
         this.containerStock = containerStock;
     }
+
 
     public Long getId() {
         return id;
@@ -315,5 +319,13 @@ public class Product extends Versionable implements Serializable {
     }
     public void removePackage(Package aPackage) {
         packages.remove(aPackage);
+    }
+
+    public Stock getStock() {
+        return stock;
+    }
+
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 }

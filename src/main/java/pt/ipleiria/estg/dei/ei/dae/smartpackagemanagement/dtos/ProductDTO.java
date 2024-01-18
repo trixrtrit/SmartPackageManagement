@@ -24,7 +24,7 @@ public class ProductDTO implements Serializable {
     private float boxStock;
     @PositiveOrZero
     private float containerStock;
-
+    //private long stockId;
     @PositiveOrZero
     private int primaryPackQuantity;
     @PositiveOrZero

@@ -83,6 +83,11 @@ public class ProductBean {
                     tertiaryPackQuantity
             );
             entityManager.persist(product);
+
+            long stockId = new StockBean().create(product);
+            Stock stock = entityManager.find(Stock.class, stockId);
+            product.setStock(stock);
+
             return product.getId();
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
