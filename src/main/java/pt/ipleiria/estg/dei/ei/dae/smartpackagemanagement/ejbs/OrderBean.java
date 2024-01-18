@@ -26,6 +26,9 @@ public class OrderBean {
     @EJB
     private QueryBean<Order> orderQueryBean;
 
+    @EJB
+    private OrderLogBean orderLogBean;
+
     public List<Order> getOrders(Map<String, String> filterMap, int pageNumber, int pageSize)
             throws IllegalArgumentException {
         Map<String, String> orderMap = new LinkedHashMap<>();
@@ -77,7 +80,7 @@ public class OrderBean {
                 orderItem.setQuantityLeft(orderItem.getQuantity());
                 entityManager.persist(orderItem);
             }
-            var orderLog = new OrderLogBean().create("Order created", order.getId(), OrderStatus.PENDING, null);
+            var orderLog = orderLogBean.create("Order created", order.getId(), OrderStatus.PENDING, null);
 
             return order.getId();
         } catch (ConstraintViolationException err) {
@@ -115,7 +118,7 @@ public class OrderBean {
     public void updateStatus(
             long id,
             OrderStatus orderStatus
-    ) throws MyEntityNotFoundException, MyIllegalConstraintException {
+    ) throws MyEntityNotFoundException, MyIllegalConstraintException, MyConstraintViolationException {
         var order  = this.find(id);
 
         if (orderStatus.ordinal() <= order.getStatus().ordinal()){
@@ -131,7 +134,7 @@ public class OrderBean {
         entityManager.lock(order, LockModeType.OPTIMISTIC);
 
         order.setStatus(orderStatus);
-        var orderLog = new OrderLogBean().create("Order status updated", order.getId(), orderStatus, null);
+        var orderLog = orderLogBean.create("Order status updated", order.getId(), orderStatus, null);
 
     }
 }
