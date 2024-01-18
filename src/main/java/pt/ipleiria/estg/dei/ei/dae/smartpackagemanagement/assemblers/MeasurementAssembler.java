@@ -15,8 +15,18 @@ public class MeasurementAssembler {
         );
     }
 
-
     public static List<MeasurementDTO> from(List<Measurement> measurements) {
         return measurements.stream().map(MeasurementAssembler::from).collect(Collectors.toList());
+    }
+
+    public static MeasurementDTO fromWithPackages (Measurement measurement){
+        return new MeasurementDTO(
+                measurement.getMeasurement(),
+                measurement.getTimestamp(),
+                SensorPackageAssembler.fromWithPackages(measurement.getSensorPackage())
+        );
+    }
+    public static List<MeasurementDTO> fromWithPackages(List<Measurement> measurements) {
+        return measurements.stream().map(MeasurementAssembler::fromWithPackages).collect(Collectors.toList());
     }
 }

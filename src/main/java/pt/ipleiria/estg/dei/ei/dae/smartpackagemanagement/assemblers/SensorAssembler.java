@@ -30,7 +30,7 @@ public class SensorAssembler {
                 sensor.getName(),
                 sensor.isAvailable(),
                 SensorTypeAssembler.from(sensor.getSensorType()),
-                MeasurementAssembler.from(measurements)
+                MeasurementAssembler.fromWithPackages(measurements)
         );
     }
 }
