@@ -12,7 +12,8 @@ public class StandardPackageAssembler {
                 standardPackage.getCode(),
                 standardPackage.getMaterial(),
                 standardPackage.getPackageType(),
-                standardPackage.isActive()
+                standardPackage.isActive(),
+                standardPackage.getManufactureDate()
         );
     }
 
@@ -26,6 +27,7 @@ public class StandardPackageAssembler {
                 standardPackage.getMaterial(),
                 standardPackage.getPackageType(),
                 standardPackage.isActive(),
+                standardPackage.getManufactureDate(),
                 ProductAssembler.from(standardPackage.getProducts())
         );
     }
@@ -40,6 +42,7 @@ public class StandardPackageAssembler {
                 standardPackage.getMaterial(),
                 standardPackage.getPackageType(),
                 standardPackage.isActive(),
+                standardPackage.getManufactureDate(),
                 ProductAssembler.fromWithProductParameters(standardPackage.getProducts())
         );
     }
@@ -54,6 +57,7 @@ public class StandardPackageAssembler {
                 standardPackage.getMaterial(),
                 standardPackage.getPackageType(),
                 standardPackage.isActive(),
+                standardPackage.getManufactureDate(),
                 SensorPackageAssembler.from(standardPackage.getSensorPackageList()),
                 true
         );

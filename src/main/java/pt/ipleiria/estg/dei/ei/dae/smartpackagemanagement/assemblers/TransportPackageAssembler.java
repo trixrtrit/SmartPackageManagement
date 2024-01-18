@@ -1,10 +1,9 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers;
 
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.TransportPackageDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.TransportPackage;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,7 +12,8 @@ public class TransportPackageAssembler {
         return new TransportPackageDTO(
                 transportPackage.getCode(),
                 transportPackage.getMaterial(),
-                transportPackage.isActive()
+                transportPackage.isActive(),
+                transportPackage.getManufactureDate()
         );
     }
 
@@ -26,6 +26,7 @@ public class TransportPackageAssembler {
                 transportPackage.getCode(),
                 transportPackage.getMaterial(),
                 transportPackage.isActive(),
+                transportPackage.getManufactureDate(),
                 SensorPackageAssembler.from(transportPackage.getSensorPackageList())
         );
     }
@@ -39,6 +40,7 @@ public class TransportPackageAssembler {
                 transportPackage.getCode(),
                 transportPackage.getMaterial(),
                 transportPackage.isActive(),
+                transportPackage.getManufactureDate(),
                 TransportPackageStandardPackagesAssembler.from(transportPackage.getTransportPackageStandardPackages()),
                 false
         );

@@ -12,7 +12,8 @@ public class PackageAssembler {
         return new PackageDTO(
                 aPackage.getCode(),
                 aPackage.getMaterial(),
-                aPackage.isActive()
+                aPackage.isActive(),
+                aPackage.getManufactureDate()
         );
     }
 
@@ -25,6 +26,7 @@ public class PackageAssembler {
                 aPackage.getCode(),
                 aPackage.getMaterial(),
                 aPackage.isActive(),
+                aPackage.getManufactureDate(),
                 SensorPackageAssembler.from(aPackage.getSensorPackageList())
         );
     }

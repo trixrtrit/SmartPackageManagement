@@ -1,9 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class TransportPackageDTO extends PackageDTO implements Serializable {
@@ -13,12 +12,17 @@ public class TransportPackageDTO extends PackageDTO implements Serializable {
         this.transportPackageStandardPackagesMetadata = new ArrayList<>();
     }
 
-    public TransportPackageDTO(long code, String material, boolean isActive) {
-        super(code, material, isActive);
+    public TransportPackageDTO(long code, String material, boolean isActive, Date manufactureDate) {
+        super(code, material, isActive, manufactureDate);
     }
 
-    public TransportPackageDTO(long code, String material, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata) {
-        super(code, material, isActive, sensorPackageMetadata);
+    public TransportPackageDTO(
+            long code,
+            String material,
+            boolean isActive,
+            Date manufactureDate,
+            List<SensorPackageDTO> sensorPackageMetadata) {
+        super(code, material, isActive, manufactureDate, sensorPackageMetadata);
         this.transportPackageStandardPackagesMetadata = new ArrayList<>();
     }
 
@@ -26,10 +30,11 @@ public class TransportPackageDTO extends PackageDTO implements Serializable {
             long code,
             String material,
             boolean isActive,
+            Date manufactureDate,
             List<TransportPackageStandardPackagesDTO> transportPackageStandardPackagesMetadata,
             boolean hasSensors
     ) {
-        super(code, material, isActive);
+        super(code, material, isActive, manufactureDate);
         this.transportPackageStandardPackagesMetadata = new ArrayList<>();
     }
 

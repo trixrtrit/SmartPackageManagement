@@ -5,6 +5,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -25,6 +26,8 @@ public class Package extends Versionable{
     private List<SensorPackage> sensorPackageList;
     private boolean deleted;
     private boolean isActive = true;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date manufactureDate;
 
     public Package() {
         this.sensorPackageList = new ArrayList<>();
@@ -34,6 +37,7 @@ public class Package extends Versionable{
         this.code = code;
         this.material = material;
         this.sensorPackageList = new ArrayList<>();
+        this.manufactureDate = new Date();
     }
 
     public long getCode() {
@@ -81,5 +85,13 @@ public class Package extends Versionable{
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Date getManufactureDate() {
+        return manufactureDate;
+    }
+
+    public void setManufactureDate(Date manufactureDate) {
+        this.manufactureDate = manufactureDate;
     }
 }

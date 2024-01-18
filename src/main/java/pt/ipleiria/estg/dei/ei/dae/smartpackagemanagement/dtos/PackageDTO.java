@@ -4,6 +4,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PackageDTO implements Serializable {
@@ -11,20 +12,28 @@ public class PackageDTO implements Serializable {
     private String material;
     private List<SensorPackageDTO> sensorPackageMetadata;
     private boolean isActive;
+    private Date manufactureDate;
 
     public PackageDTO() {
         this.sensorPackageMetadata = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, boolean isActive) {
+    public PackageDTO(long code, String material, boolean isActive, Date manufactureDate) {
         this.code = code;
         this.material = material;
         this.sensorPackageMetadata = new ArrayList<>();
         this.isActive = isActive;
+        this.manufactureDate = manufactureDate;
     }
 
-    public PackageDTO(long code, String material, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata) {
-        this(code, material, isActive);
+    public PackageDTO(
+            long code,
+            String material,
+            boolean isActive,
+            Date manufactureDate,
+            List<SensorPackageDTO> sensorPackageMetadata
+    ) {
+        this(code, material, isActive, manufactureDate);
         this.sensorPackageMetadata = sensorPackageMetadata;
     }
 
@@ -58,5 +67,13 @@ public class PackageDTO implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Date getManufactureDate() {
+        return manufactureDate;
+    }
+
+    public void setManufactureDate(Date manufactureDate) {
+        this.manufactureDate = manufactureDate;
     }
 }
