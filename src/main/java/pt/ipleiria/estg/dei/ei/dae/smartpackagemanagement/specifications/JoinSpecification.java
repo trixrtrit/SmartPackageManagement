@@ -20,7 +20,9 @@ public class JoinSpecification<T, J> implements Specification<T> {
         Join<T, J> join = root.join(joinField);
         Path<J> fieldPath = join.get(fieldOfJoinedEntity);
 
-        if ("notEqual".equalsIgnoreCase(operation)) {
+        if ("like".equalsIgnoreCase(operation)){
+            return criteriaBuilder.like(fieldPath.as(String.class), "%" + value + "%");
+        } else if ("notEqual".equalsIgnoreCase(operation)) {
             return criteriaBuilder.notEqual(fieldPath, value);
         } else { // Default to "equal"
             return criteriaBuilder.equal(fieldPath, value);
