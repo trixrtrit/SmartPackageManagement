@@ -97,7 +97,7 @@ public class CustomerService {
     @Path("{username}/orders")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getMyOrders(
+    public Response getCustomerOrders(
             @PathParam("username") String username,
             @QueryParam("status") OrderStatus orderStatus,
             @DefaultValue("1") @QueryParam("page") int page,
