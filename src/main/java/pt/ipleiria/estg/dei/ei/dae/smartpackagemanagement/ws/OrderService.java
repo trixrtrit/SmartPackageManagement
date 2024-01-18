@@ -135,7 +135,7 @@ public class OrderService {
     @Path("{id}/update-status")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response updateStatus(@PathParam("id") Long id, OrderStatus orderStatus) throws MyEntityNotFoundException, MyIllegalConstraintException {
+    public Response updateStatus(@PathParam("id") Long id, OrderStatus orderStatus) throws MyEntityNotFoundException, MyIllegalConstraintException, MyConstraintViolationException {
         orderBean.updateStatus(id, orderStatus);
         return Response.status(Response.Status.OK).build();
     }
