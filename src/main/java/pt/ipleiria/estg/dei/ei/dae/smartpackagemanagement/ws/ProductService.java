@@ -42,6 +42,7 @@ public class ProductService {
     public Response getAll(@QueryParam("reference") String reference,
                            @QueryParam("name") String name,
                            @QueryParam("description") String description,
+                           @QueryParam("category") String category,
                            @QueryParam("minPrice") double minPrice,
                            @QueryParam("maxPrice") double maxPrice,
                            @DefaultValue("1") @QueryParam("page") int page,
@@ -54,6 +55,7 @@ public class ProductService {
         GenericFilterMapBuilder.addToFilterMap(description, filterMap, "description", "");
         GenericFilterMapBuilder.addToFilterMap(minPrice, filterMap, "price", "gte");
         GenericFilterMapBuilder.addToFilterMap(maxPrice, filterMap, "price", "lte");
+        filterMap.put("Join/_/productCategory/_/category/_/like", category);
 
         var products = productBean.getProducts(filterMap, page, pageSize);
 
