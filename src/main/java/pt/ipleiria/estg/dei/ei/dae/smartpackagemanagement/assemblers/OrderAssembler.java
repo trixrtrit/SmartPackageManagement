@@ -41,6 +41,6 @@ public class OrderAssembler {
     }
 
     public static List<OrderDTO> fromNoOrderItems(List<Order> orders) {
-        return orders.stream().map(OrderAssembler::from).collect(Collectors.toList());
+        return orders.stream().map(OrderAssembler::fromNoOrderItems).collect(Collectors.toList());
     }
 }
