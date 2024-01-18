@@ -82,7 +82,7 @@ public class OrderService {
                               @DefaultValue("1") @QueryParam("page") int page,
                               @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
         Map<String, String> filterMap = new HashMap<>();
-        GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "equal");
+        GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "");
         var orders = orderBean.getOrders(filterMap, page, pageSize);
         var dtos = OrderAssembler.fromNoOrderItems(orders);
         long totalItems = orderBean.getOrdersCount(filterMap);

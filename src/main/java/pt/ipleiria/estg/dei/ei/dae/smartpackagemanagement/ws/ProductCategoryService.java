@@ -29,7 +29,6 @@ public class ProductCategoryService {
 
     @GET
     @Path("/all")
-    @Authenticated
     public List<ProductCategoryDTO> getAll(){
         return ProductCategoryAssembler.from(productCategoryBean.getCategories());
     }

@@ -80,24 +80,28 @@ public class QueryBean<T> {
                     if (keyParts.length > 2) {
                         operation += keyParts[2];
                     }
-                    switch (dataType) {
-                        case "Enum":
-                            specifications.add(new EnumSpecification<T>(fieldName, fieldValue, operation));
-                            break;
-                        case "Double":
-                            specifications.add(new DoubleSpecification<T>(fieldName, Double.parseDouble(fieldValue), operation));
-                            break;
-                        case "Boolean":
-                            specifications.add(new BooleanSpecification<T>(fieldName, Boolean.parseBoolean(fieldValue)));
-                            break;
-                        case "Instant":
-                            specifications.add(new DateSpecification<T>(fieldName, Instant.parse(fieldValue), operation));
-                            break;
-                        case "Long":
-                            specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));
-                            break;
-                        default:
-                            specifications.add(new DefaultStringSpecification<T>(fieldName, fieldValue));
+
+                    if (dataType.contains("Enum")) {
+                        var dataTypeParts = dataType.split(GenericFilterMapBuilder.getEnumSeparator());
+                        var enumName = dataTypeParts[1];
+                        specifications.add(new EnumSpecification<T>(enumName, fieldName, fieldValue, operation));
+                    } else {
+                        switch (dataType) {
+                            case "Double":
+                                specifications.add(new DoubleSpecification<T>(fieldName, Double.parseDouble(fieldValue), operation));
+                                break;
+                            case "Boolean":
+                                specifications.add(new BooleanSpecification<T>(fieldName, Boolean.parseBoolean(fieldValue)));
+                                break;
+                            case "Instant":
+                                specifications.add(new DateSpecification<T>(fieldName, Instant.parse(fieldValue), operation));
+                                break;
+                            case "Long":
+                                specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));
+                                break;
+                            default:
+                                specifications.add(new DefaultStringSpecification<T>(fieldName, fieldValue));
+                        }
                     }
                 }
             }
