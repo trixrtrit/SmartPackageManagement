@@ -43,7 +43,7 @@ public class PackageService {
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("code") long code,
                            @QueryParam("material") String material,
-                           @QueryParam("packageType") String packageType,
+                           @QueryParam("packageType") PackageType packageType,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
@@ -51,7 +51,7 @@ public class PackageService {
         Map<String, String> filterMap = new HashMap<>();
         GenericFilterMapBuilder.addToFilterMap(code, filterMap, "code", "eq");
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
-        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "enum");
+        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "equal");
 
         var dtos = PackageAssembler.from(packageBean.getPackages(filterMap, page, pageSize));
         long totalItems = packageBean.getPackagesCount(filterMap);

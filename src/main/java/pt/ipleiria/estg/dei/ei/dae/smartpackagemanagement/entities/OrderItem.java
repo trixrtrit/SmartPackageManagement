@@ -4,17 +4,20 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
+import java.io.Serializable;
+
 @Entity
 @Table(name = "order_items",
         uniqueConstraints = @UniqueConstraint(columnNames = {"id", "product_id", "packageType"})
 )
 public class
-OrderItem extends Versionable{
+OrderItem extends Versionable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private float quantity;
+    private int quantity;
+    private int quantityLeft;
     private double price;
 
     @Enumerated(EnumType.STRING)
@@ -33,7 +36,7 @@ OrderItem extends Versionable{
     public OrderItem() {
     }
 
-    public OrderItem(float quantity, double price, PackageType packageType, long productId) {
+    public OrderItem(int quantity, double price, PackageType packageType, long productId) {
         this.quantity = quantity;
         this.price = price;
         //hack for order creation
@@ -42,9 +45,10 @@ OrderItem extends Versionable{
         this.product.setId(productId);
     }
 
-    public OrderItem(Long id, float quantity, double price, PackageType packageType, Product product, Order order) {
+    public OrderItem(Long id, int quantity, int quantityLeft, double price, PackageType packageType, Product product, Order order) {
         this.id = id;
         this.quantity = quantity;
+        this.quantityLeft = quantityLeft;
         this.price = price;
         this.packageType = packageType;
         this.product = product;
@@ -59,12 +63,20 @@ OrderItem extends Versionable{
         this.id = id;
     }
 
-    public void setQuantity(float quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
 
-    public float getQuantity() {
+    public int getQuantity() {
         return quantity;
+    }
+
+    public int getQuantityLeft() {
+        return quantityLeft;
+    }
+
+    public void setQuantityLeft(int quantityLeft) {
+        this.quantityLeft = quantityLeft;
     }
 
     public double getPrice() {

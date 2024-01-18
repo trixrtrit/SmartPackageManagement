@@ -5,6 +5,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,11 +19,15 @@ import java.util.List;
         @NamedQuery(
                 name = "packageExists",
                 query = "SELECT COUNT(p.code) FROM Package p WHERE p.code = :code"
+        ),
+        @NamedQuery(
+                name = "findActivePackage",
+                query = "SELECT p FROM Package p WHERE p.code = :code AND p.isActive"
         )
 })
 @SQLDelete(sql="UPDATE packages SET deleted = TRUE WHERE code = ? AND deleted = ?::boolean")
 @Where(clause = "deleted IS FALSE")
-public class Package extends Versionable{
+public class Package extends Versionable {
     @Id
     private long code;
     private String material;
@@ -32,6 +37,21 @@ public class Package extends Versionable{
     private List<SensorPackage> sensorPackageList;
     @ManyToMany(mappedBy = "packages")
     private List<Product> products;
+
+    @ManyToMany
+    @JoinTable(
+            name = "deliveries_packages",
+            joinColumns = @JoinColumn(
+                    name = "package_code",
+                    referencedColumnName = "code"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "delivery_id",
+                    referencedColumnName = "id"
+            )
+    )
+    private List<Delivery> deliveries;
+
     private boolean deleted;
     private boolean isActive = true;
 
@@ -112,6 +132,22 @@ public class Package extends Versionable{
     }
     public void removeProduct(Product product) {
         products.remove(product);
+    }
+
+    public List<Delivery> getDeliveries() {
+        return deliveries;
+    }
+
+    public void addDelivery(Delivery delivery) {
+        if (delivery != null && !deliveries.contains(delivery)){
+            deliveries.add(delivery);
+        }
+    }
+
+    public void removeDelivery(Delivery delivery) {
+        if (delivery != null && deliveries.contains(delivery)){
+            deliveries.remove(delivery);
+        }
     }
 
     public boolean isActive() {

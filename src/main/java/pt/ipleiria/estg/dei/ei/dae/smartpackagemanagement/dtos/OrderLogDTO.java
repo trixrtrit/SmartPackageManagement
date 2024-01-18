@@ -5,10 +5,10 @@ import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-
-public class OrderLogDTO {
+public class OrderLogDTO  implements Serializable {
     private String logEntry;
     @Temporal(TemporalType.TIMESTAMP)
     private Instant timestamp;
