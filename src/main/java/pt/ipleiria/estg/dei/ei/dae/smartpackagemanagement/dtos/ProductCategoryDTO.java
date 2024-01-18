@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-public class ProductCategoryDTO {
+import java.io.Serializable;
+
+public class ProductCategoryDTO  implements Serializable {
     private Long id;
     public String category;
     public ProductCategoryDTO() {

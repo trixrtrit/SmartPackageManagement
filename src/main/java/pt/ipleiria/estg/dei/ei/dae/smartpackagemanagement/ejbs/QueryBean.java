@@ -4,7 +4,6 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.*;
 
 import java.time.Instant;
@@ -24,8 +23,7 @@ public class QueryBean<T> {
             Map<String, String> orderMap,
             int pageNumber,
             int pageSize
-    )  throws IllegalArgumentException
-    {
+    ) throws IllegalArgumentException {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<T> query = builder.createQuery(entity);
         Root<T> root = query.from(entity);
@@ -66,45 +64,56 @@ public class QueryBean<T> {
                 String[] keyParts = keyName.split(separator);
                 String dataType = keyParts[0];
                 String fieldName = keyParts[1];
-                String operation = "";
-                if(keyParts.length > 2) {
-                    operation += keyParts[2];
-                }
+                if (dataType.equals("Join")) {
+                    // Assuming format: "Join/joinField/fieldOfJoinedEntity/operation"
+                    String[] parts = keyName.split(separator);
+                    if (parts.length >= 4) {
+                        String joinField = parts[1];
+                        String fieldOfJoinedEntity = parts[2];
+                        String operation = parts[3];
 
-                switch (dataType) {
-                    case "Double":
-                        specifications.add(new DoubleSpecification<T>(fieldName, Double.parseDouble(fieldValue), operation));
-                        break;
-                    case "Boolean":
-                        specifications.add(new BooleanSpecification<T>(fieldName, Boolean.parseBoolean(fieldValue)));
-                        break;
-                    case "Instant":
-                        specifications.add(new DateSpecification<T>(fieldName, Instant.parse(fieldValue), operation));
-                        break;
-                    case "Long":
-                        specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));
-                        break;
-                    default:
-                        if(operation.equals("enum")) {
-                            specifications.add(new PackageTypeSpecification<T>(fieldName, PackageType.valueOf(fieldValue)));
-                        }
-                        else
+                        specifications.add(new JoinSpecification<>(
+                                joinField, fieldOfJoinedEntity, fieldValue, operation));
+                    }
+                } else {
+                    String operation = "";
+                    if (keyParts.length > 2) {
+                        operation += keyParts[2];
+                    }
+                    switch (dataType) {
+                        case "Enum":
+                            specifications.add(new EnumSpecification<T>(fieldName, fieldValue, operation));
+                            break;
+                        case "Double":
+                            specifications.add(new DoubleSpecification<T>(fieldName, Double.parseDouble(fieldValue), operation));
+                            break;
+                        case "Boolean":
+                            specifications.add(new BooleanSpecification<T>(fieldName, Boolean.parseBoolean(fieldValue)));
+                            break;
+                        case "Instant":
+                            specifications.add(new DateSpecification<T>(fieldName, Instant.parse(fieldValue), operation));
+                            break;
+                        case "Long":
+                            specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));
+                            break;
+                        default:
                             specifications.add(new DefaultStringSpecification<T>(fieldName, fieldValue));
-                        break;
+                    }
                 }
             }
         }
         return buildPredicates(specifications, root, builder);
     }
 
-    public List<Predicate> buildPredicates(List<Specification<T>> specifications, Root<T> root, CriteriaBuilder criteriaBuilder) {
+    public List<Predicate> buildPredicates
+            (List<Specification<T>> specifications, Root<T> root, CriteriaBuilder criteriaBuilder) {
         return specifications.stream()
                 .map(spec -> spec.toPredicate(root, criteriaBuilder))
                 .collect(Collectors.toList());
     }
 
     private List<Order> getOrderBy(Map<String, String> orderMap, CriteriaBuilder builder, Root<T> root)
-        throws IllegalArgumentException {
+            throws IllegalArgumentException {
         Order order;
         List<Order> orderList = new ArrayList<>();
         for (Map.Entry<String, String> entry : orderMap.entrySet()) {

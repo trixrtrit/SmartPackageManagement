@@ -1,6 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
-public class PrimaryPackageMeasurementUnitDTO {
+import java.io.Serializable;
+
+public class PrimaryPackageMeasurementUnitDTO  implements Serializable {
     private Long id;
     public String unit;
 

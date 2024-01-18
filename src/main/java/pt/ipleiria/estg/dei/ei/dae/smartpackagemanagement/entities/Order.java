@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.List;
                 query = "SELECT c FROM Order c WHERE c.customer.username = :username ORDER BY c.date DESC"
         )
 })
-public class Order extends Versionable{
+public class Order extends Versionable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +42,9 @@ public class Order extends Versionable{
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
     private List<OrderItem> orderItems;
+
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE)
+    private List<Delivery> deliveries;
 
     public Order() {
         this.orderItems = new ArrayList<OrderItem>();
@@ -137,5 +141,29 @@ public class Order extends Versionable{
 
     public void setOrderItems(List<OrderItem> orderItems) {
         this.orderItems = orderItems;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public List<Delivery> getDeliveries() {
+        return deliveries;
+    }
+
+    public void setDeliveries(List<Delivery> deliveries) {
+        this.deliveries = deliveries;
+    }
+
+    public void addDelivery(Delivery delivery) {
+        if (delivery != null && !deliveries.contains(delivery)){
+            deliveries.add(delivery);
+        }
+    }
+
+    public void removeDelivery(Delivery delivery) {
+        if (delivery != null && deliveries.contains(delivery)){
+            deliveries.remove(delivery);
+        }
     }
 }

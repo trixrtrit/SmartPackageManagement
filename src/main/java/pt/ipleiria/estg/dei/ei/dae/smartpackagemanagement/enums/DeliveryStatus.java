@@ -7,16 +7,15 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCust
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCustomSerializer;
 
 @JsonSerialize(using = EnumCustomSerializer.class)
-@JsonDeserialize(using = OrderStatusDeserializer.class)
-public enum OrderStatus implements EnumCustomSerialization {
-    PENDING,
-    REJECTED,
-    ACCEPTED,
-    COMPLETED
+@JsonDeserialize(using = DeliveryStatusDeserializer.class)
+public enum DeliveryStatus implements EnumCustomSerialization {
+    DISPATCHED,
+    INTRANSIT,
+    DELIVERED
 }
 
-class OrderStatusDeserializer extends EnumCustomDeserializer<OrderStatus> {
-    public OrderStatusDeserializer(){
-        super(OrderStatus.class);
+class DeliveryStatusDeserializer extends EnumCustomDeserializer<DeliveryStatus> {
+    public DeliveryStatusDeserializer(){
+        super(DeliveryStatus.class);
     }
 }

@@ -11,6 +11,7 @@ public class OrderItemAssembler {
         return new OrderItemDTO(
                 orderItem.getId(),
                 orderItem.getQuantity(),
+                orderItem.getQuantityLeft(),
                 orderItem.getPrice(),
                 orderItem.getOrder().getId(),
                 orderItem.getPackageType(),

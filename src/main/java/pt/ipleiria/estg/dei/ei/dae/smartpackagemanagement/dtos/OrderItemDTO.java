@@ -3,11 +3,14 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Versionable;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
+import java.io.Serializable;
+
 public class
-OrderItemDTO extends Versionable {
+OrderItemDTO  implements Serializable {
 
     private Long id;
-    private float quantity;
+    private int quantity;
+    private int quantityLeft;
     private double price;
     private Long orderId;
     private Long productId;
@@ -17,9 +20,10 @@ OrderItemDTO extends Versionable {
     public OrderItemDTO() {
     }
 
-    public OrderItemDTO(Long id, float quantity, double price, Long orderId, PackageType packageType, ProductDTO product) {
+    public OrderItemDTO(Long id, int quantity, int quantityLeft, double price, Long orderId, PackageType packageType, ProductDTO product) {
         this.id = id;
         this.quantity = quantity;
+        this.quantityLeft = quantityLeft;
         this.price = price;
         this.orderId = orderId;
         this.packageType = packageType;
@@ -34,12 +38,20 @@ OrderItemDTO extends Versionable {
         this.id = id;
     }
 
-    public float getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(float quantity) {
+    public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public int getQuantityLeft() {
+        return quantityLeft;
+    }
+
+    public void setQuantityLeft(int quantityLeft) {
+        this.quantityLeft = quantityLeft;
     }
 
     public double getPrice() {
