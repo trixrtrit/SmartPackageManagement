@@ -10,8 +10,11 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.CustomerAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.OrderAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.CustomerBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.OrderBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -32,6 +35,9 @@ public class CustomerService {
 
     @Context
     private SecurityContext securityContext;
+
+    @EJB
+    private OrderBean orderBean;
 
     @GET
     @Path("/all")
@@ -86,21 +92,22 @@ public class CustomerService {
     @GET
     @Path("{username}/orders")
     @Authenticated
-    @RolesAllowed({"Customer, LogisticsOperator"})
-    public Response getCustomerOrders(@PathParam("username") String username) throws MyEntityNotFoundException {
-        var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)) {
-            return Response.status(Response.Status.FORBIDDEN).build();
-        }
-
-        Customer customer = customerBean.getCustomerOrders(username);
-        if (customer != null) {
-            var dtos = OrderAssembler.from(customer.getOrders());
-            return Response.ok(dtos).build();
-        }
-        return Response.status(Response.Status.NOT_FOUND)
-                .entity("ERROR_FINDING_CUSTOMER")
-                .build();
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getMyOrders(
+            @PathParam("username") String username,
+            @QueryParam("status") OrderStatus orderStatus,
+            @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "equal");
+        filterMap.put("Join/_/customer/_/username/_/equal", username);
+        var orders = orderBean.getOrders(filterMap, page, pageSize);
+        var dtos = OrderAssembler.fromNoOrderItems(orders);
+        long totalItems = orderBean.getOrdersCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<OrderDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @POST

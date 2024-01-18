@@ -7,20 +7,22 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import org.hibernate.Hibernate;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.DeliveryAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.OrderAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderItemDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.OrderBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderItem;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyValidationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Path("orders")
@@ -75,9 +77,40 @@ public class OrderService {
     @Path("/all")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getOrders() {
-        var orders = orderBean.getOrders();
-        return Response.status(Response.Status.CREATED).entity(OrderAssembler.fromNoOrderItems(orders)).build();
+    public Response getOrders(
+                              @QueryParam("status") OrderStatus orderStatus,
+                              @DefaultValue("1") @QueryParam("page") int page,
+                              @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "equal");
+        var orders = orderBean.getOrders(filterMap, page, pageSize);
+        var dtos = OrderAssembler.fromNoOrderItems(orders);
+        long totalItems = orderBean.getOrdersCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<OrderDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
+    }
+
+    @GET
+    @Path("/my")
+    @Authenticated
+    @RolesAllowed({"Customer"})
+    public Response getMyOrders(
+            @QueryParam("status") OrderStatus orderStatus,
+            @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
+        var principal = securityContext.getUserPrincipal();
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "equal");
+        filterMap.put("Join/_/customer/_/username/_/equal", principal.getName());
+        var orders = orderBean.getOrders(filterMap, page, pageSize);
+        var dtos = OrderAssembler.fromNoOrderItems(orders);
+        long totalItems = orderBean.getOrdersCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<OrderDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @GET
@@ -86,23 +119,23 @@ public class OrderService {
     @RolesAllowed({"Customer", "LogisticsOperator"})
     public Response getOrder(@PathParam("id") long id) throws MyEntityNotFoundException {
         var order = orderBean.find(id);
+        return Response.status(Response.Status.OK).entity(OrderAssembler.from(order)).build();
+    }
 
-        //não faço a mínima ideia se isto tá correto mas ok
-        for (var orderItem : order.getOrderItems()){
-            Hibernate.initialize(orderItem.getProduct());
-            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageMeasurementUnit());
-            Hibernate.initialize(orderItem.getProduct().getPrimaryPackageType());
-            Hibernate.initialize(orderItem.getProduct().getProductCategory());
-        }
-
-        return Response.status(Response.Status.CREATED).entity(OrderAssembler.from(order)).build();
+    @GET
+    @Path("{id}/deliveries")
+    @Authenticated
+    @RolesAllowed({"Customer", "LogisticsOperator"})
+    public Response getOrderDeliveries(@PathParam("id") long id) throws MyEntityNotFoundException {
+        var order = orderBean.findWithDeliveries(id);
+        return Response.status(Response.Status.OK).entity(DeliveryAssembler.from(order.getDeliveries())).build();
     }
 
     @PATCH
     @Path("{id}/update-status")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"}) //como é que se vai fazer update automático??
-    public Response updateStatus(@PathParam("id") Long id, OrderStatus orderStatus) throws MyEntityNotFoundException, MyValidationException {
+    @RolesAllowed({"LogisticsOperator"})
+    public Response updateStatus(@PathParam("id") Long id, OrderStatus orderStatus) throws MyEntityNotFoundException, MyIllegalConstraintException {
         orderBean.updateStatus(id, orderStatus);
         return Response.status(Response.Status.OK).build();
     }

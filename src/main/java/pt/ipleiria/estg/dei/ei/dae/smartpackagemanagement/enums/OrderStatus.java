@@ -10,8 +10,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCust
 @JsonDeserialize(using = OrderStatusDeserializer.class)
 public enum OrderStatus implements EnumCustomSerialization {
     PENDING,
-    ACCEPTED,
     REJECTED,
+    ACCEPTED,
     COMPLETED
 }
 

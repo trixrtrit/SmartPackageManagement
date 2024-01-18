@@ -1,23 +1,21 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
+import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.ejb.TransactionAttribute;
 import jakarta.ejb.TransactionAttributeType;
 import jakarta.persistence.*;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ValidationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyValidationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Stateless
 public class OrderBean {
@@ -25,17 +23,18 @@ public class OrderBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<Order> getOrders() {
-        Query query = entityManager.createNamedQuery("getOrders", Order.class);
-        var result = query.getResultList();
+    @EJB
+    private QueryBean<Order> orderQueryBean;
 
-        return result;
+    public List<Order> getOrders(Map<String, String> filterMap, int pageNumber, int pageSize)
+            throws IllegalArgumentException {
+        Map<String, String> orderMap = new LinkedHashMap<>();
+        orderMap.put("date", "desc");
+        return orderQueryBean.getEntities(Order.class, filterMap, orderMap, pageNumber, pageSize);
     }
 
-    public List<Order> getCustomerOrders(String username) {
-        Query query = entityManager.createNamedQuery("getCustomerOrders", Order.class);
-        query.setParameter("username", username);
-        return query.getResultList();
+    public long getOrdersCount(Map<String, String> filterMap) {
+        return orderQueryBean.getEntitiesCount(Order.class, filterMap);
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -75,6 +74,7 @@ public class OrderBean {
 
             for (var orderItem : order.getOrderItems()){
                 orderItem.setOrder(order);
+                orderItem.setQuantityLeft(orderItem.getQuantity());
                 entityManager.persist(orderItem);
             }
 
@@ -85,12 +85,28 @@ public class OrderBean {
     }
 
     public Order find(Long id) throws MyEntityNotFoundException {
-        var  order = entityManager.find(Order.class, id);
+        var order = entityManager.find(Order.class, id);
         if (order == null)
         {
             throw new MyEntityNotFoundException("Order with id #" + id + " was not found.");
         }
+
         Hibernate.initialize(order.getOrderItems());
+
+        return order;
+    }
+
+    public Order findWithDeliveries(Long id) throws MyEntityNotFoundException {
+        var order = find(id);
+
+        Hibernate.initialize(order.getDeliveries());
+
+        for (var delivery : order.getDeliveries()) {
+            Hibernate.initialize(delivery.getPackages());
+            for (var aPackage : delivery.getPackages()){
+                Hibernate.initialize(aPackage.getProducts());
+            }
+        }
 
         return order;
     }
@@ -98,14 +114,17 @@ public class OrderBean {
     public void updateStatus(
             long id,
             OrderStatus orderStatus
-    ) throws MyEntityNotFoundException, MyValidationException {
+    ) throws MyEntityNotFoundException, MyIllegalConstraintException {
         var order  = this.find(id);
 
-        var currentStatus = order.getStatus();
-
-        if (currentStatus == OrderStatus.REJECTED){
-            throw new MyValidationException("Cannot update status of a Rejected Order");
+        if (orderStatus.ordinal() <= order.getStatus().ordinal()){
+            throw new MyIllegalConstraintException("Cannot update status to a previous or current value. Current Value: " + orderStatus.toString());
         }
+
+        if (order.getStatus() == OrderStatus.REJECTED){
+            throw new MyIllegalConstraintException("Cannot update status of a Rejected Order");
+        }
+
 
         //todo add order log after status changes
         entityManager.lock(order, LockModeType.OPTIMISTIC);
