@@ -5,11 +5,11 @@ import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
 public class PredicateUtils {
-    public static <T, E extends Enum<E>> Predicate handleEnumPredicate(
+    public static <T, E extends Enum<E>> Predicate handleEnumPredicate(String enumName,
             String fieldName, String enumValue,  String operation, CriteriaBuilder builder, Root<T> root) {
         try {
             String packageName = "pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums";
-            Class<E> enumClass = (Class<E>) Class.forName(packageName + "." + fieldName.substring(0, 1).toUpperCase() + fieldName.substring(1));
+            Class<E> enumClass = (Class<E>) Class.forName(packageName + "." + enumName);
             E enumConstant = Enum.valueOf(enumClass, enumValue.toUpperCase());
 
             if ("notEqual".equalsIgnoreCase(operation)) {

@@ -82,7 +82,7 @@ public class OrderService {
                               @DefaultValue("1") @QueryParam("page") int page,
                               @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
         Map<String, String> filterMap = new HashMap<>();
-        GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "equal");
+        GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "");
         var orders = orderBean.getOrders(filterMap, page, pageSize);
         var dtos = OrderAssembler.fromNoOrderItems(orders);
         long totalItems = orderBean.getOrdersCount(filterMap);
@@ -102,6 +102,7 @@ public class OrderService {
             @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
         var principal = securityContext.getUserPrincipal();
         Map<String, String> filterMap = new HashMap<>();
+        System.out.println(orderStatus);
         GenericFilterMapBuilder.addToFilterMap(orderStatus, filterMap, "status", "equal");
         filterMap.put("Join/_/customer/_/username/_/equal", principal.getName());
         var orders = orderBean.getOrders(filterMap, page, pageSize);
