@@ -137,11 +137,11 @@ public class ConfigBean {
 
     public void seedPrimaryPackageTypes() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
         var packageTypes = new String[]{
-                "Box",
-                "Container",
+                "Small Cardboard Container",
+                "Small Plastic Container",
                 "Bottle",
                 "Bag",
-                "Barrel"
+                "Small Barrel"
         };
 
         for (var packageType : packageTypes) {
