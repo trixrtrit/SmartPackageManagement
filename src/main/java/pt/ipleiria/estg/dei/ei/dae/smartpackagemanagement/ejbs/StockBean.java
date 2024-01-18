@@ -5,11 +5,12 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.ConstraintViolationException;
+import org.hibernate.Hibernate;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Stock;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyValidationException;
 
@@ -33,14 +34,24 @@ public class StockBean {
         }
     }
 
-    //add 1a package a lista?
-    public void addPrimaryPackage(long id, Package aPackage) throws MyEntityNotFoundException, MyValidationException {
+    public Stock find(long id) throws MyEntityNotFoundException {
         Stock stock = entityManager.find(Stock.class, id);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
+        Hibernate.initialize(stock.getProduct());
+        return stock;
+    }
+
+    //add 1a package a lista?
+    public void addPrimaryPackage(long id, long packageCode) throws MyEntityNotFoundException, MyValidationException {
+        Stock stock = entityManager.find(Stock.class, id);
+        Package aPackage = entityManager.find(Package.class, packageCode);
+        if (stock == null) {
+            throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
+        }
         if (aPackage == null) {
-            throw new MyValidationException("Package cannot be null");
+            throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
         }
         if (stock.getPrimaryPackageList().contains(aPackage)) {
             throw new MyValidationException("Package already exists in the primary package list");
@@ -49,13 +60,14 @@ public class StockBean {
     }
 
     //add 2a package a lista?
-    public void addSecondaryPackage(long id, Package aPackage) throws MyEntityNotFoundException, MyValidationException {
+    public void addSecondaryPackage(long id, long packageCode) throws MyEntityNotFoundException, MyValidationException {
         Stock stock = entityManager.find(Stock.class, id);
+        Package aPackage = entityManager.find(Package.class, packageCode);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
         if (aPackage == null) {
-            throw new MyValidationException("Package cannot be null");
+            throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
         }
         if (stock.getSecondaryPackageList().contains(aPackage)) {
             throw new MyValidationException("Package already exists in the secondary package list");
@@ -64,13 +76,14 @@ public class StockBean {
     }
 
     //remover 1a package a lista?
-    public void removePrimaryPackage(long id, Package aPackage) throws MyEntityNotFoundException, MyValidationException {
+    public void removePrimaryPackage(long id, long packageCode) throws MyEntityNotFoundException, MyValidationException {
         Stock stock = entityManager.find(Stock.class, id);
+        Package aPackage = entityManager.find(Package.class, packageCode);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
         if (aPackage == null) {
-            throw new MyValidationException("Package cannot be null");
+            throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
         }
         if (!stock.getPrimaryPackageList().contains(aPackage)) {
             throw new MyValidationException("Package does not exist in the primary package list");
@@ -79,13 +92,14 @@ public class StockBean {
     }
 
     //remover 2a package a lista?
-    public void removeSecondaryPackage(long id, Package aPackage) throws MyEntityNotFoundException, MyValidationException {
+    public void removeSecondaryPackage(long id, long packageCode) throws MyEntityNotFoundException, MyValidationException {
         Stock stock = entityManager.find(Stock.class, id);
+        Package aPackage = entityManager.find(Package.class, packageCode);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
         if (aPackage == null) {
-            throw new MyValidationException("Package cannot be null");
+            throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
         }
         if (!stock.getSecondaryPackageList().contains(aPackage)) {
             throw new MyValidationException("Package does not exist in the secondary package list");
@@ -94,72 +108,84 @@ public class StockBean {
     }
 
     //add lista de 1packages a lista
-    public void addPrimaryPackageList(long id, List<Package> packageList) throws MyEntityNotFoundException, MyValidationException {
+    public void addPrimaryPackageList(long id, List<Long> packageCodeList) throws MyEntityNotFoundException, MyValidationException {
         Stock stock = entityManager.find(Stock.class, id);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
 
-        for (Package aPackage : packageList) {
+        for (Long packageCode : packageCodeList) {
+            Package aPackage = entityManager.find(Package.class, packageCode);
             if (aPackage == null) {
-                throw new MyValidationException("Package cannot be null");
+                continue;
+                //throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
             }
             if (stock.getPrimaryPackageList().contains(aPackage)) {
-                throw new MyValidationException("Package " + aPackage.getCode() + "  already exists in the primary package list");
+                continue;
+                //throw new MyValidationException("Package " + aPackage.getCode() + " already exists in the primary package list");
             }
             stock.addPrimaryPackage(aPackage);
         }
     }
 
     //add lista de 2packages a lista
-    public void addSecondaryPackageList(long id, List<Package> packageList) throws MyEntityNotFoundException, MyValidationException {
+    public void addSecondaryPackageList(long id, List<Long> packageCodeList) throws MyEntityNotFoundException, MyValidationException {
         Stock stock = entityManager.find(Stock.class, id);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
 
-        for (Package aPackage : packageList) {
+        for (Long packageCode : packageCodeList) {
+            Package aPackage = entityManager.find(Package.class, packageCode);
             if (aPackage == null) {
-                throw new MyValidationException("Package cannot be null");
+                continue;
+                //throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
             }
             if (stock.getSecondaryPackageList().contains(aPackage)) {
-                throw new MyValidationException("Package " + aPackage.getCode() + " already exists in the secondary package list");
+                continue;
+                //throw new MyValidationException("Package " + aPackage.getCode() + " already exists in the secondary package list");
             }
             stock.addSecondaryPackage(aPackage);
         }
     }
 
     //remover lista de 1packages a lista
-    public void removePrimaryPackageList(long id, List<Package> packageList) throws MyEntityNotFoundException, MyValidationException {
+    public void removePrimaryPackageList(long id, List<Long> packageCodeList) throws MyEntityNotFoundException, MyValidationException {
         Stock stock = entityManager.find(Stock.class, id);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
 
-        for (Package aPackage : packageList) {
+        for (Long packageCode : packageCodeList) {
+            Package aPackage = entityManager.find(Package.class, packageCode);
             if (aPackage == null) {
-                throw new MyValidationException("Package cannot be null");
+                continue;
+                //throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
             }
             if (!stock.getPrimaryPackageList().contains(aPackage)) {
-                throw new MyValidationException("Package " + aPackage.getCode() + " does not exist in the primary package list");
+                continue;
+                //throw new MyValidationException("Package " + aPackage.getCode() + " does not exist in the primary package list");
             }
             stock.removePrimaryPackage(aPackage);
         }
     }
 
     //remover lista de 2packages a lista
-    public void removeSecondaryPackageList(long id, List<Package> packageList) throws MyEntityNotFoundException, MyValidationException {
+    public void removeSecondaryPackageList(long id, List<Long> packageCodeList) throws MyEntityNotFoundException, MyValidationException {
         Stock stock = entityManager.find(Stock.class, id);
         if (stock == null) {
             throw new MyEntityNotFoundException("The stock with the id: " + id + " does not exist");
         }
 
-        for (Package aPackage : packageList) {
+        for (Long packageCode : packageCodeList) {
+            Package aPackage = entityManager.find(Package.class, packageCode);
             if (aPackage == null) {
-                throw new MyValidationException("Package cannot be null");
+                continue;
+                //throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
             }
             if (!stock.getSecondaryPackageList().contains(aPackage)) {
-                throw new MyValidationException("Package " + aPackage.getCode() + " does not exist in the secondary package list");
+                continue;
+                //throw new MyValidationException("Package " + aPackage.getCode() + " does not exist in the secondary package list");
             }
             stock.removeSecondaryPackage(aPackage);
         }
