@@ -80,7 +80,8 @@ public class OrderBean {
                 orderItem.setQuantityLeft(orderItem.getQuantity());
                 entityManager.persist(orderItem);
             }
-            var orderLog = orderLogBean.create("Order created", order.getId(), OrderStatus.PENDING, null);
+            var orderLog = orderLogBean.create("Order created", order.getId(), OrderStatus.PENDING.toString(), null);
+
 
             return order.getId();
         } catch (ConstraintViolationException err) {
@@ -130,11 +131,10 @@ public class OrderBean {
         }
 
 
-        //todo add order log after status changes
         entityManager.lock(order, LockModeType.OPTIMISTIC);
 
         order.setStatus(orderStatus);
-        var orderLog = orderLogBean.create("Order status updated", order.getId(), orderStatus, null);
+        var orderLog = orderLogBean.create("Order status updated to " + orderStatus.toString(), order.getId(), orderStatus.toString(), null);
 
     }
 }
