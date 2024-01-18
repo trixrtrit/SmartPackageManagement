@@ -22,7 +22,7 @@ import java.util.List;
                         "AND sp.removedAt IS NULL"
         ),
 })
-public class SensorPackage {
+public class SensorPackage extends Versionable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

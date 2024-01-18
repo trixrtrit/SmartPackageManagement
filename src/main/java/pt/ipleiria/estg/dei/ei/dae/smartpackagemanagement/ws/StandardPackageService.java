@@ -7,11 +7,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
@@ -46,6 +44,7 @@ public class StandardPackageService {
 
     @GET
     @Path("/all")
+    @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("code") long code,
                            @QueryParam("material") String material,
@@ -103,9 +102,9 @@ public class StandardPackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response getPackageSensors(@PathParam("code") long code) throws MyEntityNotFoundException {
-        Package aPackage = packageBean.getPackageSensors(code);
-        if (aPackage != null) {
-            var dtos = SensorPackageAssembler.from(aPackage.getSensorPackageList());
+        StandardPackage standardPackage = standardPackageBean.getPackageSensors(code);
+        if (standardPackage != null) {
+            var dtos = SensorPackageAssembler.from(standardPackage.getSensorPackageList());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -118,7 +117,7 @@ public class StandardPackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
     public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
-        Package aPackage = packageBean.getPackageMeasurements(code);
+        Package aPackage = packageBean.getPackageMeasurements(code, StandardPackage.class);
         if (aPackage != null) {
             var dtos = SensorPackageAssembler.fromWithMeasurements(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();
@@ -139,7 +138,7 @@ public class StandardPackageService {
                 standardPackageDTO.getPackageType()
         );
         var standardPackage = standardPackageBean.find(packageId);
-        return Response.status(Response.Status.CREATED).entity(PackageAssembler.from(standardPackage)).build();
+        return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
     }
 
     @PUT
@@ -149,13 +148,12 @@ public class StandardPackageService {
     public Response update(@PathParam("code") long code, StandardPackageDTO standardPackageDTO)
             throws MyEntityNotFoundException, MyConstraintViolationException {
 
-        packageBean.update(
+        var standardPackage = standardPackageBean.update(
                 code,
                 standardPackageDTO.getMaterial(),
                 standardPackageDTO.getPackageType()
         );
-        var aPackage = packageBean.find(code);
-        return Response.ok(PackageAssembler.from(aPackage)).build();
+        return Response.ok(StandardPackageAssembler.from(standardPackage)).build();
     }
 
     @PUT
@@ -223,8 +221,8 @@ public class StandardPackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response delete(@PathParam("code") long code) throws MyEntityNotFoundException {
-        Package aPackage = packageBean.delete(code);
-        return Response.status(Response.Status.OK).entity(PackageAssembler.from(aPackage)).build();
+        Package aPackage = packageBean.delete(code, StandardPackage.class);
+        return Response.status(Response.Status.OK).entity(StandardPackageAssembler.from((StandardPackage)aPackage)).build();
     }
 
     @PUT
@@ -250,8 +248,8 @@ public class StandardPackageService {
                     .build();
         }
 
-        packageBean.changeActiveStatus(code);
-        return Response.ok(PackageAssembler.from(standardPackage)).build();
+        packageBean.changeActiveStatus(code, StandardPackage.class);
+        return Response.ok(StandardPackageAssembler.from(standardPackage)).build();
     }
 
     private boolean isRoleAuthorizedTertiary() {

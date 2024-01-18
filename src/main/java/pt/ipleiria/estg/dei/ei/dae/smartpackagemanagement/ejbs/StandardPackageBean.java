@@ -3,7 +3,9 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
@@ -30,7 +32,7 @@ public class StandardPackageBean {
 
     public long create(long code, String material, PackageType packageType)
             throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
-        if (packageBean.exists(code)) {
+        if (exists(code)) {
             throw new MyEntityExistsException("A package with the code: " + code + " already exists");
         }
         try {
@@ -60,16 +62,41 @@ public class StandardPackageBean {
             throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
         Hibernate.initialize(standardPackage.getSensorPackageList());
+        Hibernate.initialize(standardPackage.getTransportPackageStandardPackages());
         Hibernate.initialize(standardPackage.getProducts());
         return standardPackage;
     }
 
     public StandardPackage getStandardPackageProducts(long code) throws MyEntityNotFoundException {
-        if(!packageBean.exists(code)) {
+        if(!exists(code)) {
             throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
         StandardPackage standardPackage = entityManager.find(StandardPackage.class, code);
         Hibernate.initialize(standardPackage.getProducts());
+        return standardPackage;
+    }
+
+    public StandardPackage getPackageSensors(long code) throws MyEntityNotFoundException {
+        if(!this.exists(code)) {
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+        }
+        StandardPackage standardPackage = entityManager.find(StandardPackage.class, code);
+        Hibernate.initialize(standardPackage.getSensorPackageList());
+        return standardPackage;
+    }
+
+    public boolean exists(long code) {
+        Query query = entityManager.createNamedQuery("packageExists", StandardPackage.class);
+        query.setParameter("code", code);
+        return (Long) query.getSingleResult() > 0L;
+    }
+
+    public StandardPackage update(long code, String material, PackageType packageType)
+            throws MyEntityNotFoundException, MyConstraintViolationException {
+        StandardPackage standardPackage = this.find(code);
+        entityManager.lock(standardPackage, LockModeType.OPTIMISTIC);
+        standardPackage.setMaterial(material);
+        standardPackage.setPackageType(packageType);
         return standardPackage;
     }
 
@@ -102,11 +129,11 @@ public class StandardPackageBean {
     }
 
     public void addSensorToPackage(long code, long sensorId) throws MyEntityNotFoundException, MyEntityExistsException {
-        packageBean.addSensorToPackage(code, sensorId);
+        packageBean.addSensorToPackage(code, sensorId, StandardPackage.class);
     }
 
     public void removeSensorFromPackage(long code, long sensorId) throws MyEntityNotFoundException {
-        packageBean.removeSensorFromPackage(code, sensorId);
+        packageBean.removeSensorFromPackage(code, sensorId, StandardPackage.class);
     }
 
 }

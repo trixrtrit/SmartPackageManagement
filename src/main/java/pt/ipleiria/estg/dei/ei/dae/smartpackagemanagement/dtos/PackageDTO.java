@@ -9,7 +9,6 @@ import java.util.List;
 public class PackageDTO implements Serializable {
     private long code;
     private String material;
-    private PackageType packageType;
     private List<SensorPackageDTO> sensorPackageMetadata;
     private boolean isActive;
 
@@ -17,16 +16,15 @@ public class PackageDTO implements Serializable {
         this.sensorPackageMetadata = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive) {
+    public PackageDTO(long code, String material, boolean isActive) {
         this.code = code;
         this.material = material;
-        this.packageType = packageType;
         this.sensorPackageMetadata = new ArrayList<>();
         this.isActive = isActive;
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata) {
-        this(code, material, packageType, isActive);
+    public PackageDTO(long code, String material, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata) {
+        this(code, material, isActive);
         this.sensorPackageMetadata = sensorPackageMetadata;
     }
 
@@ -44,14 +42,6 @@ public class PackageDTO implements Serializable {
 
     public void setMaterial(String material) {
         this.material = material;
-    }
-
-    public PackageType getPackageType() {
-        return packageType;
-    }
-
-    public void setPackageType(PackageType packageType) {
-        this.packageType = packageType;
     }
 
     public List<SensorPackageDTO> getSensorPackageMetadata() {
