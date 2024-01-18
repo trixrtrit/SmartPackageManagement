@@ -3,9 +3,10 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 import jakarta.persistence.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class PrimaryPackageTypeDTO {
+public class PrimaryPackageTypeDTO  implements Serializable {
     private Long id;
     public String type;
 

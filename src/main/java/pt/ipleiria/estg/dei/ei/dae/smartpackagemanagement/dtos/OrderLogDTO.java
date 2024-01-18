@@ -4,9 +4,10 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import jakarta.validation.constraints.NotBlank;
 
+import java.io.Serializable;
 import java.time.Instant;
 
-public class OrderLogDTO {
+public class OrderLogDTO  implements Serializable {
     private String logEntry;
     @Temporal(TemporalType.TIMESTAMP)
     private Instant timestamp;
