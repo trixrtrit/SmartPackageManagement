@@ -10,9 +10,9 @@ import java.util.List;
 public class Stock {
     @Id
     private long id;
-    @OneToOne
-    @JoinColumn(name = "product_id")
-    Product product;
+//    @OneToOne
+//    @JoinColumn(name = "product_id")
+//    Product product;
     @OneToMany(mappedBy = "stock")
     List<Package> primaryPackageList;
     @OneToMany(mappedBy = "stock")
@@ -23,7 +23,7 @@ public class Stock {
         this.secondaryPackageList = new ArrayList<Package>();
     }
     public Stock(Product product) {
-        this.product = product;
+        //this.product = product;
         this.primaryPackageList = new ArrayList<Package>();
         this.secondaryPackageList = new ArrayList<Package>();
     }
@@ -32,13 +32,13 @@ public class Stock {
         return id;
     }
 
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
+//    public Product getProduct() {
+//        return product;
+//    }
+//
+//    public void setProduct(Product product) {
+//        this.product = product;
+//    }
 
     public List<Package> getPrimaryPackageList() {
         return primaryPackageList;

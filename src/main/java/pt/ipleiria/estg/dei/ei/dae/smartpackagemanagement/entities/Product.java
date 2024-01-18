@@ -52,7 +52,7 @@ public class Product extends Versionable implements Serializable {
     private float boxStock;
     @PositiveOrZero
     private float containerStock;
-    @OneToOne
+    @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "stock_id")
     private Stock stock;
     @PositiveOrZero

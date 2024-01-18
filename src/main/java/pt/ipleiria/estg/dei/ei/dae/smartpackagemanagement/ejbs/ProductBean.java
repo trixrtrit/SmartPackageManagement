@@ -83,10 +83,12 @@ public class ProductBean {
                     tertiaryPackQuantity
             );
             entityManager.persist(product);
+            Stock productStock = product.getStock();
+            entityManager.merge(productStock);
 
-            long stockId = new StockBean().create(product);
-            Stock stock = entityManager.find(Stock.class, stockId);
-            product.setStock(stock);
+//            long stockId = new StockBean().create(product);
+//            Stock stock = entityManager.find(Stock.class, stockId);
+//            product.setStock(stock);
 
             return product.getId();
         } catch (ConstraintViolationException err) {
