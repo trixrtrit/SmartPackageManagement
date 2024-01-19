@@ -75,11 +75,11 @@ public class CustomerService {
     @Path("{username}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     @Authenticated
-    @RolesAllowed({"Customer"})
+    @RolesAllowed({"Customer", "LogisticsOperator"})
     public Response get(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
 
-        if (!principal.getName().equals(username)) {
+        if (securityContext.isUserInRole("Customer") && !principal.getName().equals(username)) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
