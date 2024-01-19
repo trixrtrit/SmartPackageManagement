@@ -28,7 +28,7 @@ public class StandardPackageAssembler {
                 standardPackage.getPackageType(),
                 standardPackage.isActive(),
                 standardPackage.getManufactureDate(),
-                ProductAssembler.from(standardPackage.getProducts())
+                StandardPackageProductAssembler.from(standardPackage.getStandardPackageProducts())
         );
     }
 
@@ -43,7 +43,7 @@ public class StandardPackageAssembler {
                 standardPackage.getPackageType(),
                 standardPackage.isActive(),
                 standardPackage.getManufactureDate(),
-                ProductAssembler.fromWithProductParameters(standardPackage.getProducts())
+                StandardPackageProductAssembler.from(standardPackage.getStandardPackageProducts())
         );
     }
 

@@ -2,10 +2,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
@@ -45,6 +42,30 @@ public class PackageBean {
         return aPackage;
     }
 
+    public Package getPackageMeasurementsForUser(
+            long code,
+            Class<? extends Package> pkgType,
+            String username
+    )
+            throws MyEntityNotFoundException {
+        if(!this.exists(code, pkgType)) {
+            throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
+        }
+        User user = entityManager.find(User.class, username);
+        if (user == null) {
+            throw new MyEntityNotFoundException("User not found");
+        }
+        if (user instanceof Manufacturer) {
+
+        } else if (user instanceof Customer) {
+            // Handle Logistics-specific logic
+        }
+        Package aPackage = entityManager.find(pkgType, code);
+        Hibernate.initialize(aPackage.getSensorPackageList());
+        aPackage.getSensorPackageList().forEach(sensorPackage -> Hibernate.initialize(sensorPackage.getMeasurements()));
+        return aPackage;
+    }
+
     public List<Sensor> findPackageCurrentSensors(long packageCode){
         return entityManager.createQuery(
                         "SELECT sp.sensor FROM SensorPackage sp WHERE sp.aPackage.code = :packageCode " +
@@ -54,11 +75,16 @@ public class PackageBean {
                 .getResultList();
     }
 
-    public SensorPackage findSensorPackage(long packageCode, long sensorId){
-        return entityManager.createNamedQuery("findSensorPackage", SensorPackage.class)
-                .setParameter("packageCode", packageCode)
-                .setParameter("sensorId", sensorId)
-                .getSingleResult();
+    public SensorPackage findSensorPackage(long packageCode, long sensorId) throws MyEntityNotFoundException{
+        try {
+            return entityManager.createNamedQuery("findSensorPackage", SensorPackage.class)
+                    .setParameter("packageCode", packageCode)
+                    .setParameter("sensorId", sensorId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new MyEntityNotFoundException("Sensor with id: " + sensorId +
+                    " is not associated to the package code: " + packageCode);
+        }
     }
 
     public Package find(long code, Class<? extends Package> pkgType) throws MyEntityNotFoundException {
@@ -112,9 +138,6 @@ public class PackageBean {
             throw new MyEntityNotFoundException("The sensor with the id: " + sensorId + " does not exist");
         //get pivot object update time
         SensorPackage sensorPackage = findSensorPackage(code, sensorId);
-        if (sensorPackage == null)
-            throw new MyEntityNotFoundException("Sensor with id: " + sensorId +
-                    " is not associated to the package code: " + code);
         sensorPackage.setRemovedAt(new Date());
         aPackage.getSensorPackageList().remove(sensorPackage);
         sensor.getSensorPackageList().remove(sensorPackage);

@@ -81,19 +81,9 @@ public class Product extends Versionable implements Serializable {
     @NotNull
     private Manufacturer manufacturer;
 
-    @ManyToMany
-    @JoinTable(
-            name = "products_packages",
-            joinColumns = @JoinColumn(
-                    name = "product_id",
-                    referencedColumnName = "id"
-            ),
-            inverseJoinColumns = @JoinColumn(
-                    name = "package_code",
-                    referencedColumnName = "code"
-            )
-    )
-    private List<StandardPackage> standardPackages;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
+    private List<StandardPackageProduct> standardPackageProducts;
+
     private boolean deleted;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -105,7 +95,7 @@ public class Product extends Versionable implements Serializable {
     public Product() {
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
-        this.standardPackages = new ArrayList<>();
+        this.standardPackageProducts = new ArrayList<>();
     }
 
     public Product(
@@ -133,7 +123,7 @@ public class Product extends Versionable implements Serializable {
         this.productReference = productReference;
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
-        this.standardPackages = new ArrayList<>();
+        this.standardPackageProducts = new ArrayList<>();
         this.primaryPackQuantity = primaryPackQuantity;
         this.secondaryPackQuantity = secondaryPackQuantity;
         this.tertiaryPackQuantity = tertiaryPackQuantity;
@@ -236,12 +226,12 @@ public class Product extends Versionable implements Serializable {
         this.productCategory = productCategory;
     }
 
-    public List<StandardPackage> getStandardPackages() {
-        return standardPackages;
+    public List<StandardPackageProduct> getStandardPackageProducts() {
+        return standardPackageProducts;
     }
 
-    public void setStandardPackages(List<StandardPackage> standardPackages) {
-        this.standardPackages = standardPackages;
+    public void setStandardPackageProducts(List<StandardPackageProduct> standardPackageProducts) {
+        this.standardPackageProducts = standardPackageProducts;
     }
 
     public boolean isDeleted() {
@@ -308,12 +298,4 @@ public class Product extends Versionable implements Serializable {
         this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
-    public void addStandardPackage(StandardPackage standardPackage) {
-        if (!standardPackages.contains(standardPackage)) {
-            standardPackages.add(standardPackage);
-        }
-    }
-    public void removePackage(StandardPackage standardPackage) {
-        standardPackages.remove(standardPackage);
-    }
 }
