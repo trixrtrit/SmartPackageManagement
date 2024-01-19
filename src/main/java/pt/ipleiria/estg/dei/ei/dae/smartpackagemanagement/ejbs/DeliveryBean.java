@@ -12,9 +12,11 @@ import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Stateless
 public class DeliveryBean {
@@ -37,13 +39,18 @@ public class DeliveryBean {
             throw new MyEntityNotFoundException("The order with the id: " + orderId + " does not exist");
         }
 
+        var orderStatus = order.getStatus();
+        if (orderStatus == OrderStatus.PENDING || orderStatus == OrderStatus.REJECTED || orderStatus == OrderStatus.COMPLETED){
+            throw new MyIllegalConstraintException("Order must be in the ACCEPTED status");
+        }
+
         if (packageCodes.stream().count() <= 0){
             throw new MyValidationException("Cannot create delivery without associated packages");
         }
 
-        var orderItems = order.getOrderItems().stream().filter(x -> {
+        var filteredOrderItems = order.getOrderItems().stream().filter(x -> {
             return x.getQuantityLeft() > 0;
-        });
+        }).collect(Collectors.toList());
 
         try {
             var delivery = new Delivery(new Date(), DeliveryStatus.DISPATCHED, order);
@@ -61,16 +68,12 @@ public class DeliveryBean {
                     throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
                 }
 
-                //todo adicionar isto quando houver transport packages
-                //if (aPackage instance of StandardPackage)
-                //{
-
                 var product = standardPackage.getProducts().stream().findFirst().get();
 
-                var foundOrderItem = orderItems.filter(orderItem -> {
+                var foundOrderItem = filteredOrderItems.stream().filter(orderItem -> {
                     return  standardPackage.getPackageType() == orderItem.getPackageType() &&
                             Objects.equals(product.getId(), orderItem.getProduct().getId());
-                }).findFirst().get();
+                }).findFirst().orElse(null);
 
                 if (foundOrderItem == null)
                 {
@@ -80,10 +83,10 @@ public class DeliveryBean {
                 entityManager.lock(foundOrderItem, LockModeType.OPTIMISTIC);
                 foundOrderItem.setQuantityLeft(foundOrderItem.getQuantityLeft() - 1);
 
-                //order item has been completed
-                if (foundOrderItem.getQuantityLeft() == 0){
-                    orderItems = orderItems.filter(x -> x.getQuantityLeft() > 0);
-                }
+                //refilter
+                filteredOrderItems = filteredOrderItems.stream()
+                        .filter(x -> x.getQuantityLeft() > 0)
+                        .collect(Collectors.toList());
 
                 entityManager.lock(product, LockModeType.OPTIMISTIC);
                 switch (standardPackage.getPackageType()){
@@ -100,8 +103,6 @@ public class DeliveryBean {
                         throw new MyIllegalConstraintException("PackageType not found");
                 }
 
-                //}
-
                 delivery.addPackage(standardPackage);
                 entityManager.lock(standardPackage, LockModeType.OPTIMISTIC);
                 standardPackage.setActive(false);
@@ -109,6 +110,7 @@ public class DeliveryBean {
 
             delivery.setOrder(order);
             entityManager.persist(delivery);
+            orderLogBean.create("Delivery has been dispatched", orderId, delivery.getStatus().toString(), null);
 
             return order.getId();
         } catch (ConstraintViolationException err) {
@@ -161,6 +163,11 @@ public class DeliveryBean {
         }
         entityManager.lock(delivery, LockModeType.OPTIMISTIC);
         delivery.setStatus(deliveryStatus);
+
+        if(deliveryStatus == DeliveryStatus.DELIVERED){
+            delivery.setDeliveredDate(new Date());
+        }
+
         var orderLog = orderLogBean.create("Delivery status updated to " + deliveryStatus.toString(), delivery.getOrder().getId(), deliveryStatus.toString(), null);
 
     }

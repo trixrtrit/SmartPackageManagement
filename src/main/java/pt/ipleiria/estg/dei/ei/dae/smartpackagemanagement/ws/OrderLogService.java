@@ -34,7 +34,7 @@ public class OrderLogService {
     @GET
     @Path("/all")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"Customer", "LogisticsOperator"})
     public Response getAll(@QueryParam("orderId") Long orderId,
                            @QueryParam("startTime") Long startTime,
                            @QueryParam("endTime") Long endTime,
