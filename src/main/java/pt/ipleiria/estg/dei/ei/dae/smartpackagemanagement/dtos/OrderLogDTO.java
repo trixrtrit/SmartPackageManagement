@@ -9,11 +9,12 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCust
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.Date;
 
 public class OrderLogDTO  implements Serializable {
     private String logEntry;
     @Temporal(TemporalType.TIMESTAMP)
-    private Instant timestamp;
+    private Date timestamp;
     @NotBlank
     private long orderId;
     private String orderStatus;
@@ -22,7 +23,7 @@ public class OrderLogDTO  implements Serializable {
 
     public OrderLogDTO() {
     }
-    public OrderLogDTO(String logEntry, Instant timestamp, long orderId, String newStatus, String customerUsername, String logisticsOperatorUsername) {
+    public OrderLogDTO(String logEntry, Date timestamp, long orderId, String newStatus, String customerUsername, String logisticsOperatorUsername) {
         this.logEntry = logEntry;
         this.timestamp = timestamp;
         this.orderId = orderId;
@@ -39,11 +40,11 @@ public class OrderLogDTO  implements Serializable {
 //        this.logEntry = logEntry;
 //    }
 
-    public Instant getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Instant timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 

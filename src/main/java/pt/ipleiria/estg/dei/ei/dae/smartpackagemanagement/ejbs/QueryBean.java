@@ -4,19 +4,22 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
+import org.jboss.resteasy.util.DateUtil;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.*;
 
-import java.time.Instant;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Stateless
 public class QueryBean<T> {
     @PersistenceContext
     private EntityManager entityManager;
-
+    private static final Logger logger = Logger.getLogger("ebjs.QueryBean");
     public List<T> getEntities(
             Class<T> entity,
             Map<String, String> filterMap,
@@ -93,8 +96,13 @@ public class QueryBean<T> {
                             case "Boolean":
                                 specifications.add(new BooleanSpecification<T>(fieldName, Boolean.parseBoolean(fieldValue)));
                                 break;
-                            case "Instant":
-                                specifications.add(new DateSpecification<T>(fieldName, Instant.parse(fieldValue), operation));
+                            case "Date":
+                                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                                try {
+                                    specifications.add(new DateSpecification<T>(fieldName, formatter.parse(fieldValue), operation));
+                                } catch (DateUtil.DateParseException | ParseException ex) {
+                                    logger.warning(ex.getMessage());
+                                }
                                 break;
                             case "Long":
                                 specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));

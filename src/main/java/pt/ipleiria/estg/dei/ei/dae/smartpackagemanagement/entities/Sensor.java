@@ -6,7 +6,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 @Entity

@@ -13,11 +13,9 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderLog;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCustomSerialization;
 
-
-import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Stateless
@@ -34,8 +32,6 @@ public class OrderLogBean {
         }
         try {
             var newEntry = new OrderLog(logEntry, order, newStatus, logisticsOperatorUsername);
-            newEntry.setTimestamp(Instant.now());
-
             entityManager.persist(newEntry);
             return newEntry.getId();
         } catch (ConstraintViolationException err) {
@@ -53,8 +49,8 @@ public class OrderLogBean {
 
     public List<OrderLog> getOrderLogs(
             Long orderId,
-            Instant startDate,
-            Instant endDate,
+            Date startDate,
+            Date endDate,
             OrderStatus status,
             String customerUsername,
             String logisticsOperatorUsername

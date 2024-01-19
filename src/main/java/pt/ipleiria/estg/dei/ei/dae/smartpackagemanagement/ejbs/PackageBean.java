@@ -12,7 +12,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
-import java.time.Instant;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -91,7 +91,7 @@ public class PackageBean {
         if(findSensorPackageActiveSensor(sensorId)) {
             throw new MyEntityExistsException("The sensor with id: " + sensorId + " is already associated to another package");
         }
-        SensorPackage sensorPackage = new SensorPackage(sensor, aPackage, Instant.now());
+        SensorPackage sensorPackage = new SensorPackage(sensor, aPackage);
         aPackage.getSensorPackageList().add(sensorPackage);
         sensor.getSensorPackageList().add(sensorPackage);
         sensor.setAvailable(false);
@@ -115,7 +115,7 @@ public class PackageBean {
         if (sensorPackage == null)
             throw new MyEntityNotFoundException("Sensor with id: " + sensorId +
                     " is not associated to the package code: " + code);
-        sensorPackage.setRemovedAt(Instant.now());
+        sensorPackage.setRemovedAt(new Date());
         aPackage.getSensorPackageList().remove(sensorPackage);
         sensor.getSensorPackageList().remove(sensorPackage);
         sensor.setAvailable(true);

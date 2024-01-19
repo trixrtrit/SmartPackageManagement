@@ -8,18 +8,13 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Order;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.PrimaryPackageMeasurementUnit;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.PrimaryPackageType;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyIllegalConstraintException;
 
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Stateless
 public class PrimaryPackageMeasurementUnitBean {

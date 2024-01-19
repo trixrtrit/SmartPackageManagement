@@ -6,9 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Null;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -28,9 +27,11 @@ public class Delivery extends Versionable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Instant dispatchedDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date dispatchedDate;
     @Null
-    private Instant deliveredDate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date deliveredDate;
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status;
 
@@ -57,7 +58,7 @@ public class Delivery extends Versionable {
         this.packages = new ArrayList<>();
     }
 
-    public Delivery(Instant dispatchedDate, DeliveryStatus status, Order order) {
+    public Delivery(Date dispatchedDate, DeliveryStatus status, Order order) {
         this.dispatchedDate = dispatchedDate;
         this.status = status;
         this.order = order;
@@ -72,19 +73,19 @@ public class Delivery extends Versionable {
         this.id = id;
     }
 
-    public Instant getDispatchedDate() {
+    public Date getDispatchedDate() {
         return dispatchedDate;
     }
 
-    public void setDispatchedDate(Instant dispatchedDate) {
+    public void setDispatchedDate(Date dispatchedDate) {
         this.dispatchedDate = dispatchedDate;
     }
 
-    public Instant getDeliveredDate() {
+    public Date getDeliveredDate() {
         return deliveredDate;
     }
 
-    public void setDeliveredDate(Instant deliveredDate) {
+    public void setDeliveredDate(Date deliveredDate) {
         this.deliveredDate = deliveredDate;
     }
 

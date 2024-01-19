@@ -29,7 +29,6 @@ public class ProductCategory {
     }
 
     public ProductCategory(String category) {
-        this.id = id;
         this.category = category;
         this.products = new ArrayList<>();
     }

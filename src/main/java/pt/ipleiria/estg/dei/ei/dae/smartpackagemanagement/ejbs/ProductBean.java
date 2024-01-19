@@ -12,7 +12,6 @@ import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 

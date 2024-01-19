@@ -31,6 +31,7 @@ public class Order extends Versionable {
     private String postCode;
     private String city;
     private double totalPrice;
+    @Temporal(TemporalType.TIMESTAMP)
     private Date date;
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

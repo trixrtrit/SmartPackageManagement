@@ -8,6 +8,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -15,8 +16,8 @@ public class DeliveryDTO  implements Serializable {
     private Long id;
 
     @NotNull
-    private Instant dispatchedDate;
-    private Instant deliveredDate;
+    private Date dispatchedDate;
+    private Date deliveredDate;
 
     @NotNull
     private DeliveryStatus status;
@@ -36,7 +37,7 @@ public class DeliveryDTO  implements Serializable {
         this.packageCodes = new ArrayList<>();
     }
 
-    public DeliveryDTO(Long id, Instant dispatchedDate, Instant deliveredDate, DeliveryStatus status, Long orderId) {
+    public DeliveryDTO(Long id, Date dispatchedDate, Date deliveredDate, DeliveryStatus status, Long orderId) {
         this.id = id;
         this.dispatchedDate = dispatchedDate;
         this.deliveredDate = deliveredDate;
@@ -49,8 +50,8 @@ public class DeliveryDTO  implements Serializable {
 
     public DeliveryDTO(
             Long id,
-            Instant dispatchedDate,
-            Instant deliveredDate,
+            Date dispatchedDate,
+            Date deliveredDate,
             DeliveryStatus status,
             Long orderId,
             List<StandardPackageDTO> standardPackages,
@@ -74,19 +75,19 @@ public class DeliveryDTO  implements Serializable {
         this.id = id;
     }
 
-    public Instant getDispatchedDate() {
+    public Date getDispatchedDate() {
         return dispatchedDate;
     }
 
-    public void setDispatchedDate(Instant dispatchedDate) {
+    public void setDispatchedDate(Date dispatchedDate) {
         this.dispatchedDate = dispatchedDate;
     }
 
-    public Instant getDeliveredDate() {
+    public Date getDeliveredDate() {
         return deliveredDate;
     }
 
-    public void setDeliveredDate(Instant deliveredDate) {
+    public void setDeliveredDate(Date deliveredDate) {
         this.deliveredDate = deliveredDate;
     }
 

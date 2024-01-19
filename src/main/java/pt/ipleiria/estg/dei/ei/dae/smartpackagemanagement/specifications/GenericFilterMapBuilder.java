@@ -1,8 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications;
 
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
-
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Date;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -23,10 +23,10 @@ public class GenericFilterMapBuilder {
         } else if (param.getClass().equals(String.class)) {
             datatype = "String";
             valueField = (String) param;
-        } else if (param.getClass().equals(Instant.class)) {
-            datatype = "Instant";
-            Instant instant = (Instant) param;
-            valueField = instant.toString();
+        } else if (param.getClass().equals(Date.class)) {
+            datatype = "Date";
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            valueField = formatter.format(param);
         } else if (param.getClass().equals(Double.class) || param.getClass().equals(double.class)) {
             datatype = "Double";
             valueField = param.toString();

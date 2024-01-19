@@ -18,6 +18,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 @Path("orderlogs")
 @Produces({MediaType.APPLICATION_JSON})
@@ -35,20 +36,20 @@ public class OrderLogService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("orderId") Long orderId,
-                           @QueryParam("startDate") String startDateStr,
-                           @QueryParam("endDate") String endDateStr,
+                           @QueryParam("startTime") Long startTime,
+                           @QueryParam("endTime") Long endTime,
                            @QueryParam("status") OrderStatus status,
                            @QueryParam("customerUsername") String customerUsername,
                            @QueryParam("logisticsOperatorUsername") String logisticsOperatorUsername
     ) {
-        Instant startDate = null;
-        Instant endDate = null;
+        Date startDate = null;
+        Date endDate = null;
         try {
-            if(startDateStr != null) {
-                startDate = Instant.parse(startDateStr);
+            if(startTime != null) {
+                startDate = new Date(startTime);
             }
-            if(endDateStr != null) {
-                endDate = Instant.parse(endDateStr);
+            if(endTime != null) {
+                endDate = new Date(endTime);
             }
         } catch ( DateTimeParseException e ) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();

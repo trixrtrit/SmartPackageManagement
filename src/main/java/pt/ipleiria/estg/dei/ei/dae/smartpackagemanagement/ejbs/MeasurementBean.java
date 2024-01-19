@@ -14,7 +14,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -33,7 +32,6 @@ public class MeasurementBean {
         }
         try {
             var measurementLine = new Measurement(measurement, sensorPackage);
-            measurementLine.setTimestamp(Instant.now());
             entityManager.persist(measurementLine);
             return measurementLine.getId();
         } catch (ConstraintViolationException err) {
@@ -53,8 +51,8 @@ public class MeasurementBean {
     public List<Measurement> getMeasurements(
             Long sensorId,
             String packageCode,
-            Instant startDate,
-            Instant endDate,
+            Date startDate,
+            Date endDate,
             Boolean isActive,
             int pageNumber,
             int pageSize
@@ -91,8 +89,8 @@ public class MeasurementBean {
     public long getMeasurementsCount(
             Long sensorId,
             String packageCode,
-            Instant startDate,
-            Instant endDate,
+            Date startDate,
+            Date endDate,
             Boolean isActive
     ) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
@@ -115,7 +113,7 @@ public class MeasurementBean {
         return measurement;
     }
 
-    private static List<Predicate> getPredicates(Long sensorId, String packageCode, Instant startDate, Instant endDate, Boolean isActive, CriteriaBuilder builder, Root<Measurement> root) {
+    private static List<Predicate> getPredicates(Long sensorId, String packageCode, Date startDate, Date endDate, Boolean isActive, CriteriaBuilder builder, Root<Measurement> root) {
         List<Predicate> predicates = new ArrayList<>();
 
         if (sensorId != null) {

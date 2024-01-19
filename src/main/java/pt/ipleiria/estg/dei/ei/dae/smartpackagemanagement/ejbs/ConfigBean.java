@@ -91,7 +91,6 @@ public class ConfigBean {
             logger.severe(ex.getMessage());
         }
 
-        /*
         seedLogOperators(seedSize);
         seedManufacturers(seedSize);
         seedPrimaryPackageTypes();
@@ -105,7 +104,6 @@ public class ConfigBean {
         seedPackages(seedSize, maxSensorsPerPackage);
         seedTransportPackages(seedSize, maxSensorsPerPackage);
         seedMeasurements(measurementSize);
-        */
     }
 
     public void seedLogOperators(int size) {

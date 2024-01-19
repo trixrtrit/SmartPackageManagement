@@ -11,13 +11,13 @@ import java.util.Date;
 public class MeasurementDTO implements Serializable {
     private String measurement;
     @Temporal(TemporalType.TIMESTAMP)
-    private Instant timestamp;
+    private Date timestamp;
     private SensorPackageDTO sensorPackageDTO;
 
     public MeasurementDTO() {
     }
 
-    public MeasurementDTO(String measurement, Instant timestamp, SensorPackageDTO sensorPackageDTO) {
+    public MeasurementDTO(String measurement, Date timestamp, SensorPackageDTO sensorPackageDTO) {
         this.measurement = measurement;
         this.timestamp = timestamp;
         this.sensorPackageDTO = sensorPackageDTO;
@@ -31,11 +31,11 @@ public class MeasurementDTO implements Serializable {
         this.measurement = measurement;
     }
 
-    public Instant getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Instant timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 

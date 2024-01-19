@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -40,19 +41,19 @@ public class SensorPackage extends Versionable{
     private Package aPackage;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Instant addedAt;
+    private Date addedAt;
     @Temporal(TemporalType.TIMESTAMP)
-    private Instant removedAt;
+    private Date removedAt;
 
     public SensorPackage() {
         this.measurements = new ArrayList<Measurement>();
     }
 
-    public SensorPackage(Sensor sensor, Package aPackage, Instant addedAt) {
+    public SensorPackage(Sensor sensor, Package aPackage) {
         this.measurements = new ArrayList<Measurement>();
         this.sensor = sensor;
         this.aPackage = aPackage;
-        this.addedAt = addedAt;
+        this.addedAt = new Date();
     }
 
     public Long getId() {
@@ -79,19 +80,19 @@ public class SensorPackage extends Versionable{
         this.aPackage = aPackage;
     }
 
-    public Instant getAddedAt() {
+    public Date getAddedAt() {
         return addedAt;
     }
 
-    public void setAddedAt(Instant addedAt) {
+    public void setAddedAt(Date addedAt) {
         this.addedAt = addedAt;
     }
 
-    public Instant getRemovedAt() {
+    public Date getRemovedAt() {
         return removedAt;
     }
 
-    public void setRemovedAt(Instant removedAt) {
+    public void setRemovedAt(Date removedAt) {
         this.removedAt = removedAt;
     }
 

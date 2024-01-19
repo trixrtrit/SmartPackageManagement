@@ -4,14 +4,14 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 
-import java.time.Instant;
+import java.util.Date;
 
 public class DateSpecification<T> implements Specification<T> {
     private final String field;
-    private final Instant value;
+    private final Date value;
     private final String operation;
 
-    public DateSpecification(String field, Instant value, String operation) {
+    public DateSpecification(String field, Date value, String operation) {
         this.field = field;
         this.value = value;
         this.operation = operation;

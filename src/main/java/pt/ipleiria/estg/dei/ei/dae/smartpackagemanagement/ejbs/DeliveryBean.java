@@ -14,9 +14,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 
-import java.time.Instant;
 import java.util.*;
-import java.util.logging.Logger;
 
 @Stateless
 public class DeliveryBean {
@@ -48,7 +46,7 @@ public class DeliveryBean {
         });
 
         try {
-            var delivery = new Delivery(Instant.now(), DeliveryStatus.DISPATCHED, order);
+            var delivery = new Delivery(new Date(), DeliveryStatus.DISPATCHED, order);
 
             for (var packageCode : packageCodes){
                 var standardPackage = entityManager.createNamedQuery("findActivePackage", StandardPackage.class)

@@ -19,6 +19,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.util.Date;
 
 @Path("measurements")
 @Produces({MediaType.APPLICATION_JSON})
@@ -36,20 +37,20 @@ public class MeasurementService {
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("sensorId") Long sensorId,
                            @QueryParam("packageCode") String packageCode,
-                           @QueryParam("startDate") String startDateStr,
-                           @QueryParam("endDate") String endDateStr,
+                           @QueryParam("startTime") Long startTime,
+                           @QueryParam("endTime") Long endTime,
                            @QueryParam("isActive") boolean isActive,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) {
-        Instant startDate = null;
-        Instant endDate = null;
+        Date startDate = null;
+        Date endDate = null;
         try {
-            if(startDateStr != null) {
-                startDate = Instant.parse(startDateStr);
+            if(startTime != null) {
+                startDate = new Date(startTime);
             }
-            if(endDateStr != null) {
-                endDate = Instant.parse(endDateStr);
+            if(endTime != null) {
+                endDate = new Date(endTime);
             }
         } catch ( DateTimeParseException e ) {
             return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();

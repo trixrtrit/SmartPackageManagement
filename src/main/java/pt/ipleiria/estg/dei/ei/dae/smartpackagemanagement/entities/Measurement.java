@@ -3,7 +3,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Table(name = "measurements")
@@ -13,7 +13,7 @@ public class Measurement extends Versionable{
     private Long id;
     private String measurement;
     @Temporal(TemporalType.TIMESTAMP)
-    private Instant timestamp;
+    private Date timestamp;
     @ManyToOne
     @NotNull
     @JoinColumn(name = "sensor_package_id")
@@ -25,6 +25,7 @@ public class Measurement extends Versionable{
     public Measurement(String measurement, SensorPackage sensorPackage) {
         this.measurement = measurement;
         this.sensorPackage = sensorPackage;
+        this.timestamp = new Date();
     }
 
     public Long getId() {
@@ -44,11 +45,11 @@ public class Measurement extends Versionable{
     }
 
 
-    public Instant getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Instant timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 

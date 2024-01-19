@@ -2,11 +2,8 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCustomSerialization;
 
-
-import java.time.Instant;
+import java.util.Date;
 
 @Entity
 @Table(name = "order_logs")
@@ -16,7 +13,7 @@ public class OrderLog {
     private Long id;
     private String logEntry;
     @Temporal(TemporalType.TIMESTAMP)
-    private Instant timestamp;
+    private Date timestamp;
 
     @ManyToOne
     @NotNull
@@ -35,6 +32,7 @@ public class OrderLog {
         this.orderStatus = newStatus;
         this.customerUsername = order.getCustomer().getUsername();
         this.logisticsOperatorUsername = logisticsOperatorUsername;
+        this.timestamp = new Date();
     }
 
     public Long getId() {
@@ -53,11 +51,11 @@ public class OrderLog {
 //        this.logEntry = logEntry;
 //    }
 
-    public Instant getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Instant timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 

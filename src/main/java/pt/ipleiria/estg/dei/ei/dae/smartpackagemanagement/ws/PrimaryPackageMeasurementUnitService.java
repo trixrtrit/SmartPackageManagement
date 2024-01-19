@@ -9,12 +9,8 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PrimaryPackageMeasurementUnitAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PrimaryPackageTypeAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PrimaryPackageMeasurementUnitDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.PrimaryPackageTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PrimaryPackageMeasurementUnitBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PrimaryPackageTypeBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.PrimaryPackageMeasurementUnit;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 
 import java.util.List;
