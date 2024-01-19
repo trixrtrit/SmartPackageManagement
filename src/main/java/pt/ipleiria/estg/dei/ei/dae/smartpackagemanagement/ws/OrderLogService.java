@@ -59,6 +59,8 @@ public class OrderLogService {
 
     @POST
     @Path("/")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
     public Response create(OrderLogDTO orderLogDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long orderLogId = orderLogBean.create(

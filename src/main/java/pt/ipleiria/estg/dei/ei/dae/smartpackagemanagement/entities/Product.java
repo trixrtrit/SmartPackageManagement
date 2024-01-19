@@ -93,7 +93,7 @@ public class Product extends Versionable implements Serializable {
                     referencedColumnName = "code"
             )
     )
-    private List<Package> packages;
+    private List<StandardPackage> standardPackages;
     private boolean deleted;
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.REMOVE)
@@ -105,7 +105,7 @@ public class Product extends Versionable implements Serializable {
     public Product() {
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
-        this.packages = new ArrayList<>();
+        this.standardPackages = new ArrayList<>();
     }
 
     public Product(
@@ -133,7 +133,7 @@ public class Product extends Versionable implements Serializable {
         this.productReference = productReference;
         this.orderItems = new ArrayList<OrderItem>();
         this.productParameters = new ArrayList<>();
-        this.packages = new ArrayList<>();
+        this.standardPackages = new ArrayList<>();
         this.primaryPackQuantity = primaryPackQuantity;
         this.secondaryPackQuantity = secondaryPackQuantity;
         this.tertiaryPackQuantity = tertiaryPackQuantity;
@@ -236,12 +236,12 @@ public class Product extends Versionable implements Serializable {
         this.productCategory = productCategory;
     }
 
-    public List<Package> getPackages() {
-        return packages;
+    public List<StandardPackage> getStandardPackages() {
+        return standardPackages;
     }
 
-    public void setPackages(List<Package> packages) {
-        this.packages = packages;
+    public void setStandardPackages(List<StandardPackage> standardPackages) {
+        this.standardPackages = standardPackages;
     }
 
     public boolean isDeleted() {
@@ -308,12 +308,12 @@ public class Product extends Versionable implements Serializable {
         this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
-    public void addPackage(Package aPackage) {
-        if (!packages.contains(aPackage)) {
-            packages.add(aPackage);
+    public void addStandardPackage(StandardPackage standardPackage) {
+        if (!standardPackages.contains(standardPackage)) {
+            standardPackages.add(standardPackage);
         }
     }
-    public void removePackage(Package aPackage) {
-        packages.remove(aPackage);
+    public void removePackage(StandardPackage standardPackage) {
+        standardPackages.remove(standardPackage);
     }
 }

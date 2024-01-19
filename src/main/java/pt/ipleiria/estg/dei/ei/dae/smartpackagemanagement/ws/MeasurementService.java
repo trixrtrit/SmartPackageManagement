@@ -76,8 +76,8 @@ public class MeasurementService {
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long measurementId = measurementBean.create(
                 measurementDTO.getMeasurement(),
-                measurementDTO.getPackageCode(),
-                measurementDTO.getSensorId()
+                measurementDTO.getSensorPackageDTO().getaPackage().getCode(),
+                measurementDTO.getSensorPackageDTO().getSensor().getId()
         );
         var measurement = measurementBean.find(measurementId);
         return Response.status(Response.Status.CREATED).entity(MeasurementAssembler.from(measurement)).build();

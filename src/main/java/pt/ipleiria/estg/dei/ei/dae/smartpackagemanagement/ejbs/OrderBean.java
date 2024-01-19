@@ -109,7 +109,9 @@ public class OrderBean {
         for (var delivery : order.getDeliveries()) {
             Hibernate.initialize(delivery.getPackages());
             for (var aPackage : delivery.getPackages()){
-                Hibernate.initialize(aPackage.getProducts());
+                if(aPackage instanceof StandardPackage) {
+                    Hibernate.initialize(((StandardPackage) aPackage).getProducts());
+                }
             }
         }
 

@@ -12,8 +12,8 @@ public class PackageAssembler {
         return new PackageDTO(
                 aPackage.getCode(),
                 aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive()
+                aPackage.isActive(),
+                aPackage.getManufactureDate()
         );
     }
 
@@ -21,28 +21,13 @@ public class PackageAssembler {
         return aPackages.stream().map(PackageAssembler::from).collect(Collectors.toList());
     }
 
-    public static PackageDTO fromWithProducts(Package aPackage) {
-        return new PackageDTO(
-                aPackage.getCode(),
-                aPackage.getMaterial(),
-                aPackage.getPackageType(),
-                aPackage.isActive(),
-                ProductAssembler.from(aPackage.getProducts())
-        );
-    }
-
-    public static List<PackageDTO> fromWithProducts(List<Package> aPackages) {
-        return aPackages.stream().map(PackageAssembler::fromWithProducts).collect(Collectors.toList());
-    }
-
     public static PackageDTO fromWithSensors(Package aPackage) {
         return new PackageDTO(
                 aPackage.getCode(),
                 aPackage.getMaterial(),
-                aPackage.getPackageType(),
                 aPackage.isActive(),
-                SensorPackageAssembler.from(aPackage.getSensorPackageList()),
-                true
+                aPackage.getManufactureDate(),
+                SensorPackageAssembler.from(aPackage.getSensorPackageList())
         );
     }
 

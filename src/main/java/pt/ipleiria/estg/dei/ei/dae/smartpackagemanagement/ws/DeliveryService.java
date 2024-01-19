@@ -7,13 +7,9 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.DeliveryAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.DeliveryDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.DeliveryBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
@@ -54,9 +50,9 @@ public class DeliveryService {
     }
 
     @GET
-    @Path("/{id}")
+    @Path("{id}")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator, Customer"})
+    @RolesAllowed({"LogisticsOperator", "Customer"})
     public Response get(@PathParam("id") long id) throws MyEntityNotFoundException {
         var delivery = deliveryBean.findWithPackages(id);
         return Response.ok(DeliveryAssembler.from(delivery)).build();

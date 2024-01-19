@@ -31,13 +31,13 @@ public class SensorDTO implements Serializable {
     public SensorDTO(Long id, String name, boolean isAvailable, SensorTypeDTO sensorType, List<MeasurementDTO> measurements) {
         this(id, name, isAvailable, sensorType);
         this.measurements = measurements;
-        this.packages = new ArrayList<>();
+        //this.packages = new ArrayList<>();
     }
 
     public SensorDTO(Long id, String name, boolean isAvailable, SensorTypeDTO sensorType, List<PackageDTO> packages, boolean hasMeasurements) {
         this(id, name, isAvailable, sensorType);
         this.measurements = new ArrayList<>();
-        this.packages = new ArrayList<>();
+        this.packages = packages;
     }
 
     public Long getId() {

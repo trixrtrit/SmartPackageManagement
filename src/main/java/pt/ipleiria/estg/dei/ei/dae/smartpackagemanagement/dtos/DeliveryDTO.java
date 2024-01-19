@@ -27,22 +27,43 @@ public class DeliveryDTO  implements Serializable {
     @NotNull
     @Min(1)
     private ArrayList<Long> packageCodes;
-    private List<PackageDTO> packages;
+    private List<StandardPackageDTO> standardPackages;
+    private List<TransportPackageDTO> transportPackage;
 
     public DeliveryDTO() {
+        this.standardPackages = new ArrayList<>();
+        this.transportPackage = new ArrayList<>();
+        this.packageCodes = new ArrayList<>();
     }
 
     public DeliveryDTO(Long id, Instant dispatchedDate, Instant deliveredDate, DeliveryStatus status, Long orderId) {
-        this(id, dispatchedDate, deliveredDate, status, orderId, new ArrayList<>());
-    }
-
-    public DeliveryDTO(Long id, Instant dispatchedDate, Instant deliveredDate, DeliveryStatus status, Long orderId, List<PackageDTO> packages) {
         this.id = id;
         this.dispatchedDate = dispatchedDate;
         this.deliveredDate = deliveredDate;
         this.status = status;
         this.orderId = orderId;
-        this.packages = packages;
+        this.standardPackages = new ArrayList<>();
+        this.transportPackage = new ArrayList<>();
+        this.packageCodes = new ArrayList<>();
+    }
+
+    public DeliveryDTO(
+            Long id,
+            Instant dispatchedDate,
+            Instant deliveredDate,
+            DeliveryStatus status,
+            Long orderId,
+            List<StandardPackageDTO> standardPackages,
+            List<TransportPackageDTO> transportPackages
+    ) {
+        this.id = id;
+        this.dispatchedDate = dispatchedDate;
+        this.deliveredDate = deliveredDate;
+        this.status = status;
+        this.orderId = orderId;
+        this.standardPackages = standardPackages;
+        this.transportPackage = transportPackages;
+        this.packageCodes = new ArrayList<>();
     }
 
     public Long getId() {
@@ -93,11 +114,19 @@ public class DeliveryDTO  implements Serializable {
         this.packageCodes = packageCodes;
     }
 
-    public List<PackageDTO> getPackages() {
-        return packages;
+    public List<StandardPackageDTO> getStandardPackages() {
+        return standardPackages;
     }
 
-    public void setPackages(List<PackageDTO> packages) {
-        this.packages = packages;
+    public void setStandardPackages(List<StandardPackageDTO> standardPackages) {
+        this.standardPackages = standardPackages;
+    }
+
+    public List<TransportPackageDTO> getTransportPackage() {
+        return transportPackage;
+    }
+
+    public void setTransportPackage(List<TransportPackageDTO> transportPackage) {
+        this.transportPackage = transportPackage;
     }
 }

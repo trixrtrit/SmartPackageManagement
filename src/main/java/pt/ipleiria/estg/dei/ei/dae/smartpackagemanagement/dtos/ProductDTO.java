@@ -2,7 +2,6 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos;
 
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.ProductParameter;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class ProductDTO implements Serializable {
     //TODO: OrderItemDTO
     //private List<OrderItemDTO> orderItems;
 
-    private List<ProductParameter> productParameters;
+    private List<ProductParameterDTO> productParameters;
 
     public ProductDTO() {
         //this.orderItems = new ArrayList<>();
@@ -87,6 +86,44 @@ public class ProductDTO implements Serializable {
         this.secondaryPackQuantity = secondaryPackQuantity;
         this.tertiaryPackQuantity = tertiaryPackQuantity;
         //this.orderItems = new ArrayList<>();
+    }
+
+    public ProductDTO(
+            Long id,
+            String name,
+            String description,
+            double price,
+            boolean isActive,
+            String manufacturerUsername,
+            String reference,
+            float unitStock,
+            float boxStock,
+            float containerStock,
+            String primaryPackageType,
+            String primaryPackageMeasurementUnit,
+            String productCategory,
+            int primaryPackQuantity,
+            int secondaryPackQuantity,
+            int tertiaryPackQuantity,
+            List<ProductParameterDTO> productParameters
+    ) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.price = price;
+        this.isActive = isActive;
+        this.reference = reference;
+        this.manufacturerUsername = manufacturerUsername;
+        this.unitStock = unitStock;
+        this.boxStock = boxStock;
+        this.containerStock = containerStock;
+        this.primaryPackageType = primaryPackageType;
+        this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
+        this.productCategory = productCategory;
+        this.productParameters = productParameters;
+        this.primaryPackQuantity = primaryPackQuantity;
+        this.secondaryPackQuantity = secondaryPackQuantity;
+        this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
     public ProductDTO(
@@ -266,11 +303,11 @@ public class ProductDTO implements Serializable {
         this.primaryPackageMeasurementUnit = primaryPackageMeasurementUnit;
     }
 
-    public List<ProductParameter> getProductParameters() {
+    public List<ProductParameterDTO> getProductParameters() {
         return productParameters;
     }
 
-    public void setProductParameters(List<ProductParameter> productParameters) {
+    public void setProductParameters(List<ProductParameterDTO> productParameters) {
         this.productParameters = productParameters;
     }
 }

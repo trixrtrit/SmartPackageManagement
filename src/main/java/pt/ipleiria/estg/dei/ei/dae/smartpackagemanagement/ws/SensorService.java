@@ -36,6 +36,8 @@ public class SensorService {
 
     @GET
     @Path("/all")
+    @Authenticated
+    @RolesAllowed({"Manufacturer", "LogisticsOperator"})
     public Response getAll(@QueryParam("name") String name,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
@@ -54,6 +56,8 @@ public class SensorService {
 
     @GET
     @Path("{id}")
+    @Authenticated
+    @RolesAllowed({"Manufacturer", "LogisticsOperator"})
     @Produces({MediaType.APPLICATION_JSON, MediaType.TEXT_PLAIN})
     public Response get(@PathParam("id") long id) throws MyEntityNotFoundException {
         Sensor sensor = sensorBean.find(id);

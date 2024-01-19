@@ -139,7 +139,7 @@ public class ManufacturerService {
     @DELETE
     @Path("{username}")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})
+    @RolesAllowed({"Manufacturer", "LogisticsOperator"})
     public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException{
         var principal = securityContext.getUserPrincipal();
         if (!principal.getName().equals(username)){

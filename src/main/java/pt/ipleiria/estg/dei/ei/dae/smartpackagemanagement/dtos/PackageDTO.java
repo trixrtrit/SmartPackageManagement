@@ -4,39 +4,36 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class PackageDTO implements Serializable {
     private long code;
     private String material;
-    private PackageType packageType;
-    private List<ProductDTO> products;
     private List<SensorPackageDTO> sensorPackageMetadata;
     private boolean isActive;
+    private Date manufactureDate;
 
     public PackageDTO() {
-        this.products = new ArrayList<>();
         this.sensorPackageMetadata = new ArrayList<>();
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive) {
+    public PackageDTO(long code, String material, boolean isActive, Date manufactureDate) {
         this.code = code;
         this.material = material;
-        this.packageType = packageType;
-        this.products = new ArrayList<>();
         this.sensorPackageMetadata = new ArrayList<>();
         this.isActive = isActive;
+        this.manufactureDate = manufactureDate;
     }
 
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<ProductDTO> products) {
-        this(code, material, packageType, isActive);
-        this.products = products;
-        this.sensorPackageMetadata = new ArrayList<>();
-    }
-
-    public PackageDTO(long code, String material, PackageType packageType, boolean isActive, List<SensorPackageDTO> sensorPackageMetadata, boolean hasSensors) {
-        this(code, material, packageType, isActive);
-        this.products = new ArrayList<>();
+    public PackageDTO(
+            long code,
+            String material,
+            boolean isActive,
+            Date manufactureDate,
+            List<SensorPackageDTO> sensorPackageMetadata
+    ) {
+        this(code, material, isActive, manufactureDate);
         this.sensorPackageMetadata = sensorPackageMetadata;
     }
 
@@ -56,22 +53,6 @@ public class PackageDTO implements Serializable {
         this.material = material;
     }
 
-    public PackageType getPackageType() {
-        return packageType;
-    }
-
-    public void setPackageType(PackageType packageType) {
-        this.packageType = packageType;
-    }
-
-    public List<ProductDTO> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<ProductDTO> products) {
-        this.products = products;
-    }
-
     public List<SensorPackageDTO> getSensorPackageMetadata() {
         return sensorPackageMetadata;
     }
@@ -86,5 +67,13 @@ public class PackageDTO implements Serializable {
 
     public void setActive(boolean active) {
         isActive = active;
+    }
+
+    public Date getManufactureDate() {
+        return manufactureDate;
+    }
+
+    public void setManufactureDate(Date manufactureDate) {
+        this.manufactureDate = manufactureDate;
     }
 }

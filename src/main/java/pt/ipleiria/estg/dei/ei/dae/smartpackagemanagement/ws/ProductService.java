@@ -7,10 +7,7 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.CustomerAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.PackageAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductParameterAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
@@ -25,7 +22,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.Generic
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @Path("products")
@@ -110,7 +106,7 @@ public class ProductService {
     public Response getProductPackages(@PathParam("id") long id) throws MyEntityNotFoundException{
         Product product = productBean.getProductPackages(id);
         if (product != null) {
-            var dtos = PackageAssembler.from(product.getPackages());
+            var dtos = StandardPackageAssembler.from(product.getStandardPackages());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -144,7 +140,7 @@ public class ProductService {
     @GET
     @Path("export")
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    //@Authenticated
+    @Authenticated
     //@RolesAllowed({"Manufacturer"})
     public Response export(@QueryParam("fileLocation") String fileLocation)
             throws IOException {

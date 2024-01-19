@@ -154,7 +154,7 @@ public class CustomerService {
     @DELETE
     @Path("{username}")
     @Authenticated
-    @RolesAllowed({"Customer"})
+    @RolesAllowed({"Customer", "LogisticsOperator"})
     public Response delete(@PathParam("username") String username) throws MyEntityNotFoundException {
         var principal = securityContext.getUserPrincipal();
         if (!principal.getName().equals(username)) {

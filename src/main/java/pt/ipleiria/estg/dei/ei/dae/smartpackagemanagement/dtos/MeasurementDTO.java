@@ -12,19 +12,15 @@ public class MeasurementDTO implements Serializable {
     private String measurement;
     @Temporal(TemporalType.TIMESTAMP)
     private Instant timestamp;
-    @NotBlank
-    private long sensorId;
-    @NotBlank
-    private long packageCode;
+    private SensorPackageDTO sensorPackageDTO;
 
     public MeasurementDTO() {
     }
 
-    public MeasurementDTO(String measurement, Instant timestamp, long sensorId, long packageCode) {
+    public MeasurementDTO(String measurement, Instant timestamp, SensorPackageDTO sensorPackageDTO) {
         this.measurement = measurement;
         this.timestamp = timestamp;
-        this.sensorId = sensorId;
-        this.packageCode = packageCode;
+        this.sensorPackageDTO = sensorPackageDTO;
     }
 
     public String getMeasurement() {
@@ -43,19 +39,11 @@ public class MeasurementDTO implements Serializable {
         this.timestamp = timestamp;
     }
 
-    public long getSensorId() {
-        return sensorId;
+    public SensorPackageDTO getSensorPackageDTO() {
+        return sensorPackageDTO;
     }
 
-    public void setSensorId(long sensorId) {
-        this.sensorId = sensorId;
-    }
-
-    public long getPackageCode() {
-        return packageCode;
-    }
-
-    public void setPackageCode(long packageCode) {
-        this.packageCode = packageCode;
+    public void setSensorPackageDTO(SensorPackageDTO sensorPackageDTO) {
+        this.sensorPackageDTO = sensorPackageDTO;
     }
 }

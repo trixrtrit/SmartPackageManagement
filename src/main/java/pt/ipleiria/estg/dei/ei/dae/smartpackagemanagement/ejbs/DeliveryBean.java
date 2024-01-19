@@ -15,10 +15,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.logging.Logger;
 
 @Stateless
 public class DeliveryBean {
@@ -53,7 +51,7 @@ public class DeliveryBean {
             var delivery = new Delivery(Instant.now(), DeliveryStatus.DISPATCHED, order);
 
             for (var packageCode : packageCodes){
-                var aPackage = entityManager.createNamedQuery("findActivePackage", Package.class)
+                var standardPackage = entityManager.createNamedQuery("findActivePackage", StandardPackage.class)
                         .setParameter("code", packageCode)
                         .setMaxResults(1)
                         .getResultList()
@@ -61,7 +59,7 @@ public class DeliveryBean {
                         .findFirst()
                         .orElse(null);
 
-                if (aPackage == null) {
+                if (standardPackage == null) {
                     throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
                 }
 
@@ -69,11 +67,11 @@ public class DeliveryBean {
                 //if (aPackage instance of StandardPackage)
                 //{
 
-                var product = aPackage.getProducts().stream().findFirst().get();
+                var product = standardPackage.getProducts().stream().findFirst().get();
 
                 var foundOrderItem = orderItems.filter(orderItem -> {
-                    return  aPackage.getPackageType() == orderItem.getPackageType() &&
-                            product.getId() == orderItem.getProduct().getId();
+                    return  standardPackage.getPackageType() == orderItem.getPackageType() &&
+                            Objects.equals(product.getId(), orderItem.getProduct().getId());
                 }).findFirst().get();
 
                 if (foundOrderItem == null)
@@ -90,7 +88,7 @@ public class DeliveryBean {
                 }
 
                 entityManager.lock(product, LockModeType.OPTIMISTIC);
-                switch (aPackage.getPackageType()){
+                switch (standardPackage.getPackageType()){
                     case PRIMARY:
                         product.setUnitStock(product.getUnitStock() - 1);
                         break;
@@ -106,9 +104,9 @@ public class DeliveryBean {
 
                 //}
 
-                delivery.addPackage(aPackage);
-                entityManager.lock(aPackage, LockModeType.OPTIMISTIC);
-                aPackage.setActive(false);
+                delivery.addPackage(standardPackage);
+                entityManager.lock(standardPackage, LockModeType.OPTIMISTIC);
+                standardPackage.setActive(false);
             }
 
             delivery.setOrder(order);
@@ -145,10 +143,11 @@ public class DeliveryBean {
     public Delivery findWithPackages(Long id) throws MyEntityNotFoundException {
         var delivery = find(id);
         Hibernate.initialize(delivery.getPackages());
-
-        for (var aPackage : delivery.getPackages())
-            Hibernate.initialize(aPackage.getProducts());
-
+        for (Package aPackage : delivery.getPackages()) {
+            if (aPackage instanceof StandardPackage) {
+                Hibernate.initialize(((StandardPackage) aPackage).getProducts());
+            }
+        }
         return delivery;
     }
 
