@@ -235,10 +235,10 @@ public class ConfigBean {
                         faker.number().numberBetween(1,100),
                         faker.number().numberBetween(1,100)
                 );
-                var product = productBean.find(productId);
-                product.setUnitStock(faker.number().numberBetween(0,1000));
-                product.setBoxStock(faker.number().numberBetween(0,1000));
-                product.setContainerStock(faker.number().numberBetween(0,1000));
+//                var product = productBean.find(productId);
+//                product.setUnitStock(faker.number().numberBetween(0,1000));
+//                product.setBoxStock(faker.number().numberBetween(0,1000));
+//                product.setContainerStock(faker.number().numberBetween(0,1000));
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
@@ -332,6 +332,7 @@ public class ConfigBean {
         int packageSize = size/maxSensorsPerPackage;
         var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size);
         var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
+        var listOfProductIds = products.stream().map(product -> product.getId()).toArray();
         var packTypes = PackageType.values();
         int packTypesLength = packTypes.length;
         try {
@@ -339,17 +340,20 @@ public class ConfigBean {
                 int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
                 int packageTypeNumber = faker.number().numberBetween(0, packTypesLength);
                 var packType = packTypes[packageTypeNumber];
+                //get  random product id from list of product ids
+                long productNumber = (long) listOfProductIds[faker.number().numberBetween(0, listOfProductIds.length)];
                 long packId = standardPackageBean.create(
                         faker.number().randomNumber(9, true),
                         faker.commerce().material(),
-                        packType
+                        packType,
+                        productNumber
                 );
                 for (int j = 0; j < numberOfSensors; j++) {
                     standardPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
                     lastAssociatedSensorId++;
                 }
                 standardPackageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
-                standardPackageBean.addProductToPackage(packId, products.get(i).getId());
+                //standardPackageBean.addProductToPackage(packId, products.get(i).getId());
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
