@@ -27,6 +27,7 @@ public class StandardPackage extends Package {
 
     @OneToMany(mappedBy = "standardPackage", cascade = CascadeType.REMOVE)
     private List<TransportPackageStandardPackage> transportPackageStandardPackages;
+    private Long initialProductId;
 
     public StandardPackage() {
         this.products = new ArrayList<Product>();
@@ -71,5 +72,13 @@ public class StandardPackage extends Package {
 
     public void setPackageType(PackageType packageType) {
         this.packageType = packageType;
+    }
+
+    public Long getInitialProductId() {
+        return initialProductId;
+    }
+
+    public void setInitialProductId(Long initialProductId) {
+        this.initialProductId = initialProductId;
     }
 }

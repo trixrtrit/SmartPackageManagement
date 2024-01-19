@@ -39,8 +39,7 @@ public class StandardPackageService {
     private PackageBean packageBean;
     @EJB
     private StandardPackageBean standardPackageBean;
-    @EJB
-    private ProductBean productBean;
+
     @Context
     private SecurityContext securityContext;
 

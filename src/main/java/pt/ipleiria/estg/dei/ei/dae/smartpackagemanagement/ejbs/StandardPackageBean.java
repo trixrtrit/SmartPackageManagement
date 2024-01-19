@@ -46,6 +46,7 @@ public class StandardPackageBean {
                     throw new MyEntityNotFoundException("Product with id '" + initialProductId + "' for the package does not exist");
                 }
                 standardPackage.addProduct(product);
+                standardPackage.setInitialProductId(initialProductId);
                 productBean.addUnitStock(initialProductId);
             }
 
