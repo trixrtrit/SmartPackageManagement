@@ -129,6 +129,7 @@ public class StandardPackageService {
 
     @POST
     @Path("/")
+    @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response create(StandardPackageDTO standardPackageDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {

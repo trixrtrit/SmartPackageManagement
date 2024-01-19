@@ -38,6 +38,7 @@ public class ProductService {
     public Response getAll(@QueryParam("reference") String reference,
                            @QueryParam("name") String name,
                            @QueryParam("description") String description,
+                           @QueryParam("category") String category,
                            @QueryParam("minPrice") double minPrice,
                            @QueryParam("maxPrice") double maxPrice,
                            @DefaultValue("1") @QueryParam("page") int page,
@@ -50,6 +51,7 @@ public class ProductService {
         GenericFilterMapBuilder.addToFilterMap(description, filterMap, "description", "");
         GenericFilterMapBuilder.addToFilterMap(minPrice, filterMap, "price", "gte");
         GenericFilterMapBuilder.addToFilterMap(maxPrice, filterMap, "price", "lte");
+        filterMap.put("Join/_/productCategory/_/category/_/like", category);
 
         var products = productBean.getProducts(filterMap, page, pageSize);
 
@@ -125,8 +127,8 @@ public class ProductService {
                 productDTO.getManufacturerUsername(),
                 productDTO.getReference(),
                 productDTO.getPrimaryPackageMeasurementUnitId(),
-                productDTO.getProductCategoryId(),
                 productDTO.getPrimaryPackageTypeId(),
+                productDTO.getProductCategoryId(),
                 productDTO.getPrimaryPackQuantity(),
                 productDTO.getSecondaryPackQuantity(),
                 productDTO.getTertiaryPackQuantity()
@@ -138,7 +140,7 @@ public class ProductService {
     @GET
     @Path("export")
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    //@Authenticated
+    @Authenticated
     //@RolesAllowed({"Manufacturer"})
     public Response export(@QueryParam("fileLocation") String fileLocation)
             throws IOException {
@@ -188,7 +190,7 @@ public class ProductService {
     @PUT
     @Path("{id}/set-stock")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"LogisticsOperator", "Manufacturer"})
     public Response setStocks(@PathParam("id") long id, ProductStockDTO productStockDTO) throws MyEntityNotFoundException {
         productBean.setStocks(
                 id,

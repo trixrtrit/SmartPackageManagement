@@ -13,6 +13,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.OrderLog;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCustomSerialization;
+
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -24,14 +26,14 @@ public class OrderLogBean {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public long create(String logEntry, long orderId)
-            throws MyConstraintViolationException, MyEntityNotFoundException {
+    public long create(String logEntry, long orderId, String newStatus, String logisticsOperatorUsername)
+    throws MyConstraintViolationException, MyEntityNotFoundException {
         Order order = entityManager.find(Order.class, orderId);
         if (order == null) {
             throw new MyEntityNotFoundException("No order with id '" + orderId + "' has been found.");
         }
         try {
-            var newEntry = new OrderLog(logEntry, order);
+            var newEntry = new OrderLog(logEntry, order, newStatus, logisticsOperatorUsername);
             newEntry.setTimestamp(Instant.now());
 
             entityManager.persist(newEntry);
@@ -53,7 +55,9 @@ public class OrderLogBean {
             Long orderId,
             Instant startDate,
             Instant endDate,
-            OrderStatus status
+            OrderStatus status,
+            String customerUsername,
+            String logisticsOperatorUsername
     ) {
         CriteriaBuilder builder = entityManager.getCriteriaBuilder();
         CriteriaQuery<OrderLog> query = builder.createQuery(OrderLog.class);
@@ -75,14 +79,19 @@ public class OrderLogBean {
         }
 
         if(status != null) {
-            predicates.add(builder.isNull(root.get("order").get("status")));
+            predicates.add(builder.isNull(root.get("orderStatus")));
         }
-
+        if (customerUsername != null) {
+            predicates.add(builder.equal(root.get("customerUsername"), customerUsername));
+        }
+        if (logisticsOperatorUsername != null) {
+            predicates.add(builder.equal(root.get("logisticsOperatorUsername"), logisticsOperatorUsername));
+        }
         query.where(builder.and(predicates.toArray(new Predicate[0])));
 
         query.orderBy(builder.asc(root.get("order").get("id")),
-                builder.asc(root.get("order").get("date")),
-                builder.asc(root.get("order").get("status")));
+                builder.asc(root.get("order").get("date"))
+        );
 
         return entityManager.createQuery(query).getResultList();
     }

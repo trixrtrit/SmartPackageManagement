@@ -35,7 +35,7 @@ public class TransportPackageDTO extends PackageDTO implements Serializable {
             boolean hasSensors
     ) {
         super(code, material, isActive, manufactureDate);
-        this.transportPackageStandardPackagesMetadata = new ArrayList<>();
+        this.transportPackageStandardPackagesMetadata = transportPackageStandardPackagesMetadata;
     }
 
     public List<TransportPackageStandardPackagesDTO> getTransportPackageStandardPackagesMetadata() {

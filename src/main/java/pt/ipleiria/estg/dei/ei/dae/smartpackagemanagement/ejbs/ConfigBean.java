@@ -64,19 +64,7 @@ public class ConfigBean {
         int maxSensorsPerPackage = 4;
         int measurementSize = 20;
         System.out.println("Hello Java EE!");
-        seedLogOperators(seedSize);
-        seedManufacturers(seedSize);
-        seedPrimaryPackageTypes();
-        seedPrimaryPackageMeasurementUnits();
-        seedProductCategories();
-        seedProducts(seedSize);
-        seedCustomers(seedSize);
-        seedSensorType();
-        seedProductParameters(seedSize);
-        seedSensors(seedSize);
-        seedPackages(seedSize, maxSensorsPerPackage);
-        seedTransportPackages(seedSize, maxSensorsPerPackage);
-        seedMeasurements(measurementSize);
+
         try {
             logisticsOperatorBean.create(
                     "gatoMega",
@@ -102,6 +90,22 @@ public class ConfigBean {
         catch (Exception ex) {
             logger.severe(ex.getMessage());
         }
+
+        /*
+        seedLogOperators(seedSize);
+        seedManufacturers(seedSize);
+        seedPrimaryPackageTypes();
+        seedPrimaryPackageMeasurementUnits();
+        seedProductCategories();
+        seedProducts(seedSize);
+        seedCustomers(seedSize);
+        seedSensorType();
+        seedProductParameters(seedSize);
+        seedSensors(seedSize);
+        seedPackages(seedSize, maxSensorsPerPackage);
+        seedTransportPackages(seedSize, maxSensorsPerPackage);
+        seedMeasurements(measurementSize);
+        */
     }
 
     public void seedLogOperators(int size) {
@@ -142,11 +146,11 @@ public class ConfigBean {
 
     public void seedPrimaryPackageTypes() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
         var packageTypes = new String[]{
-                "Box",
-                "Container",
+                "Small Cardboard Container",
+                "Small Plastic Container",
                 "Bottle",
                 "Bag",
-                "Barrel"
+                "Small Barrel"
         };
 
         for (var packageType : packageTypes) {

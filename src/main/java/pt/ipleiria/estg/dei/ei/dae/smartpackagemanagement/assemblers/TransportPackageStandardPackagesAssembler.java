@@ -11,6 +11,7 @@ public class TransportPackageStandardPackagesAssembler {
             TransportPackageStandardPackage transportPackageStandardPackage) {
         return new TransportPackageStandardPackagesDTO(
                 transportPackageStandardPackage.getId(),
+                TransportPackageAssembler.from(transportPackageStandardPackage.getTransportPackage()),
                 StandardPackageAssembler.from(transportPackageStandardPackage.getStandardPackage()),
                 transportPackageStandardPackage.getAddedAt(),
                 transportPackageStandardPackage.getRemovedAt()

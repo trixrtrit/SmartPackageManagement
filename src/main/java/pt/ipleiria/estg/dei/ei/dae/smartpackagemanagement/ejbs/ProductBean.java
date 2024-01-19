@@ -222,13 +222,19 @@ public class ProductBean {
         product.setActive(!product.isActive());
     }
 
-    public void setStocks(long id, float unitStock, float boxStock, float containerStock)
+    public void setStocks(long id, Float unitStock, Float boxStock, Float containerStock)
             throws MyEntityNotFoundException{
         Product product = this.find(id);
         entityManager.lock(product, LockModeType.OPTIMISTIC);
-        product.setUnitStock(unitStock);
-        product.setBoxStock(boxStock);
-        product.setContainerStock(containerStock);
+        if(unitStock != null){
+            product.setUnitStock(unitStock);
+        }
+        if(boxStock != null){
+            product.setBoxStock(boxStock);
+        }
+        if(containerStock != null){
+            product.setContainerStock(containerStock);
+        }
     }
 
     public Product delete(long id) throws MyEntityNotFoundException {

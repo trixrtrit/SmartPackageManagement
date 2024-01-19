@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 public class GenericFilterMapBuilder {
     private final static String separator = "/_/";
+    private final static String enumSeparator = "/__/";
 
     public static <T> void addToFilterMap(T param, Map<String, String> filterMap, String keyField, String operation) {
         if (param == null || (param instanceof Number && ((Number) param).doubleValue() == 0.0)) {
@@ -16,7 +17,10 @@ public class GenericFilterMapBuilder {
 
         String datatype;
         String valueField;
-        if (param.getClass().equals(String.class)) {
+        if (param instanceof Enum<?>) {
+            datatype = "Enum" + enumSeparator + param.getClass().getSimpleName();
+            valueField = ((Enum<?>) param).name();
+        } else if (param.getClass().equals(String.class)) {
             datatype = "String";
             valueField = (String) param;
         } else if (param.getClass().equals(Instant.class)) {
@@ -40,14 +44,7 @@ public class GenericFilterMapBuilder {
             datatype = param.getClass().getSimpleName();
             valueField = param.toString();
         }
-        if(operation.equals("enum")) {
-            try {
-                valueField = valueField.toUpperCase();
-                PackageType.valueOf(valueField);
-            } catch (IllegalArgumentException e) {
-                return;
-            }
-        }
+
         String key = datatype + separator + keyField + separator + operation;
         Logger logger = Logger.getLogger("GenericFilterMapBuilder");
         logger.severe(key);
@@ -58,4 +55,6 @@ public class GenericFilterMapBuilder {
     public static String getSeparator() {
         return separator;
     }
+
+    public static String getEnumSeparator() { return enumSeparator; }
 }

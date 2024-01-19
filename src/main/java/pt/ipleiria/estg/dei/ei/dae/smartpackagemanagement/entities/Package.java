@@ -14,6 +14,10 @@ import java.util.List;
         @NamedQuery(
                 name = "packageExists",
                 query = "SELECT COUNT(p.code) FROM Package p WHERE p.code = :code"
+        ),
+        @NamedQuery(
+                name = "findActivePackage",
+                query = "SELECT p FROM Package p WHERE p.code = :code AND p.isActive"
         )
 })
 @SQLDelete(sql="UPDATE packages SET deleted = TRUE WHERE code = ? AND deleted = ?::boolean")
@@ -24,6 +28,21 @@ public class Package extends Versionable{
     private String material;
     @OneToMany(mappedBy = "aPackage", cascade = CascadeType.REMOVE)
     private List<SensorPackage> sensorPackageList;
+
+    @ManyToMany
+    @JoinTable(
+            name = "deliveries_packages",
+            joinColumns = @JoinColumn(
+                    name = "package_code",
+                    referencedColumnName = "code"
+            ),
+            inverseJoinColumns = @JoinColumn(
+                    name = "delivery_id",
+                    referencedColumnName = "id"
+            )
+    )
+    private List<Delivery> deliveries;
+
     private boolean deleted;
     private boolean isActive = true;
     @Temporal(TemporalType.TIMESTAMP)
@@ -77,6 +96,22 @@ public class Package extends Versionable{
     }
     public void setDeleted(Boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public List<Delivery> getDeliveries() {
+        return deliveries;
+    }
+
+    public void addDelivery(Delivery delivery) {
+        if (delivery != null && !deliveries.contains(delivery)){
+            deliveries.add(delivery);
+        }
+    }
+
+    public void removeDelivery(Delivery delivery) {
+        if (delivery != null && deliveries.contains(delivery)){
+            deliveries.remove(delivery);
+        }
     }
 
     public boolean isActive() {

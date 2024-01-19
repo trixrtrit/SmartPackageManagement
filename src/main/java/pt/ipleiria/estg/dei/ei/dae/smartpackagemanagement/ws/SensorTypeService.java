@@ -33,6 +33,8 @@ public class SensorTypeService {
 
     @GET
     @Path("/all")
+    @Authenticated
+    @RolesAllowed({"Manufacturer", "LogisticsOperator"})
     public Response getAll(@QueryParam("name") String name,
                            @QueryParam("unit") String measurementUnit,
                            @DefaultValue("1") @QueryParam("page") int page,
@@ -54,7 +56,7 @@ public class SensorTypeService {
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response create(SensorTypeDTO sensorTypeDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         var id = sensorTypeBean.create(
@@ -68,7 +70,7 @@ public class SensorTypeService {
     @PUT
     @Path("{id}")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response update(@PathParam("id") long id, SensorTypeDTO sensorTypeDTO)
             throws MyEntityNotFoundException, MyConstraintViolationException {
         sensorTypeBean.update(
@@ -83,7 +85,7 @@ public class SensorTypeService {
     @DELETE
     @Path("{id}")
     @Authenticated
-    @RolesAllowed({"Manufacturer"})
+    @RolesAllowed({"LogisticsOperator"})
     public Response delete(@PathParam("id") long id) throws MyEntityNotFoundException{
         var sensorType = sensorTypeBean.delete(id);
         return Response.status(Response.Status.OK).entity(SensorTypeAssembler.from(sensorType)).build();
