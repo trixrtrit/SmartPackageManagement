@@ -2,21 +2,17 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.LockModeType;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
+import jakarta.persistence.*;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageProductAssociationViolationException;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +59,7 @@ public class StandardPackageBean {
         }
         Hibernate.initialize(standardPackage.getSensorPackageList());
         Hibernate.initialize(standardPackage.getTransportPackageStandardPackages());
-        Hibernate.initialize(standardPackage.getProducts());
+        Hibernate.initialize(standardPackage.getStandardPackageProducts());
         return standardPackage;
     }
 
@@ -72,7 +68,7 @@ public class StandardPackageBean {
             throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
         StandardPackage standardPackage = entityManager.find(StandardPackage.class, code);
-        Hibernate.initialize(standardPackage.getProducts());
+        Hibernate.initialize(standardPackage.getStandardPackageProducts());
         return standardPackage;
     }
 
@@ -100,6 +96,26 @@ public class StandardPackageBean {
         return standardPackage;
     }
 
+    public StandardPackageProduct findStandardPackageProduct(long standardPkgCode, long productId)
+            throws MyEntityNotFoundException{
+        try {
+            return entityManager.createNamedQuery("findStandardPackageProduct", StandardPackageProduct.class)
+                    .setParameter("standardPkgCode", standardPkgCode)
+                    .setParameter("productId", productId)
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            throw new MyEntityNotFoundException("Product with id: " + productId +
+                    " is not associated to the package code: " + standardPkgCode);
+        }
+    }
+
+    private long standardPackageAssociatedToProductCount(long code, long productId){
+        Query query = entityManager.createNamedQuery("standardPackageProductExists", StandardPackageProduct.class)
+                .setParameter("standardPkgCode", code)
+                .setParameter("productId", productId);
+        return (Long) query.getSingleResult();
+    }
+
     public void addProductToPackage(long code, long productId)
             throws MyEntityNotFoundException, MyPackageProductAssociationViolationException {
         StandardPackage standardPackage = find(code);
@@ -109,11 +125,13 @@ public class StandardPackageBean {
         Product product = entityManager.find(Product.class, productId);
         if (product == null)
             throw new MyEntityNotFoundException("The product with the id: " + productId + " does not exist");
-        if (standardPackage.getPackageType() != PackageType.TERTIARY && !standardPackage.getProducts().isEmpty()) {
+        if (standardPackage.getPackageType() != PackageType.TERTIARY && standardPackageAssociatedToProductCount(code, productId) > 0) {
             throw new MyPackageProductAssociationViolationException("Non-tertiary packages cannot have more than one product");
         }
-        standardPackage.addProduct(product);
-        product.addStandardPackage(standardPackage);
+        StandardPackageProduct standardPackageProduct = new StandardPackageProduct(standardPackage, product);
+        standardPackage.getStandardPackageProducts().add(standardPackageProduct);
+        product.getStandardPackageProducts().add(standardPackageProduct);
+        entityManager.persist(standardPackageProduct);
     }
 
     public void removeProductFromPackage(long code, long productId) throws MyEntityNotFoundException {
@@ -124,8 +142,10 @@ public class StandardPackageBean {
         Product product = entityManager.find(Product.class, productId);
         if (product == null)
             throw new MyEntityNotFoundException("The product with the id: " + productId + " does not exist");
-        standardPackage.removeProduct(product);
-        product.removePackage(standardPackage);
+        StandardPackageProduct standardPackageProduct = findStandardPackageProduct(code, productId);
+        standardPackageProduct.setRemovedAt(new Date());
+        standardPackage.getStandardPackageProducts().remove(standardPackageProduct);
+        product.getStandardPackageProducts().remove(standardPackageProduct);
     }
 
     public void addSensorToPackage(long code, long sensorId) throws MyEntityNotFoundException, MyEntityExistsException {

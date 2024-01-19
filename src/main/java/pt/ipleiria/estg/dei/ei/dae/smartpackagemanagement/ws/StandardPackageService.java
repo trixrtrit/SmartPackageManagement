@@ -10,11 +10,13 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.StandardPackageBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
@@ -89,7 +91,7 @@ public class StandardPackageService {
     public Response getPackageProducts(@PathParam("code") long code) throws MyEntityNotFoundException {
         StandardPackage standardPackage = standardPackageBean.getStandardPackageProducts(code);
         if (standardPackage != null) {
-            var dtos = ProductAssembler.from(standardPackage.getProducts());
+            var dtos = StandardPackageProductAssembler.from(standardPackage.getStandardPackageProducts());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -117,7 +119,14 @@ public class StandardPackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
     public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
-        Package aPackage = packageBean.getPackageMeasurements(code, StandardPackage.class);
+        Package aPackage = null;
+        String username = securityContext.getUserPrincipal().getName();
+        if(securityContext.isUserInRole("LogisticsOperator")) {
+            aPackage = packageBean.getPackageMeasurements(code, StandardPackage.class);
+        } else if (securityContext.isUserInRole("Manufacturer")){
+            packageBean.getPackageMeasurementsForUser(code, StandardPackage.class, username);
+        }
+
         if (aPackage != null) {
             var dtos = SensorPackageAssembler.fromWithMeasurements(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();

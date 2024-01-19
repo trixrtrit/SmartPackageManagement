@@ -3,7 +3,6 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;

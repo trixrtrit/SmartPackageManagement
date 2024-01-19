@@ -106,7 +106,7 @@ public class ProductService {
     public Response getProductPackages(@PathParam("id") long id) throws MyEntityNotFoundException{
         Product product = productBean.getProductPackages(id);
         if (product != null) {
-            var dtos = StandardPackageAssembler.from(product.getStandardPackages());
+            var dtos = StandardPackageProductAssembler.fromWithPackages(product.getStandardPackageProducts());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
