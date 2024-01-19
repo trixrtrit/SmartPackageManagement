@@ -62,8 +62,11 @@ public class OrderBean {
             }
             orderItem.setProduct(product);
 
-            calculatedTotalPrice += (double) Math.round((orderItem.getPrice() * orderItem.getQuantity()) * 100) / 100.0; //???
+            calculatedTotalPrice += orderItem.getPrice();
         }
+
+        calculatedTotalPrice = (Math.round(calculatedTotalPrice * 100) / 100);
+        totalPrice = (Math.round(totalPrice * 100) / 100);
 
         if (totalPrice != calculatedTotalPrice){
             throw new MyValidationException("Calculated price (" + calculatedTotalPrice + "€) does not match total price (" + totalPrice + "€)");
