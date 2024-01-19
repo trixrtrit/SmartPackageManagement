@@ -14,6 +14,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.StandardPackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
@@ -38,7 +39,8 @@ public class StandardPackageService {
     private PackageBean packageBean;
     @EJB
     private StandardPackageBean standardPackageBean;
-
+    @EJB
+    private ProductBean productBean;
     @Context
     private SecurityContext securityContext;
 
@@ -130,14 +132,16 @@ public class StandardPackageService {
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"LogisticsOperator", "Manufacturer"})
     public Response create(StandardPackageDTO standardPackageDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long packageId = standardPackageBean.create(
                 standardPackageDTO.getCode(),
                 standardPackageDTO.getMaterial(),
-                standardPackageDTO.getPackageType()
+                standardPackageDTO.getPackageType(),
+                standardPackageDTO.getInitialProductId()
         );
+
         var standardPackage = standardPackageBean.find(packageId);
         return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
     }

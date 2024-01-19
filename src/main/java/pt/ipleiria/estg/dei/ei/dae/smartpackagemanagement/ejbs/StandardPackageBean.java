@@ -28,15 +28,27 @@ public class StandardPackageBean {
     @EJB
     private PackageBean packageBean;
     @EJB
+    private ProductBean productBean;
+    @EJB
     private QueryBean<StandardPackage> standardPackageQueryBean;
 
-    public long create(long code, String material, PackageType packageType)
+    public long create(long code, String material, PackageType packageType, Long initialProductId)
             throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
         if (exists(code)) {
             throw new MyEntityExistsException("A package with the code: " + code + " already exists");
         }
         try {
             StandardPackage standardPackage = new StandardPackage(code, material, packageType);
+
+            if (initialProductId != null){//packageType != PackageType.TERTIARY &&
+                var product = entityManager.find(Product.class, initialProductId);
+                if (product == null){
+                    throw new MyEntityNotFoundException("Product with id '" + initialProductId + "' for the package does not exist");
+                }
+                standardPackage.addProduct(product);
+                productBean.addUnitStock(initialProductId);
+            }
+
             entityManager.persist(standardPackage);
             return standardPackage.getCode();
         } catch (ConstraintViolationException err) {
