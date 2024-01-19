@@ -1,9 +1,9 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
 
 import java.util.ArrayList;
@@ -29,7 +29,7 @@ public class Delivery extends Versionable {
     private Long id;
     @Temporal(TemporalType.TIMESTAMP)
     private Date dispatchedDate;
-    @Null
+    @Nullable
     @Temporal(TemporalType.TIMESTAMP)
     private Date deliveredDate;
     @Enumerated(EnumType.STRING)
