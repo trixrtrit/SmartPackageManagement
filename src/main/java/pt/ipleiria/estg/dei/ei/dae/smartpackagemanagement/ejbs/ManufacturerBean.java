@@ -58,6 +58,7 @@ public class ManufacturerBean {
         if(!this.exists(username)) {
             throw new MyEntityNotFoundException("The manufacturer with the username: " + username + " does not exist");
         }
+
         Manufacturer manufacturer = entityManager.find(Manufacturer.class, username);
         Hibernate.initialize(manufacturer.getProducts());
         return manufacturer;

@@ -13,6 +13,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAsse
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.EmailBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ManufacturerBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -31,6 +32,8 @@ import java.util.Map;
 public class ManufacturerService {
     @EJB
     private ManufacturerBean manufacturerBean;
+    @EJB
+    private ProductBean productBean;
     @EJB
     private EmailBean emailBean;
     @Context
@@ -84,17 +87,41 @@ public class ManufacturerService {
     @GET
     @Path("{username}/products")
     @Authenticated
-    @RolesAllowed({"Customer", "Manufacturer"})
-    public Response getManufacturerProducts(@PathParam("username") String username) throws MyEntityNotFoundException{
+    @RolesAllowed({"LogisticsOperator", "Manufacturer"})
+    public Response getManufacturerProducts(
+            @PathParam("username") String username,
+            @QueryParam("reference") String reference,
+            @QueryParam("name") String name,
+            @QueryParam("description") String description,
+            @QueryParam("category") String category,
+            @QueryParam("minPrice") double minPrice,
+            @QueryParam("maxPrice") double maxPrice,
+            @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) throws MyEntityNotFoundException{
         var principal = securityContext.getUserPrincipal();
-        if (!principal.getName().equals(username)){
+        if (securityContext.isUserInRole("Manufacturer") && !principal.getName().equals(username)){
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        Manufacturer manufacturer = manufacturerBean.getManufacturerProducts(username);
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(username, filterMap, "manufacturer.username", "");
+        GenericFilterMapBuilder.addToFilterMap(reference, filterMap, "productReference", "");
+        GenericFilterMapBuilder.addToFilterMap(name, filterMap, "name", "");
+        GenericFilterMapBuilder.addToFilterMap(description, filterMap, "description", "");
+        GenericFilterMapBuilder.addToFilterMap(minPrice, filterMap, "price", "gte");
+        GenericFilterMapBuilder.addToFilterMap(maxPrice, filterMap, "price", "lte");
+        GenericFilterMapBuilder.addToFilterMap(category, filterMap, "productCategory.category", "");
+        //filterMap.put("Join/_/productCategory/_/category/_/like", category);
+
+        Manufacturer manufacturer = manufacturerBean.find(username);
         if (manufacturer != null) {
-            var dtos = ProductAssembler.from(manufacturer.getProducts());
-            return Response.ok(dtos).build();
+            var dtos = ProductAssembler.from(productBean.getProducts(filterMap, page, pageSize));
+            long totalItems = productBean.getProductsCount(filterMap);
+            long totalPages = (totalItems + pageSize - 1) / pageSize;
+            PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+            PaginationResponse<ProductDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+            return Response.ok(paginationResponse).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_MANUFACTURER")
