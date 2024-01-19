@@ -242,6 +242,36 @@ public class ProductBean {
         return product;
     }
 
+    public void addUnitStock(long id) throws MyEntityNotFoundException {
+        Product product = this.find(id);
+        entityManager.lock(product, LockModeType.OPTIMISTIC);
+        product.addUnitStock();
+    }
+    public void addBoxStock(long id) throws MyEntityNotFoundException {
+        Product product = this.find(id);
+        entityManager.lock(product, LockModeType.OPTIMISTIC);
+        product.addBoxStock();
+    }
+    public void addContainerStock(long id) throws MyEntityNotFoundException {
+        Product product = this.find(id);
+        entityManager.lock(product, LockModeType.OPTIMISTIC);
+        product.addContainerStock();
+    }
+    public void addUnitStock(long id, float quantity) throws MyEntityNotFoundException {
+        Product product = this.find(id);
+        entityManager.lock(product, LockModeType.OPTIMISTIC);
+        product.addUnitStock(quantity);
+    }
+    public void addBoxStock(long id, float quantity) throws MyEntityNotFoundException {
+        Product product = this.find(id);
+        entityManager.lock(product, LockModeType.OPTIMISTIC);
+        product.addBoxStock(quantity);
+    }
+    public void addContainerStock(long id, float quantity) throws MyEntityNotFoundException {
+        Product product = this.find(id);
+        entityManager.lock(product, LockModeType.OPTIMISTIC);
+        product.addContainerStock(quantity);
+    }
     private List<String> getExportableProperties() {
         List<String> productAttributesList = new ArrayList<>();
 
