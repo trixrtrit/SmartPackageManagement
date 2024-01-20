@@ -32,7 +32,7 @@ public class DeliveryBean {
     private StandardPackageBean standardPackageBean;
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public long create(Long orderId, ArrayList<Long> packageCodes)
+    public long create(String logisticOperator, Long orderId, ArrayList<Long> packageCodes)
             throws MyEntityExistsException, MyConstraintViolationException, MyEntityNotFoundException, MyValidationException, MyIllegalConstraintException {
 
         var order = (Order)entityManager.find(Order.class, orderId);
@@ -55,7 +55,7 @@ public class DeliveryBean {
         }).collect(Collectors.toList());
 
         try {
-            var delivery = new Delivery(new Date(), DeliveryStatus.DISPATCHED, order);
+            var delivery = new Delivery(logisticOperator, new Date(), DeliveryStatus.PROCESSING, order);
 
             for (var packageCode : packageCodes){
                 var standardPackage = entityManager.createNamedQuery("findActivePackage", StandardPackage.class)
@@ -116,7 +116,7 @@ public class DeliveryBean {
 
             delivery.setOrder(order);
             entityManager.persist(delivery);
-            orderLogBean.create("Delivery has been dispatched", orderId, delivery.getStatus().toString(), null);
+            orderLogBean.create("A delivery has been put into processing. It will be dispatched shortly.", orderId, delivery.getStatus().toString(), null);
 
             return order.getId();
         } catch (ConstraintViolationException err) {
@@ -165,7 +165,7 @@ public class DeliveryBean {
         entityManager.lock(delivery, LockModeType.OPTIMISTIC);
         delivery.setStatus(deliveryStatus);
 
-        if(deliveryStatus == DeliveryStatus.DELIVERED){
+        if (deliveryStatus == DeliveryStatus.DELIVERED){
             delivery.setDeliveredDate(new Date());
         }
 

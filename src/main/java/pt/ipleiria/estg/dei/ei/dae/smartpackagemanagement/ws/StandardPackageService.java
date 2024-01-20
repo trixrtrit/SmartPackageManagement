@@ -101,13 +101,8 @@ public class StandardPackageService {
             throw new IllegalArgumentException("Product not found");
         }
 
-        Map<String, String> filterMap = new HashMap<>();
-        GenericFilterMapBuilder.addToFilterMap(true, filterMap, "isActive", "");
-        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
-        filterMap.put("Join/_/products/_/id/_/equal/isManyToMany", productId.toString());
-
-        var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
-        long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
+        var dtos = StandardPackageAssembler.from(standardPackageBean.getForDelivery(productId, packageType, page, pageSize));
+        long totalItems = standardPackageBean.getForDeliveryCount(productId, packageType);
         long totalPages = (totalItems + pageSize - 1) / pageSize;
         PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
         PaginationResponse<StandardPackageDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
