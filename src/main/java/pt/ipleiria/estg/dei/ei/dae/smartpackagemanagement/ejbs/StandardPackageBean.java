@@ -29,6 +29,21 @@ public class StandardPackageBean {
     @EJB
     private QueryBean<StandardPackage> standardPackageQueryBean;
 
+    public long createEmpty(long code, String material, PackageType packageType, Date manufactureDate)
+            throws MyConstraintViolationException, MyEntityExistsException {
+        if (exists(code)) {
+            throw new MyEntityExistsException("A package with the code: " + code + " already exists");
+        }
+        try {
+            StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);
+            entityManager.persist(standardPackage);
+
+            return standardPackage.getCode();
+        } catch (ConstraintViolationException err) {
+            throw new MyConstraintViolationException(err);
+        }
+    }
+
     public long create(long code, String material, PackageType packageType, Date manufactureDate, Long initialProductId)
             throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
         if(initialProductId == null){
