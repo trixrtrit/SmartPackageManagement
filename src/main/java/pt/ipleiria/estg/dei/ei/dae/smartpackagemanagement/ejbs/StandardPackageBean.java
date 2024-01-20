@@ -36,17 +36,21 @@ public class StandardPackageBean {
         }
         try {
             StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);
+            entityManager.persist(standardPackage);
 
-            if (initialProductId != null){//packageType != PackageType.TERTIARY &&
+            if (initialProductId != null && packageType != PackageType.TERTIARY){//packageType != PackageType.TERTIARY &&
                 var product = entityManager.find(Product.class, initialProductId);
                 if (product == null){
                     throw new MyEntityNotFoundException("Product with id '" + initialProductId + "' for the package does not exist");
                 }
                 //standardPackage.addProduct(product);
-                entityManager.persist(standardPackage);
                 addProductToPackage(code, initialProductId);//
                 standardPackage.setInitialProductId(initialProductId);
-                productBean.addUnitStock(initialProductId);
+
+                if (packageType == PackageType.PRIMARY)
+                    productBean.addUnitStock(initialProductId);
+                if (packageType == PackageType.SECONDARY)
+                    productBean.addBoxStock(initialProductId);
             }
             //entityManager.persist(standardPackage);
             return standardPackage.getCode();

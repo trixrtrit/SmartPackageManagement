@@ -63,7 +63,10 @@ public class DeliveryService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response create(DeliveryDTO deliveryDTO) throws MyIllegalConstraintException, MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException, MyValidationException {
+        var principal = securityContext.getUserPrincipal();
+
         var id = deliveryBean.create(
+                principal.getName(),
                 deliveryDTO.getOrderId(),
                 deliveryDTO.getPackageCodes()
         );
