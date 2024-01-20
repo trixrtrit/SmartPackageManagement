@@ -58,8 +58,10 @@ public class ConfigBean {
     @PostConstruct
     public void populateDB() throws MyConstraintViolationException, MyEntityNotFoundException, MyEntityExistsException {
         int seedSize = 100;
-        int maxSensorsPerPackage = 4;
-        int measurementSize = 20;
+        int maxSensorsPerPackage = 2;
+        int measurementSize = 10;
+        int factor = 5;
+
         System.out.println("Hello Java EE!");
 
         try {
@@ -97,8 +99,8 @@ public class ConfigBean {
         seedCustomers(seedSize);
         seedSensorType();
         seedProductParameters(seedSize);
-        seedSensors(seedSize);
-        seedPackages(seedSize, maxSensorsPerPackage);
+        seedSensors(seedSize * factor * maxSensorsPerPackage);
+        seedPackages(seedSize * factor, maxSensorsPerPackage, factor);
         seedTransportPackages(seedSize, maxSensorsPerPackage);
         seedMeasurements(measurementSize);
     }
@@ -218,7 +220,7 @@ public class ConfigBean {
                 var primaryPackageType = primaryPackageTypes.get(faker.number().numberBetween(0, primaryPackageTypes.size()));
                 var primaryPackageUnit = primaryPackageUnits.get(faker.number().numberBetween(0, primaryPackageUnits.size()));
                 var productCategory = productCategories.get(faker.number().numberBetween(0, productCategories.size()));
-                System.out.println("seedProducts:" + i);
+                //System.out.println("seedProducts:" + i);
                 long productId = productBean.create(
                         faker.commerce().productName(),
                         faker.lorem().sentence(),
@@ -322,13 +324,14 @@ public class ConfigBean {
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
+            logger.severe("seedSensors");
         }
     }
 
-    private void seedPackages(int size, int maxSensorsPerPackage) {
-        int packageSize = 10*size;
-        var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size);
-        var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
+    private void seedPackages(int size, int maxSensorsPerPackage, int factor) {
+        int packageSize = size;
+        var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size * maxSensorsPerPackage);
+        var products = productBean.getProducts(new HashMap<String, String>(), 1, size/factor);
         var listOfProductIds = products.stream().map(product -> product.getId()).toArray();
         var packTypes = PackageType.values();
         int packTypesLength = packTypes.length;
@@ -337,9 +340,8 @@ public class ConfigBean {
                 int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
                 int packageTypeNumber = faker.number().numberBetween(0, packTypesLength);
                 var packType = packTypes[packageTypeNumber];
-                //get  random product id from list of product ids
                 long productNumber = (long) listOfProductIds[faker.number().numberBetween(0, listOfProductIds.length)];
-                System.out.println("seed packages iteration:[" + i + "] for productId:[" + productNumber + "]");
+                //System.out.println("seed packages iteration:[" + i + "] for productId:[" + productNumber + "]");
                 long packId = standardPackageBean.create(
                         faker.number().randomNumber(9, true),
                         faker.commerce().material(),
@@ -349,23 +351,29 @@ public class ConfigBean {
 
                 );
                 //todo assign sensors
-//                for (int j = 0; j < numberOfSensors; j++) {
-//                    standardPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
-//                    lastAssociatedSensorId++;
-//                }
-//                standardPackageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
+                for (int j = 0; j < numberOfSensors; j++) {
+                    try {
+                        standardPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
+                        lastAssociatedSensorId++;
+                    } catch (Exception ex) {
+                        logger.severe(ex.getMessage());
+                        logger.severe("addSensorToPackage");
+                    }
+                }
+                standardPackageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
                 //standardPackageBean.addProductToPackage(packId, products.get(i).getId());
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
+            logger.severe("seedPackages");
         }
     }
 
     private void seedTransportPackages(int size, int maxSensorsPerPackage) {
-        var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size);
-        var standardPkgs = standardPackageBean.getStandardPackages(new HashMap<String, String>(), 1, size);
+        var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size*30);
+        var standardPkgs = standardPackageBean.getStandardPackages(new HashMap<String, String>(), 1, size*10);
         int stdPkgsToTransport = 5;
-        int packageSize = standardPkgs.size()/stdPkgsToTransport;
+        int packageSize = standardPkgs.size()/stdPkgsToTransport/10;
         int lastAssociatedPkgCode = 0;
         try {
             for (int i = 0; i < packageSize; i++) {
@@ -396,16 +404,17 @@ public class ConfigBean {
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
+            logger.severe("seedTransportPackages");
         }
     }
 
     private void seedMeasurements(int size) {
-        var packages = packageBean.getPackages(new HashMap<String, String>(), 1, size);
+        var packages = packageBean.getPackages(new HashMap<String, String>(), 1, 100);
         try {
             for (Package aPackage: packages) {
                 var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());
                 for(Sensor sensor: sensors) {
-                    for (int i = 0; i < 20; i++) {
+                    for (int i = 0; i < 11; i++) {
                         measurementBean.create(
                                 Double.toString(faker.number().randomDouble(3,0,100)),
                                 aPackage.getCode(),
@@ -416,6 +425,7 @@ public class ConfigBean {
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
+            logger.severe("seedMeasurements");
         }
     }
 }

@@ -180,6 +180,26 @@ public class StandardPackageService {
     }
 
     @POST
+    @Path("/empty")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator", "Manufacturer"})
+    public Response createEmpty(StandardPackageDTO standardPackageDTO)
+            throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
+        if (isUnauthorizedAccess(standardPackageDTO.getPackageType()))
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("UNAUTHORIZED")
+                    .build();
+            long packageId = standardPackageBean.createEmpty(
+                    standardPackageDTO.getCode(),
+                    standardPackageDTO.getMaterial(),
+                    standardPackageDTO.getPackageType(),
+                    standardPackageDTO.getManufactureDate()
+            );
+            var standardPackage = standardPackageBean.find(packageId);
+            return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
+    }
+
+    @POST
     @Path("/")
     @Authenticated
     @RolesAllowed({"LogisticsOperator", "Manufacturer"})
