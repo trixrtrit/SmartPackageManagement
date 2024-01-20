@@ -59,15 +59,11 @@ public class TransportPackageService {
         GenericFilterMapBuilder.addToFilterMap(code, filterMap, "code", "eq");
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
 
-        List<TransportPackage> transportPackages = new ArrayList<>();
         String username = securityContext.getUserPrincipal().getName();
-        if(securityContext.isUserInRole("LogisticsOperator")) {
-            transportPackages = transportPackageBean.getTransportPackages(filterMap, page, pageSize);
-        } else if (securityContext.isUserInRole("Customer")) {
-            transportPackages = transportPackageBean.filterTransportPackagesByUserOwnership(
-                    transportPackageBean.getTransportPackages(filterMap, page, pageSize), username
-            );
+        if (securityContext.isUserInRole("Customer")){
+            GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "Customer");
         }
+        List<TransportPackage> transportPackages = transportPackageBean.getTransportPackages(filterMap, page, pageSize);
         var dtos = TransportPackageAssembler.from(transportPackages);
         long totalItems = transportPackageBean.getTransportPackagesCount(filterMap);
         long totalPages = (totalItems + pageSize - 1) / pageSize;

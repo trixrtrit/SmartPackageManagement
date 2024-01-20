@@ -72,15 +72,12 @@ public class StandardPackageService {
 
         String username = securityContext.getUserPrincipal().getName();
         if (securityContext.isUserInRole("Manufacturer")){
-            GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "Manu");
+            GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "Manufacturer");
         }
         else if (securityContext.isUserInRole("Customer")){
             GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "Customer");
-        }/*else if (securityContext.isUserInRole("Customer")) {
-            standardPackages = standardPackageBean.filterStandardPackagesByUserOwnership(
-                    standardPackages, username
-            );
-        }*/
+        }
+
         List<StandardPackage> standardPackages = standardPackageBean.getStandardPackages(filterMap, page, pageSize);
         var dtos = StandardPackageAssembler.from(standardPackages);
 

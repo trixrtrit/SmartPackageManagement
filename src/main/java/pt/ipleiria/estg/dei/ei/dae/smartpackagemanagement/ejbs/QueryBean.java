@@ -5,7 +5,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.*;
 import org.jboss.resteasy.util.DateUtil;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.*;
 
 import java.text.ParseException;
@@ -115,10 +114,10 @@ public class QueryBean<T> {
                             case "Long":
                                 specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));
                                 break;
-                            case "Manu":
+                            case "ManufacturerPackage":
                                 specifications.add(new ManufacturerProductSpecification<>(fieldValue));
                                 break;
-                            case "Customer":
+                            case "CustomerPackage":
                                 specifications.add(new CustomerPackageSpecification<>(fieldValue));
                                 break;
                             default:

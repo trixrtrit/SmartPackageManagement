@@ -44,10 +44,10 @@ public class GenericFilterMapBuilder {
             valueField = param.toString();
         }
 
-        if(operation.equals("Manu")){
-            datatype = "Manu";
+        if(operation.equals("Manufacturer")){
+            datatype = "ManufacturerPackage";
         } else if (operation.equals("Customer")) {
-            datatype = "Customer";
+            datatype = "CustomerPackage";
         }
 
         String key = datatype + separator + keyField + separator + operation;
