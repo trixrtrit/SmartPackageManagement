@@ -45,20 +45,28 @@ public class MeasurementBean {
             throws MyConstraintViolationException {
         Package currentPackage = measurementLine.getSensorPackage().getaPackage();
         MeasurementType measurementType = measurementLine.getSensorPackage().getSensor().getSensorType().getMeasurementType();
-        if (currentPackage instanceof StandardPackage) {
-            List<StandardPackageProduct> standardPackageProducts =
-                    ((StandardPackage) currentPackage).getStandardPackageProducts();
-            if(measurementType.equals(MeasurementType.NUMERIC)) {
-                for (StandardPackageProduct standardPackageProduct : standardPackageProducts) {
-                    processProductParameters(measurement, measurementLine, packageCode, standardPackageProduct);
+        switch (measurementType) {
+            case NUMERIC:
+                processNumericMeasurements(currentPackage, measurement, measurementLine, packageCode);
+                break;
+            case BOOLEAN:
+                if (Boolean.parseBoolean(measurement)) {
+                    notificationBean.fireSecurityNotification(measurement, measurementLine, packageCode);
                 }
-            }
-            else if (measurementType.equals(MeasurementType.BOOLEAN) && Boolean.parseBoolean(measurement)) {
-                notificationBean.fireSecurityNotification(
-                        measurement,
-                        measurementLine,
-                        packageCode
-                );
+                break;
+        }
+    }
+
+    private void processNumericMeasurements(
+            Package currentPackage,
+            String measurement,
+            Measurement measurementLine,
+            long packageCode
+    ) throws MyConstraintViolationException {
+        if (currentPackage instanceof StandardPackage) {
+            List<StandardPackageProduct> standardPackageProducts = ((StandardPackage) currentPackage).getStandardPackageProducts();
+            for (StandardPackageProduct standardPackageProduct : standardPackageProducts) {
+                processProductParameters(measurement, measurementLine, packageCode, standardPackageProduct);
             }
         }
     }
