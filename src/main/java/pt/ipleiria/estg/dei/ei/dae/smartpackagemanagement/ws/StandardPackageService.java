@@ -24,6 +24,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationM
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.utils.EnumUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,15 +50,22 @@ public class StandardPackageService {
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("code") long code,
                            @QueryParam("material") String material,
-                           @QueryParam("packageType") String packageType,
+                           @QueryParam("packageType") String packageTypeString,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
 
+        PackageType packageType;
+        try {
+           packageType  = EnumUtil.getEnumFromString(PackageType.class, packageTypeString);
+        } catch (IllegalArgumentException e) {
+            packageType = null;
+        }
+
         Map<String, String> filterMap = new HashMap<>();
         GenericFilterMapBuilder.addToFilterMap(code, filterMap, "code", "eq");
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
-        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "enum");
+        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
 
         var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
         long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
@@ -73,10 +81,17 @@ public class StandardPackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("productId") Long productId,
-                           @QueryParam("packageType") PackageType packageType,
+                           @QueryParam("packageType") String packageTypeString,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
+
+        PackageType packageType;
+        try {
+            packageType  = EnumUtil.getEnumFromString(PackageType.class, packageTypeString);
+        } catch (IllegalArgumentException e) {
+            packageType = null;
+        }
 
         if (productId == null || packageType == null){
             throw new IllegalArgumentException("The productId and the packageType are mandatory");
