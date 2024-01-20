@@ -32,6 +32,12 @@ import java.util.List;
                         "JOIN p.deliveries d " +
                         "WHERE p.code = :code AND d.status = :status"
         ),
+        @NamedQuery(
+                name = "findLogisticsOperatorPackage",
+                query = "SELECT d.logisticOperator FROM Package p " +
+                        "JOIN p.deliveries d " +
+                        "WHERE p.code = :code AND d.status = :status"
+        ),
 })
 @SQLDelete(sql="UPDATE packages SET deleted = TRUE WHERE code = ? AND deleted = ?::boolean")
 @Where(clause = "deleted IS FALSE")

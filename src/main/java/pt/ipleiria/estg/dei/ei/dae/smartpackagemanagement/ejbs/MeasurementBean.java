@@ -5,7 +5,6 @@ import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.Query;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -14,7 +13,7 @@ import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.MeasurementType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
@@ -27,7 +26,7 @@ public class MeasurementBean {
     @PersistenceContext
     private EntityManager entityManager;
     @EJB
-    private EmailBean emailBean;
+    private NotificationBean notificationBean;
 
     public long create(String measurement, long packageCode, long sensorId)
             throws MyConstraintViolationException, MyEntityNotFoundException {
@@ -45,9 +44,27 @@ public class MeasurementBean {
     private void processPackage(String measurement, Measurement measurementLine, long packageCode)
             throws MyConstraintViolationException {
         Package currentPackage = measurementLine.getSensorPackage().getaPackage();
+        MeasurementType measurementType = measurementLine.getSensorPackage().getSensor().getSensorType().getMeasurementType();
+        switch (measurementType) {
+            case NUMERIC:
+                processNumericMeasurements(currentPackage, measurement, measurementLine, packageCode);
+                break;
+            case BOOLEAN:
+                if (Boolean.parseBoolean(measurement)) {
+                    notificationBean.fireSecurityNotification(measurement, measurementLine, packageCode);
+                }
+                break;
+        }
+    }
+
+    private void processNumericMeasurements(
+            Package currentPackage,
+            String measurement,
+            Measurement measurementLine,
+            long packageCode
+    ) throws MyConstraintViolationException {
         if (currentPackage instanceof StandardPackage) {
-            List<StandardPackageProduct> standardPackageProducts =
-                    ((StandardPackage) currentPackage).getStandardPackageProducts();
+            List<StandardPackageProduct> standardPackageProducts = ((StandardPackage) currentPackage).getStandardPackageProducts();
             for (StandardPackageProduct standardPackageProduct : standardPackageProducts) {
                 processProductParameters(measurement, measurementLine, packageCode, standardPackageProduct);
             }
@@ -60,7 +77,7 @@ public class MeasurementBean {
         for (ProductParameter productParameter : productParameters) {
             if (Float.compare(productParameter.getMinValue(), Float.parseFloat(measurement)) > 0 ||
                     Float.compare(productParameter.getMaxValue(), Float.parseFloat(measurement)) < 0) {
-                fireNotification(
+                notificationBean.fireEnvironmentalNotification(
                         measurement,
                         measurementLine,
                         standardPackageProduct.getProduct(),
@@ -68,43 +85,6 @@ public class MeasurementBean {
                         packageCode
                 );
             }
-        }
-    }
-
-    private void fireNotification(
-            String measurement,
-            Measurement measurementLine,
-            Product product,
-            ProductParameter productParameter,
-            long packageCode
-    ) throws MyConstraintViolationException {
-        String subject = "Quality Control | Warning on product: " + product.getProductReference();
-        String text = "Your product " + product.getProductReference() + " has gone beyond its regulated bounds [" +
-                productParameter.getMinValue() + "," + productParameter.getMaxValue() + "] \n" +
-                "Received measurement " + measurement + " on package code: " + packageCode +
-                "On: " + measurementLine.getTimestamp().toString();
-        emailBean.send(
-                product.getManufacturer().getEmail(),
-                subject,
-                text
-        );
-        try {
-            Notification notification = new Notification(text, product.getManufacturer(), measurementLine);
-            entityManager.persist(notification);
-            Query query = entityManager.createNamedQuery("findCustomerPackage", Package.class).
-                    setParameter("code", packageCode).setParameter("status", DeliveryStatus.DISPATCHED);
-            if (!query.getResultList().isEmpty()) {
-                Customer customer = (Customer) query.getResultList().get(0);
-                emailBean.send(
-                        customer.getEmail(),
-                        subject,
-                        text
-                );
-                notification = new Notification(text, customer, measurementLine);
-                entityManager.persist(notification);
-            }
-        } catch (ConstraintViolationException err) {
-            throw new MyConstraintViolationException(err);
         }
     }
 
