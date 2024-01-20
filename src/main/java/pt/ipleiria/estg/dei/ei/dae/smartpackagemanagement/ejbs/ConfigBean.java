@@ -7,6 +7,7 @@ import jakarta.ejb.Startup;
 import net.datafaker.Faker;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.MeasurementType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -270,7 +271,7 @@ public class ConfigBean {
 
         try {
             for (String mapKey : mapKeys) {
-                sensorTypeBean.create(mapKey, sensorUnits.get(mapKey));
+                sensorTypeBean.create(mapKey, sensorUnits.get(mapKey), MeasurementType.NUMERIC);
             }
         } catch (Exception ex) {
             logger.severe(ex.getMessage());
