@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import net.datafaker.providers.entertainment.SouthPark;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
@@ -140,7 +141,7 @@ public class ProductService {
     @GET
     @Path("export")
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    @Authenticated
+    //@Authenticated
     //@RolesAllowed({"Manufacturer"})
     public Response export(@QueryParam("fileLocation") String fileLocation)
             throws IOException {
