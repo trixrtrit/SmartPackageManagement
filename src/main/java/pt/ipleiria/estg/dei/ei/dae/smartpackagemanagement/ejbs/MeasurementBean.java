@@ -77,9 +77,9 @@ public class MeasurementBean {
             Package pkg = measurement.getSensorPackage().getaPackage();
             if (pkg instanceof StandardPackage) {
                 StandardPackage standardPkg = (StandardPackage) pkg;
-                Hibernate.initialize(standardPkg.getProducts());
-                for (Product product : standardPkg.getProducts()) {
-                    Hibernate.initialize(product.getProductParameters());
+                Hibernate.initialize(standardPkg.getStandardPackageProducts());
+                for (var spp : standardPkg.getStandardPackageProducts()) {
+                    Hibernate.initialize(spp.getProduct().getProductParameters());
                 }
             }
         }

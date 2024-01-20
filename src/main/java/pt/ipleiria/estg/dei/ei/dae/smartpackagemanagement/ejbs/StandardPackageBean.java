@@ -59,7 +59,6 @@ public class StandardPackageBean {
         }
         Hibernate.initialize(standardPackage.getSensorPackageList());
         Hibernate.initialize(standardPackage.getTransportPackageStandardPackages());
-        Hibernate.initialize(standardPackage.getStandardPackageProducts());
         return standardPackage;
     }
 
@@ -132,6 +131,12 @@ public class StandardPackageBean {
         standardPackage.getStandardPackageProducts().add(standardPackageProduct);
         product.getStandardPackageProducts().add(standardPackageProduct);
         entityManager.persist(standardPackageProduct);
+    }
+
+    public Product findCurrentProductByPackageId(Long packageId) {
+        TypedQuery<Product> query = entityManager.createNamedQuery("findCurrentProductByPackageId", Product.class);
+        query.setParameter("packageId", packageId);
+        return query.getSingleResult();
     }
 
     public void removeProductFromPackage(long code, long productId) throws MyEntityNotFoundException {

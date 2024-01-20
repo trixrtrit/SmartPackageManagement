@@ -16,6 +16,6 @@ public class BooleanSpecification<T> implements Specification<T>{
 
     @Override
     public Predicate toPredicate(Root<T> root, CriteriaBuilder criteriaBuilder) {
-        return criteriaBuilder.equal(criteriaBuilder.lower(root.get(field)), value);
+        return criteriaBuilder.equal(root.get(field), value);
     }
 }

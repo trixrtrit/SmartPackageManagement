@@ -70,13 +70,19 @@ public class QueryBean<T> {
                 if (dataType.equals("Join")) {
                     // Assuming format: "Join/joinField/fieldOfJoinedEntity/operation"
                     String[] parts = keyName.split(separator);
-                    if (parts.length >= 4) {
+                    if (parts.length > 3) {
                         String joinField = parts[1];
                         String fieldOfJoinedEntity = parts[2];
                         String operation = parts[3];
+                        Boolean isManyToMany = false;
+
+                        if(parts.length > 4){
+                            System.out.println("XD Is Many to Many");
+                            isManyToMany = true;
+                        }
 
                         specifications.add(new JoinSpecification<>(
-                                joinField, fieldOfJoinedEntity, fieldValue, operation));
+                                joinField, fieldOfJoinedEntity, fieldValue, operation, isManyToMany));
                     }
                 } else {
                     String operation = "";
