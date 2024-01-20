@@ -7,8 +7,6 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageProductAssembler;
@@ -18,7 +16,6 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDT
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.StandardPackageBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
@@ -178,6 +175,12 @@ public class StandardPackageService {
     @RolesAllowed({"LogisticsOperator", "Manufacturer"})
     public Response create(StandardPackageDTO standardPackageDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
+
+        if (isUnauthorizedAccess(standardPackageDTO.getPackageType()))
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("UNAUTHORIZED")
+                    .build();
+
         long packageId = standardPackageBean.create(
                 standardPackageDTO.getCode(),
                 standardPackageDTO.getMaterial(),
@@ -188,6 +191,14 @@ public class StandardPackageService {
 
         var standardPackage = standardPackageBean.find(packageId);
         return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
+    }
+
+    private boolean isUnauthorizedAccess(PackageType packageType) {
+        boolean unauthorizedTertiary = packageType == PackageType.TERTIARY && !isRoleAuthorizedTertiary();
+        boolean unauthorizedNonTertiary = (packageType == PackageType.PRIMARY ||
+                packageType == PackageType.SECONDARY) && isRoleAuthorizedTertiary();
+
+        return unauthorizedTertiary || unauthorizedNonTertiary;
     }
 
     @PUT
@@ -287,15 +298,9 @@ public class StandardPackageService {
                     .build();
         }
 
-        boolean unauthorizedTertiary = standardPackage.getPackageType() == PackageType.TERTIARY && !isRoleAuthorizedTertiary();
-        boolean unauthorizedNonTertiary = (standardPackage.getPackageType() == PackageType.PRIMARY ||
-                standardPackage.getPackageType() == PackageType.SECONDARY) && isRoleAuthorizedTertiary();
-
-        if (unauthorizedTertiary || unauthorizedNonTertiary) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("UNAUTHORIZED")
-                    .build();
-        }
+        if (isUnauthorizedAccess(standardPackage.getPackageType())) return Response.status(Response.Status.UNAUTHORIZED)
+                .entity("UNAUTHORIZED")
+                .build();
 
         packageBean.changeActiveStatus(code, StandardPackage.class);
         return Response.ok(StandardPackageAssembler.from(standardPackage)).build();
