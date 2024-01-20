@@ -141,7 +141,7 @@ public class ProductService {
     @GET
     @Path("export")
     @Produces("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    //@Authenticated
+    @Authenticated
     //@RolesAllowed({"Manufacturer"})
     public Response export(@QueryParam("fileLocation") String fileLocation)
             throws IOException {
