@@ -150,6 +150,11 @@ public class DeliveryBean {
     public Delivery findWithPackages(Long id) throws MyEntityNotFoundException {
         var delivery = find(id);
         Hibernate.initialize(delivery.getPackages());
+        for (var aPackage : delivery.getPackages()){
+            if(aPackage instanceof StandardPackage) {
+                Hibernate.initialize(((StandardPackage) aPackage).getStandardPackageProducts());
+            }
+        }
         return delivery;
     }
 

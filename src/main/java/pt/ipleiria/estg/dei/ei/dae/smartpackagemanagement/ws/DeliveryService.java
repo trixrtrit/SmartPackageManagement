@@ -15,6 +15,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.utils.EnumUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -34,12 +36,21 @@ public class DeliveryService {
     @Path("/all")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getAll(@DefaultValue("1") @QueryParam("page") int page,
-                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    public Response getAll(
+                            @QueryParam("status") String statusString,
+                            @DefaultValue("1") @QueryParam("page") int page,
+                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
 
-        Map<String, String> filterMap = new HashMap<>();
+        DeliveryStatus deliveryStatus;
+        try {
+            deliveryStatus  = EnumUtil.getEnumFromString(DeliveryStatus.class, statusString);
+        } catch (IllegalArgumentException e) {
+            deliveryStatus = null;
+        }
 
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(deliveryStatus, filterMap, "status", "");
         var products = deliveryBean.getDeliveries(filterMap, page, pageSize);
         var dtos = DeliveryAssembler.fromNoPackages(products);
         long totalItems = deliveryBean.getDeliveriesCount(filterMap);
