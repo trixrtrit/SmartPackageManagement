@@ -175,14 +175,17 @@ public class StandardPackageService {
     @POST
     @Path("/")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"LogisticsOperator", "Manufacturer"})
     public Response create(StandardPackageDTO standardPackageDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         long packageId = standardPackageBean.create(
                 standardPackageDTO.getCode(),
                 standardPackageDTO.getMaterial(),
-                standardPackageDTO.getPackageType()
+                standardPackageDTO.getPackageType(),
+                standardPackageDTO.getManufactureDate(),
+                standardPackageDTO.getInitialProductId()
         );
+
         var standardPackage = standardPackageBean.find(packageId);
         return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
     }

@@ -66,6 +66,13 @@ public class Package extends Versionable{
         this.manufactureDate = new Date();
     }
 
+    public Package(long code, String material, Date manufactureDate) {
+        this.code = code;
+        this.material = material;
+        this.sensorPackageList = new ArrayList<>();
+        this.manufactureDate = manufactureDate;
+    }
+
     public long getCode() {
         return code;
     }
