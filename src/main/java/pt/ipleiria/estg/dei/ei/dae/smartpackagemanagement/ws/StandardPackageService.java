@@ -69,19 +69,19 @@ public class StandardPackageService {
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
         GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
 
-        List<StandardPackage> standardPackages = new ArrayList<>();
+
         String username = securityContext.getUserPrincipal().getName();
-        if(securityContext.isUserInRole("LogisticsOperator")) {
-            standardPackages = standardPackageBean.getStandardPackages(filterMap, page, pageSize);
-        } else if (securityContext.isUserInRole("Manufacturer")){
-            standardPackages = standardPackageBean.filterStandardPackagesByUserOwnership(
-                    standardPackageBean.getStandardPackages(filterMap, page, pageSize), username
-            );
-        } else if (securityContext.isUserInRole("Customer")) {
-            standardPackages = standardPackageBean.filterStandardPackagesByUserOwnership(
-                    standardPackageBean.getStandardPackages(filterMap, page, pageSize), username
-            );
+        if (securityContext.isUserInRole("Manufacturer")){
+            GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "Manu");
         }
+        else if (securityContext.isUserInRole("Customer")){
+            GenericFilterMapBuilder.addToFilterMap(username, filterMap, "username", "Customer");
+        }/*else if (securityContext.isUserInRole("Customer")) {
+            standardPackages = standardPackageBean.filterStandardPackagesByUserOwnership(
+                    standardPackages, username
+            );
+        }*/
+        List<StandardPackage> standardPackages = standardPackageBean.getStandardPackages(filterMap, page, pageSize);
         var dtos = StandardPackageAssembler.from(standardPackages);
 
         long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);

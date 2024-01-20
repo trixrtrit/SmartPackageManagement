@@ -147,9 +147,10 @@ public class StandardPackageBean {
                         return packageBean.packageIsFromCustomerOrder(standardPkgCode, username);
                     }
                     else if (user instanceof Manufacturer) {
+                        System.out.println(packageBean.packageHasManufacturerProduct(standardPkgCode, username));
                         return packageBean.packageHasManufacturerProduct(standardPkgCode, username);
                     }
-                    return false;
+                    return true;
                 })
                 .collect(Collectors.toList());
     }
