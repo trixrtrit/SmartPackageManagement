@@ -31,7 +31,7 @@ public class DeliveryAssembler {
                 delivery.getDeliveredDate(),
                 delivery.getStatus(),
                 delivery.getOrder().getId(),
-                StandardPackageAssembler.fromWithProducts(standardPackages),
+                StandardPackageAssembler.from(standardPackages),
                 TransportPackageAssembler.fromWithPackages(transportPackages)
         );
     }

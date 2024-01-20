@@ -29,6 +29,9 @@ public class DeliveryBean {
     @EJB
     private OrderLogBean orderLogBean;
 
+    @EJB
+    private StandardPackageBean standardPackageBean;
+
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public long create(Long orderId, ArrayList<Long> packageCodes)
             throws MyEntityExistsException, MyConstraintViolationException, MyEntityNotFoundException, MyValidationException, MyIllegalConstraintException {
@@ -68,7 +71,11 @@ public class DeliveryBean {
                     throw new MyEntityNotFoundException("The package with the code: " + packageCode + " does not exist");
                 }
 
-                var product = standardPackage.getProducts().stream().findFirst().get();
+                var product = standardPackageBean.findCurrentProductByPackageId(packageCode);
+
+                if (product == null){
+                    throw new MyIllegalConstraintException("Package does not have a product associated.");
+                }
 
                 var foundOrderItem = filteredOrderItems.stream().filter(orderItem -> {
                     return  standardPackage.getPackageType() == orderItem.getPackageType() &&
@@ -143,11 +150,6 @@ public class DeliveryBean {
     public Delivery findWithPackages(Long id) throws MyEntityNotFoundException {
         var delivery = find(id);
         Hibernate.initialize(delivery.getPackages());
-        for (Package aPackage : delivery.getPackages()) {
-            if (aPackage instanceof StandardPackage) {
-                Hibernate.initialize(((StandardPackage) aPackage).getProducts());
-            }
-        }
         return delivery;
     }
 

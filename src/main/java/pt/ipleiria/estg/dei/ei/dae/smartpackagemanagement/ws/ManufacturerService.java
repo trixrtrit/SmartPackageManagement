@@ -112,7 +112,6 @@ public class ManufacturerService {
         GenericFilterMapBuilder.addToFilterMap(minPrice, filterMap, "price", "gte");
         GenericFilterMapBuilder.addToFilterMap(maxPrice, filterMap, "price", "lte");
         GenericFilterMapBuilder.addToFilterMap(category, filterMap, "productCategory.category", "");
-        //filterMap.put("Join/_/productCategory/_/category/_/like", category);
 
         Manufacturer manufacturer = manufacturerBean.find(username);
         if (manufacturer != null) {

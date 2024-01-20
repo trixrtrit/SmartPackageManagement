@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Stateless
 public class ProductBean {
@@ -123,7 +124,7 @@ public class ProductBean {
             throw new MyEntityNotFoundException("The product with the id: " + id + " does not exist");
         }
         Product product = entityManager.find(Product.class, id);
-        Hibernate.initialize(product.getStandardPackages());
+        Hibernate.initialize(product.getStandardPackageProducts());
         return product;
     }
 
@@ -132,6 +133,12 @@ public class ProductBean {
         var query = entityManager.createQuery(queryString, ProductParameter.class);
         query.setParameter("productId", productId);
         return query.getResultList();
+    }
+
+    public List<StandardPackageProduct> findAllStandardPackageProduct(long productId) {
+        return entityManager.createNamedQuery("findAllStandardPackagesForProducts", StandardPackageProduct.class)
+                .setParameter("productId", productId)
+                .getResultList();
     }
 
     //TODO: load function with excel
@@ -170,7 +177,9 @@ public class ProductBean {
         List<Product> productList = getProductsForExport();
 
         for (Product product : productList) {
-            List<StandardPackage> standardPackages = product.getStandardPackages();
+            List<StandardPackage> standardPackages = findAllStandardPackageProduct(product.getId())
+                    .stream().map(StandardPackageProduct::getStandardPackage).collect(Collectors.toList());
+
             if(!standardPackages.isEmpty()) {
                 for (StandardPackage standardPackage : standardPackages) {
                     Row row = sheet.createRow(rowNum++);

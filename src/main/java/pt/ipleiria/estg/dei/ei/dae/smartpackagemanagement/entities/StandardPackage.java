@@ -23,40 +23,24 @@ public class StandardPackage extends Package {
 
     @Enumerated(EnumType.STRING)
     private PackageType packageType;
-    @ManyToMany(mappedBy = "standardPackages")
-    private List<Product> products;
 
     @OneToMany(mappedBy = "standardPackage", cascade = CascadeType.REMOVE)
     private List<TransportPackageStandardPackage> transportPackageStandardPackages;
     private Long initialProductId;
 
+    @OneToMany(mappedBy = "standardPackage", cascade = CascadeType.REMOVE)
+    private List<StandardPackageProduct> standardPackageProducts;
+
     public StandardPackage() {
-        this.products = new ArrayList<Product>();
         this.transportPackageStandardPackages = new ArrayList<TransportPackageStandardPackage>();
+        this.standardPackageProducts = new ArrayList<StandardPackageProduct>();
     }
 
     public StandardPackage(long code, String material, PackageType packageType, Date manufactureDate) {
         super(code, material, manufactureDate);
         this.packageType = packageType;
-        this.products = new ArrayList<Product>();
         this.transportPackageStandardPackages = new ArrayList<TransportPackageStandardPackage>();
-    }
-
-    public List<Product> getProducts() {
-        return products;
-    }
-
-    public void setProducts(List<Product> products) {
-        this.products = products;
-    }
-
-    public void addProduct(Product product) {
-        if (!products.contains(product)) {
-            products.add(product);
-        }
-    }
-    public void removeProduct(Product product) {
-        products.remove(product);
+        this.standardPackageProducts = new ArrayList<StandardPackageProduct>();
     }
 
     public List<TransportPackageStandardPackage> getTransportPackageStandardPackages() {
@@ -73,6 +57,14 @@ public class StandardPackage extends Package {
 
     public void setPackageType(PackageType packageType) {
         this.packageType = packageType;
+    }
+
+    public List<StandardPackageProduct> getStandardPackageProducts() {
+        return standardPackageProducts;
+    }
+
+    public void setStandardPackageProducts(List<StandardPackageProduct> standardPackageProducts) {
+        this.standardPackageProducts = standardPackageProducts;
     }
 
     public Long getInitialProductId() {

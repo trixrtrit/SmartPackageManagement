@@ -7,22 +7,22 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.StandardPackageBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageProductAssociationViolationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
@@ -39,6 +39,9 @@ public class StandardPackageService {
     private PackageBean packageBean;
     @EJB
     private StandardPackageBean standardPackageBean;
+
+    @EJB
+    ProductBean productBean;
 
     @Context
     private SecurityContext securityContext;
@@ -58,6 +61,38 @@ public class StandardPackageService {
         GenericFilterMapBuilder.addToFilterMap(code, filterMap, "code", "eq");
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
         GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "enum");
+
+        var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
+        long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<StandardPackageDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
+    }
+
+
+    @GET
+    @Path("/getForDelivery")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getAll(@QueryParam("productId") Long productId,
+                           @QueryParam("packageType") PackageType packageType,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) throws IllegalArgumentException {
+
+        if (productId == null || packageType == null){
+            throw new IllegalArgumentException("The productId and the packageType are mandatory");
+        }
+
+        if(!productBean.exists(productId)){
+            throw new IllegalArgumentException("Product not found");
+        }
+
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(true, filterMap, "isActive", "");
+        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
+        filterMap.put("Join/_/products/_/id/_/equal/isManyToMany", productId.toString());
 
         var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
         long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
@@ -90,7 +125,7 @@ public class StandardPackageService {
     public Response getPackageProducts(@PathParam("code") long code) throws MyEntityNotFoundException {
         StandardPackage standardPackage = standardPackageBean.getStandardPackageProducts(code);
         if (standardPackage != null) {
-            var dtos = ProductAssembler.from(standardPackage.getProducts());
+            var dtos = StandardPackageProductAssembler.from(standardPackage.getStandardPackageProducts());
             return Response.ok(dtos).build();
         }
         return Response.status(Response.Status.NOT_FOUND)
@@ -117,8 +152,17 @@ public class StandardPackageService {
     @Path("{code}/measurements")
     @Authenticated
     @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
-    public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
-        Package aPackage = packageBean.getPackageMeasurements(code, StandardPackage.class);
+    public Response getPackageMeasurements(@PathParam("code") long code)
+            throws MyEntityNotFoundException, MyPackageMeasurementInvalidAccessException {
+
+        Package aPackage = null;
+        String username = securityContext.getUserPrincipal().getName();
+        if(securityContext.isUserInRole("LogisticsOperator")) {
+            aPackage = packageBean.getPackageMeasurements(code, StandardPackage.class);
+        } else if (securityContext.isUserInRole("Manufacturer")){
+            aPackage = packageBean.getPackageMeasurementsForUser(code, StandardPackage.class, username);
+        }
+
         if (aPackage != null) {
             var dtos = SensorPackageAssembler.fromWithMeasurements(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();
@@ -173,7 +217,7 @@ public class StandardPackageService {
                 product.getId()
         );
         var standardPackage = standardPackageBean.find(code);
-        return Response.ok(StandardPackageAssembler.fromWithProducts(standardPackage)).build();
+        return Response.ok(StandardPackageAssembler.from(standardPackage)).build();
     }
 
     @PUT
@@ -188,7 +232,7 @@ public class StandardPackageService {
                 product.getId()
         );
         var standardPackage = standardPackageBean.find(code);
-        return Response.ok(StandardPackageAssembler.fromWithProducts(standardPackage)).build();
+        return Response.ok(StandardPackageAssembler.from(standardPackage)).build();
     }
 
     @PUT

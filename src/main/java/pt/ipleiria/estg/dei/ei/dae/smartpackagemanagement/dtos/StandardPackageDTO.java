@@ -10,9 +10,9 @@ import java.util.List;
 public class StandardPackageDTO extends PackageDTO implements Serializable {
 
     private PackageType packageType;
-    private List<ProductDTO> products;
+    private List<StandardPackageProductDTO> standardPackageProductMetadata;
     public StandardPackageDTO() {
-        this.products = new ArrayList<>();
+        this.standardPackageProductMetadata = new ArrayList<>();
     }
     public Long initialProductId;
 
@@ -27,10 +27,10 @@ public class StandardPackageDTO extends PackageDTO implements Serializable {
             PackageType packageType,
             boolean isActive,
             Date manufactureDate,
-            List<ProductDTO> products
+            List<StandardPackageProductDTO> standardPackageProductMetadata
     ) {
         super(code, material, isActive, manufactureDate);
-        this.products = products;
+        this.standardPackageProductMetadata = standardPackageProductMetadata;
         this.packageType = packageType;
     }
 
@@ -44,16 +44,16 @@ public class StandardPackageDTO extends PackageDTO implements Serializable {
             boolean hasSensors
     ) {
         super(code, material, isActive, manufactureDate, sensorPackageMetadata);
-        this.products = new ArrayList<>();
+        this.standardPackageProductMetadata = new ArrayList<>();
         this.packageType = packageType;
     }
 
-    public List<ProductDTO> getProducts() {
-        return products;
+    public List<StandardPackageProductDTO> getStandardPackageProductMetadata() {
+        return standardPackageProductMetadata;
     }
 
-    public void setProducts(List<ProductDTO> products) {
-        this.products = products;
+    public void setStandardPackageProductMetadata(List<StandardPackageProductDTO> standardPackageProductMetadata) {
+        this.standardPackageProductMetadata = standardPackageProductMetadata;
     }
 
     public PackageType getPackageType() {
