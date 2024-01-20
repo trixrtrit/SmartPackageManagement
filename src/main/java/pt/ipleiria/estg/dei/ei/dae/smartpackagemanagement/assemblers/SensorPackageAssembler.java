@@ -1,11 +1,9 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers;
 
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorPackageDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +35,14 @@ public class SensorPackageAssembler {
     }
 
     public static SensorPackageDTO fromWithPackages(SensorPackage sensorPackage) {
+        if(sensorPackage.getaPackage() instanceof StandardPackage) {
+            return new SensorPackageDTO(
+                    sensorPackage.getId(),
+                    StandardPackageAssembler.from((StandardPackage) sensorPackage.getaPackage()),
+                    sensorPackage.getAddedAt(),
+                    sensorPackage.getRemovedAt()
+            );
+        }
         return new SensorPackageDTO(
                 sensorPackage.getId(),
                 PackageAssembler.from(sensorPackage.getaPackage()),
