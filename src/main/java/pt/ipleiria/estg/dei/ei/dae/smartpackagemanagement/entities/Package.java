@@ -18,7 +18,14 @@ import java.util.List;
         @NamedQuery(
                 name = "findActivePackage",
                 query = "SELECT p FROM Package p WHERE p.code = :code AND p.isActive"
-        )
+        ),
+        @NamedQuery(
+                name = "findPackageForCustomer",
+                query = "SELECT COUNT(p.code) FROM Package p " +
+                        "JOIN p.deliveries d " +
+                        "WHERE d.order.customer.username = :username " +
+                        "AND p.code = :code"
+        ),
 })
 @SQLDelete(sql="UPDATE packages SET deleted = TRUE WHERE code = ? AND deleted = ?::boolean")
 @Where(clause = "deleted IS FALSE")
@@ -57,6 +64,13 @@ public class Package extends Versionable{
         this.material = material;
         this.sensorPackageList = new ArrayList<>();
         this.manufactureDate = new Date();
+    }
+
+    public Package(long code, String material, Date manufactureDate) {
+        this.code = code;
+        this.material = material;
+        this.sensorPackageList = new ArrayList<>();
+        this.manufactureDate = manufactureDate;
     }
 
     public long getCode() {

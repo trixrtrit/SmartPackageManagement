@@ -14,6 +14,7 @@ public class StandardPackageDTO extends PackageDTO implements Serializable {
     public StandardPackageDTO() {
         this.standardPackageProductMetadata = new ArrayList<>();
     }
+    public Long initialProductId;
 
     public StandardPackageDTO(long code, String material, PackageType packageType, boolean isActive, Date manufactureDate) {
         super(code, material, isActive, manufactureDate);
@@ -61,5 +62,13 @@ public class StandardPackageDTO extends PackageDTO implements Serializable {
 
     public void setPackageType(PackageType packageType) {
         this.packageType = packageType;
+    }
+
+    public Long getInitialProductId() {
+        return initialProductId;
+    }
+
+    public void setInitialProductId(Long initialProductId) {
+        this.initialProductId = initialProductId;
     }
 }
