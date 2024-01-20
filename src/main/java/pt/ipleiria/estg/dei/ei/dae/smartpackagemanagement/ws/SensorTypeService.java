@@ -10,6 +10,7 @@ import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorTypeAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorTypeDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.SensorTypeBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.MeasurementType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -17,6 +18,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationM
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.utils.EnumUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,13 +39,22 @@ public class SensorTypeService {
     @RolesAllowed({"Manufacturer", "LogisticsOperator"})
     public Response getAll(@QueryParam("name") String name,
                            @QueryParam("unit") String measurementUnit,
+                           @QueryParam("type") String measurementTypeString,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
 
+        MeasurementType measurementType;
+        try {
+            measurementType  = EnumUtil.getEnumFromString(MeasurementType.class, measurementTypeString);
+        } catch (IllegalArgumentException e) {
+            measurementType = null;
+        }
+
         Map<String, String> filterMap = new HashMap<>();
         GenericFilterMapBuilder.addToFilterMap(name, filterMap, "name", "");
         GenericFilterMapBuilder.addToFilterMap(measurementUnit, filterMap, "measurementUnit", "");
+        GenericFilterMapBuilder.addToFilterMap(measurementType, filterMap, "measurementType", "");
 
         var dtos = SensorTypeAssembler.from(sensorTypeBean.getProductParameters(filterMap, page, pageSize));
         long totalItems = sensorTypeBean.getSensorTypeCount(filterMap);
@@ -61,7 +72,8 @@ public class SensorTypeService {
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
         var id = sensorTypeBean.create(
                 sensorTypeDTO.getName(),
-                sensorTypeDTO.getMeasurementUnit()
+                sensorTypeDTO.getMeasurementUnit(),
+                sensorTypeDTO.getMeasurementType()
         );
         var sensorType = sensorTypeBean.find(id);
         return Response.status(Response.Status.CREATED).entity(SensorTypeAssembler.from(sensorType)).build();
@@ -76,7 +88,8 @@ public class SensorTypeService {
         sensorTypeBean.update(
                 id,
                 sensorTypeDTO.getName(),
-                sensorTypeDTO.getMeasurementUnit()
+                sensorTypeDTO.getMeasurementUnit(),
+                sensorTypeDTO.getMeasurementType()
         );
         var sensorType = sensorTypeBean.find(id);
         return Response.ok(SensorTypeAssembler.from(sensorType)).build();

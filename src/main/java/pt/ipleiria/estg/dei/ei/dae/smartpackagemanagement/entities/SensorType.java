@@ -1,6 +1,7 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
 import jakarta.persistence.*;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.MeasurementType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,9 @@ public class SensorType extends Versionable{
     private Long id;
     private String name;
     private String measurementUnit;
+    @Enumerated(EnumType.STRING)
+    private MeasurementType measurementType;
+
 
     @OneToMany(mappedBy = "sensorType", cascade = CascadeType.REMOVE)
     private List<Sensor> sensors;
@@ -31,9 +35,10 @@ public class SensorType extends Versionable{
         this.productParameters = new ArrayList<ProductParameter>();
     }
 
-    public SensorType(String name, String measurementUnit) {
+    public SensorType(String name, String measurementUnit, MeasurementType measurementType) {
         this.name = name;
         this.measurementUnit = measurementUnit;
+        this.measurementType = measurementType;
         this.sensors = new ArrayList<Sensor>();
         this.productParameters = new ArrayList<>();
     }
@@ -76,5 +81,13 @@ public class SensorType extends Versionable{
 
     public void setProductParameters(List<ProductParameter> productParameters) {
         this.productParameters = productParameters;
+    }
+
+    public MeasurementType getMeasurementType() {
+        return measurementType;
+    }
+
+    public void setMeasurementType(MeasurementType measurementType) {
+        this.measurementType = measurementType;
     }
 }
