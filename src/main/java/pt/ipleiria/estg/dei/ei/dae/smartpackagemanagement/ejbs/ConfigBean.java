@@ -337,7 +337,7 @@ public class ConfigBean {
         int packTypesLength = packTypes.length;
         try {
             for (int i = 0; i < packageSize; i++) {
-                int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage);
+                int numberOfSensors = faker.number().numberBetween(1, maxSensorsPerPackage + 1);
                 int packageTypeNumber = faker.number().numberBetween(0, packTypesLength);
                 var packType = packTypes[packageTypeNumber];
                 long productNumber = (long) listOfProductIds[faker.number().numberBetween(0, listOfProductIds.length)];
@@ -409,7 +409,7 @@ public class ConfigBean {
     }
 
     private void seedMeasurements(int size) {
-        var packages = packageBean.getPackages(new HashMap<String, String>(), 1, 100);
+        var packages = packageBean.getPackages(new HashMap<String, String>(), 1, 500);
         try {
             for (Package aPackage: packages) {
                 var sensors = packageBean.findPackageCurrentSensors(aPackage.getCode());
