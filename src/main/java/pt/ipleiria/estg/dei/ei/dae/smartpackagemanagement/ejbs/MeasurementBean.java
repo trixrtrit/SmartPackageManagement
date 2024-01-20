@@ -34,6 +34,7 @@ public class MeasurementBean {
         try {
             var measurementLine = new Measurement(measurement, sensorPackage);
             entityManager.persist(measurementLine);
+            entityManager.flush();
             processPackage(measurement, measurementLine, packageCode);
             return measurementLine.getId();
         } catch (ConstraintViolationException err) {
