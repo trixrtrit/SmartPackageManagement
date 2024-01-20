@@ -8,6 +8,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.TransportPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.TransportPackageStandardPackagesAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
@@ -16,6 +17,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.TransportPackageD
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.TransportPackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.TransportPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
@@ -26,7 +28,9 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationR
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Path("transport-packages")
@@ -44,7 +48,7 @@ public class TransportPackageService {
     @GET
     @Path("/all")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"LogisticsOperator", "Customer"})
     public Response getAll(@QueryParam("code") long code,
                            @QueryParam("material") String material,
                            @DefaultValue("1") @QueryParam("page") int page,
@@ -55,7 +59,16 @@ public class TransportPackageService {
         GenericFilterMapBuilder.addToFilterMap(code, filterMap, "code", "eq");
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
 
-        var dtos = TransportPackageAssembler.from(transportPackageBean.getTransportPackages(filterMap, page, pageSize));
+        List<TransportPackage> transportPackages = new ArrayList<>();
+        String username = securityContext.getUserPrincipal().getName();
+        if(securityContext.isUserInRole("LogisticsOperator")) {
+            transportPackages = transportPackageBean.getTransportPackages(filterMap, page, pageSize);
+        } else if (securityContext.isUserInRole("Customer")) {
+            transportPackages = transportPackageBean.filterTransportPackagesByUserOwnership(
+                    transportPackageBean.getTransportPackages(filterMap, page, pageSize), username
+            );
+        }
+        var dtos = TransportPackageAssembler.from(transportPackages);
         long totalItems = transportPackageBean.getTransportPackagesCount(filterMap);
         long totalPages = (totalItems + pageSize - 1) / pageSize;
         PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());

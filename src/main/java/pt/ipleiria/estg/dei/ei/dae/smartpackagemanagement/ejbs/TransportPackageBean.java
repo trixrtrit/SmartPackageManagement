@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Stateless
 public class TransportPackageBean {
@@ -50,6 +51,19 @@ public class TransportPackageBean {
 
     public long getTransportPackagesCount(Map<String, String> filterMap) {
         return transportPackageQueryBean.getEntitiesCount(TransportPackage.class, filterMap);
+    }
+
+    public List<TransportPackage> filterTransportPackagesByUserOwnership(List<TransportPackage> transportPackages, String username) {
+        User user = entityManager.find(User.class, username);
+        return transportPackages.stream()
+                .filter(transportPackage -> {
+                    long transportPackageCode = transportPackage.getCode();
+                    if (user instanceof Manufacturer) {
+                        return packageBean.packageHasManufacturerProduct(transportPackageCode, username);
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
     public TransportPackage find(long code) throws MyEntityNotFoundException {
