@@ -11,7 +11,8 @@ public class SensorTypeAssembler {
         return new SensorTypeDTO(
                 sensorType.getId(),
                 sensorType.getName(),
-                sensorType.getMeasurementUnit()
+                sensorType.getMeasurementUnit(),
+                sensorType.getMeasurementType()
         );
     }
 

@@ -7,6 +7,7 @@ import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import jakarta.validation.ConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.SensorType;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.MeasurementType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
@@ -22,14 +23,14 @@ public class SensorTypeBean {
     @EJB
     private QueryBean<SensorType> sensorTypeQueryBean;
 
-    public long create(String name, String measurementType)
+    public long create(String name, String measurementUnit, MeasurementType measurementType)
             throws MyEntityExistsException, MyConstraintViolationException, MyEntityNotFoundException {
 
         if (exists(name)) {
             throw new MyEntityExistsException("Sensor type with the name '" + name + " already exists.");
         }
         try {
-            var sensorType = new SensorType(name, measurementType);
+            var sensorType = new SensorType(name, measurementUnit, measurementType);
             entityManager.persist(sensorType);
             return sensorType.getId();
         } catch (ConstraintViolationException err) {
@@ -65,11 +66,13 @@ public class SensorTypeBean {
         return sensorType;
     }
 
-    public void update(long id, String name, String measurementUnit) throws MyEntityNotFoundException, MyConstraintViolationException {
+    public void update(long id, String name, String measurementUnit, MeasurementType measurementType)
+            throws MyEntityNotFoundException, MyConstraintViolationException {
         var sensorType = this.find(id);
         entityManager.lock(sensorType, LockModeType.OPTIMISTIC);
         sensorType.setName(name);
         sensorType.setMeasurementUnit(measurementUnit);
+        sensorType.setMeasurementType(measurementType);
     }
 
     public SensorType delete(long id) throws MyEntityNotFoundException {

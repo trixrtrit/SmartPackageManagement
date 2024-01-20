@@ -15,9 +15,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstrain
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.utils.DateUtil;
 
-import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.Date;
 
 @Path("orderlogs")
@@ -42,18 +41,9 @@ public class OrderLogService {
                            @QueryParam("customerUsername") String customerUsername,
                            @QueryParam("logisticsOperatorUsername") String logisticsOperatorUsername
     ) {
-        Date startDate = null;
-        Date endDate = null;
-        try {
-            if(startTime != null) {
-                startDate = new Date(startTime);
-            }
-            if(endTime != null) {
-                endDate = new Date(endTime);
-            }
-        } catch ( DateTimeParseException e ) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
-        }
+        Date[] dates = DateUtil.parseDates(startTime, endTime);
+        Date startDate = dates[0];
+        Date endDate = dates[1];
         var dtos = OrderLogAssembler.from(orderLogBean.getOrderLogs(orderId, startDate, endDate, status, customerUsername, logisticsOperatorUsername));
         return Response.ok(dtos).build();
     }

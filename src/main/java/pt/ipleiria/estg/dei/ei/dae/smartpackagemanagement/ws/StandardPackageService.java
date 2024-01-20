@@ -7,16 +7,15 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
-import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.*;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.MeasurementDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.StandardPackageBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
@@ -25,6 +24,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationM
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.utils.EnumUtil;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,15 +50,22 @@ public class StandardPackageService {
     @RolesAllowed({"LogisticsOperator"})
     public Response getAll(@QueryParam("code") long code,
                            @QueryParam("material") String material,
-                           @QueryParam("packageType") String packageType,
+                           @QueryParam("packageType") String packageTypeString,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
 
+        PackageType packageType;
+        try {
+           packageType  = EnumUtil.getEnumFromString(PackageType.class, packageTypeString);
+        } catch (IllegalArgumentException e) {
+            packageType = null;
+        }
+
         Map<String, String> filterMap = new HashMap<>();
         GenericFilterMapBuilder.addToFilterMap(code, filterMap, "code", "eq");
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
-        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "enum");
+        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
 
         var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
         long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
@@ -73,11 +80,18 @@ public class StandardPackageService {
     @Path("/getForDelivery")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getForDelivery(@QueryParam("productId") Long productId,
-                           @QueryParam("packageType") PackageType packageType,
+    public Response getAll(@QueryParam("productId") Long productId,
+                           @QueryParam("packageType") String packageTypeString,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
+
+        PackageType packageType;
+        try {
+            packageType  = EnumUtil.getEnumFromString(PackageType.class, packageTypeString);
+        } catch (IllegalArgumentException e) {
+            packageType = null;
+        }
 
         if (productId == null || packageType == null){
             throw new IllegalArgumentException("The productId and the packageType are mandatory");
@@ -171,16 +185,56 @@ public class StandardPackageService {
     @RolesAllowed({"LogisticsOperator", "Manufacturer"})
     public Response create(StandardPackageDTO standardPackageDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
-        long packageId = standardPackageBean.create(
-                standardPackageDTO.getCode(),
-                standardPackageDTO.getMaterial(),
-                standardPackageDTO.getPackageType(),
-                standardPackageDTO.getManufactureDate(),
-                standardPackageDTO.getInitialProductId()
-        );
+        if (isUnauthorizedAccess(standardPackageDTO.getPackageType()))
+            return Response.status(Response.Status.UNAUTHORIZED)
+                    .entity("UNAUTHORIZED")
+                    .build();
+        var amount = standardPackageDTO.getInitialAmountCreation();
+        if(amount <= 0){
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("AMOUNT_MUST_BE_GREATER_THAN_ZERO")
+                    .build();
+        }
+        else if(amount == null || amount == 1){
+            long packageId = standardPackageBean.create(
+                    standardPackageDTO.getCode(),
+                    standardPackageDTO.getMaterial(),
+                    standardPackageDTO.getPackageType(),
+                    standardPackageDTO.getManufactureDate(),
+                    standardPackageDTO.getInitialProductId()
+            );
+            var standardPackage = standardPackageBean.find(packageId);
+            return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
+        }
+        else {
+            long result = standardPackageBean.createMany(
+                    standardPackageDTO.getCode(),
+                    standardPackageDTO.getMaterial(),
+                    standardPackageDTO.getPackageType(),
+                    standardPackageDTO.getManufactureDate(),
+                    standardPackageDTO.getInitialProductId(),
+                    standardPackageDTO.getInitialAmountCreation()
+            );
+            if (result >= 1) {
+                if(result == amount){
+                    return Response.status(Response.Status.CREATED).entity("Success: " + amount + " Packages were created").build();
+                }
+                else{
+                    return Response.status(207).entity("Only " + result + " Packages were created").build();
+                }
+            }
+        }
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("ERROR_CREATING_PACKAGE")
+                .build();
+    }
 
-        var standardPackage = standardPackageBean.find(packageId);
-        return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
+    private boolean isUnauthorizedAccess(PackageType packageType) {
+        boolean unauthorizedTertiary = packageType == PackageType.TERTIARY && !isRoleAuthorizedTertiary();
+        boolean unauthorizedNonTertiary = (packageType == PackageType.PRIMARY ||
+                packageType == PackageType.SECONDARY) && isRoleAuthorizedTertiary();
+
+        return unauthorizedTertiary || unauthorizedNonTertiary;
     }
 
     @PUT
@@ -280,15 +334,9 @@ public class StandardPackageService {
                     .build();
         }
 
-        boolean unauthorizedTertiary = standardPackage.getPackageType() == PackageType.TERTIARY && !isRoleAuthorizedTertiary();
-        boolean unauthorizedNonTertiary = (standardPackage.getPackageType() == PackageType.PRIMARY ||
-                standardPackage.getPackageType() == PackageType.SECONDARY) && isRoleAuthorizedTertiary();
-
-        if (unauthorizedTertiary || unauthorizedNonTertiary) {
-            return Response.status(Response.Status.UNAUTHORIZED)
-                    .entity("UNAUTHORIZED")
-                    .build();
-        }
+        if (isUnauthorizedAccess(standardPackage.getPackageType())) return Response.status(Response.Status.UNAUTHORIZED)
+                .entity("UNAUTHORIZED")
+                .build();
 
         packageBean.changeActiveStatus(code, StandardPackage.class);
         return Response.ok(StandardPackageAssembler.from(standardPackage)).build();

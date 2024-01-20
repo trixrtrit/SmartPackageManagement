@@ -26,6 +26,12 @@ import java.util.List;
                         "WHERE d.order.customer.username = :username " +
                         "AND p.code = :code"
         ),
+        @NamedQuery(
+                name = "findCustomerPackage",
+                query = "SELECT d.order.customer FROM Package p " +
+                        "JOIN p.deliveries d " +
+                        "WHERE p.code = :code AND d.status = :status"
+        ),
 })
 @SQLDelete(sql="UPDATE packages SET deleted = TRUE WHERE code = ? AND deleted = ?::boolean")
 @Where(clause = "deleted IS FALSE")
