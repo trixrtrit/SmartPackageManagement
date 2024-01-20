@@ -1,7 +1,6 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications;
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -43,6 +42,12 @@ public class GenericFilterMapBuilder {
         else {
             datatype = param.getClass().getSimpleName();
             valueField = param.toString();
+        }
+
+        if(operation.equals("Manufacturer")){
+            datatype = "ManufacturerPackage";
+        } else if (operation.equals("Customer")) {
+            datatype = "CustomerPackage";
         }
 
         String key = datatype + separator + keyField + separator + operation;

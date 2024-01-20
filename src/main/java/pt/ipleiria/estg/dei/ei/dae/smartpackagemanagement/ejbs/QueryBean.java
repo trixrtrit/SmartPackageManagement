@@ -20,6 +20,7 @@ public class QueryBean<T> {
     @PersistenceContext
     private EntityManager entityManager;
     private static final Logger logger = Logger.getLogger("ebjs.QueryBean");
+
     public List<T> getEntities(
             Class<T> entity,
             Map<String, String> filterMap,
@@ -76,7 +77,7 @@ public class QueryBean<T> {
                         String operation = parts[3];
                         Boolean isManyToMany = false;
 
-                        if(parts.length > 4){
+                        if (parts.length > 4) {
                             System.out.println("XD Is Many to Many");
                             isManyToMany = true;
                         }
@@ -112,6 +113,12 @@ public class QueryBean<T> {
                                 break;
                             case "Long":
                                 specifications.add(new CodeSpecification<>(fieldName, Long.parseLong(fieldValue), operation));
+                                break;
+                            case "ManufacturerPackage":
+                                specifications.add(new ManufacturerProductSpecification<>(fieldValue));
+                                break;
+                            case "CustomerPackage":
+                                specifications.add(new CustomerPackageSpecification<>(fieldValue));
                                 break;
                             default:
                                 specifications.add(new DefaultStringSpecification<T>(fieldName, fieldValue));

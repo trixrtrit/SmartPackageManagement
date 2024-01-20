@@ -39,12 +39,14 @@ public class SensorService {
     @Authenticated
     @RolesAllowed({"Manufacturer", "LogisticsOperator"})
     public Response getAll(@QueryParam("name") String name,
+                           @QueryParam("isAvailable") Boolean isAvailable,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
     ) throws IllegalArgumentException {
 
         Map<String, String> filterMap = new HashMap<>();
         GenericFilterMapBuilder.addToFilterMap(name, filterMap, "name", "eq");
+        GenericFilterMapBuilder.addToFilterMap(isAvailable, filterMap, "isAvailable", "");
 
         var dtos = SensorAssembler.from(sensorBean.getSensors(filterMap, page, pageSize));
         long totalItems = sensorBean.getSensorsCount(filterMap);
