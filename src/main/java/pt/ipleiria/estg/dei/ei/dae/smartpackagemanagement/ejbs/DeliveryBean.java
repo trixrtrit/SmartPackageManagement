@@ -10,7 +10,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
