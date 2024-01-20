@@ -65,7 +65,7 @@ public class OrderBean {
             calculatedTotalPrice += orderItem.getPrice();
         }
 
-        calculatedTotalPrice = (Math.round(calculatedTotalPrice * 100) / 100);
+        calculatedTotalPrice = (Math.round(calculatedTotalPrice * 100.0) / 100.0);
         var customer = (Customer) entityManager.find(Customer.class, username);
 
         try {
