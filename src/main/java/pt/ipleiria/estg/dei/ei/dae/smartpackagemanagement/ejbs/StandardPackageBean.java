@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Stateless
 public class StandardPackageBean {
@@ -135,6 +136,22 @@ public class StandardPackageBean {
 
     public long getStandardPackagesCount(Map<String, String> filterMap) {
         return standardPackageQueryBean.getEntitiesCount(StandardPackage.class, filterMap);
+    }
+
+    public List<StandardPackage> filterStandardPackagesByUserOwnership(List<StandardPackage> standardPackages, String username) {
+        User user = entityManager.find(User.class, username);
+        return standardPackages.stream()
+                .filter(standardPackage -> {
+                    long standardPkgCode = standardPackage.getCode();
+                    if ( user instanceof Customer) {
+                        return packageBean.packageIsFromCustomerOrder(standardPkgCode, username);
+                    }
+                    else if (user instanceof Manufacturer) {
+                        return packageBean.packageHasManufacturerProduct(standardPkgCode, username);
+                    }
+                    return false;
+                })
+                .collect(Collectors.toList());
     }
 
     public StandardPackage find(long code) throws MyEntityNotFoundException {

@@ -26,7 +26,9 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.utils.EnumUtil;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Path("standard-packages")
@@ -47,7 +49,7 @@ public class StandardPackageService {
     @GET
     @Path("/all")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator"})
+    @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
     public Response getAll(@QueryParam("code") long code,
                            @QueryParam("material") String material,
                            @QueryParam("packageType") String packageTypeString,
@@ -67,7 +69,21 @@ public class StandardPackageService {
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
         GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
 
-        var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
+        List<StandardPackage> standardPackages = new ArrayList<>();
+        String username = securityContext.getUserPrincipal().getName();
+        if(securityContext.isUserInRole("LogisticsOperator")) {
+            standardPackages = standardPackageBean.getStandardPackages(filterMap, page, pageSize);
+        } else if (securityContext.isUserInRole("Manufacturer")){
+            standardPackages = standardPackageBean.filterStandardPackagesByUserOwnership(
+                    standardPackageBean.getStandardPackages(filterMap, page, pageSize), username
+            );
+        } else if (securityContext.isUserInRole("Customer")) {
+            standardPackages = standardPackageBean.filterStandardPackagesByUserOwnership(
+                    standardPackageBean.getStandardPackages(filterMap, page, pageSize), username
+            );
+        }
+        var dtos = StandardPackageAssembler.from(standardPackages);
+
         long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
         long totalPages = (totalItems + pageSize - 1) / pageSize;
         PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
