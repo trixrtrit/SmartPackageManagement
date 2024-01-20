@@ -9,7 +9,6 @@ import jakarta.validation.ConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.DeliveryStatus;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.MeasurementType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 
 import java.util.LinkedHashMap;
@@ -49,18 +48,8 @@ public class NotificationBean {
         try {
             Notification notification = new Notification(text, product.getManufacturer(), measurementLine);
             entityManager.persist(notification);
-            Query query = entityManager.createNamedQuery("findCustomerPackage", Package.class).
-                    setParameter("code", packageCode).setParameter("status", DeliveryStatus.DISPATCHED);
-            if (!query.getResultList().isEmpty()) {
-                Customer customer = (Customer) query.getResultList().get(0);
-                emailBean.send(
-                        customer.getEmail(),
-                        subject,
-                        text
-                );
-                notification = new Notification(text, customer, measurementLine);
-                entityManager.persist(notification);
-            }
+            sendNotificationToCustomer(packageCode, subject, text, measurementLine);
+            sendNotificationToLogisticsOperator(packageCode, subject, text, measurementLine);
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         }
@@ -74,24 +63,58 @@ public class NotificationBean {
         String subject = buildSecuritySubject(packageCode);
         String text = buildSecurityText(measurement, packageCode, measurementLine);
         try {
-            //Notification notification = new Notification(text, product.getManufacturer(), measurementLine);
-            //entityManager.persist(notification);
-            Query query = entityManager.createNamedQuery("findCustomerPackage", Package.class).
-                    setParameter("code", packageCode).setParameter("status", DeliveryStatus.DISPATCHED);
-            if (!query.getResultList().isEmpty()) {
-                Customer customer = (Customer) query.getResultList().get(0);
-                emailBean.send(
-                        customer.getEmail(),
-                        subject,
-                        text
-                );
-                Notification notification = new Notification(text, customer, measurementLine);
-                entityManager.persist(notification);
-            }
+            sendNotificationToCustomer(packageCode, subject, text, measurementLine);
+            sendNotificationToLogisticsOperator(packageCode, subject, text, measurementLine);
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         }
 
+    }
+
+    private void sendNotificationToCustomer(
+            long packageCode,
+            String subject,
+            String text,
+            Measurement measurementLine
+    ) {
+        Query customerQuery = createPackageOwnershipQuery(
+                "findCustomerPackage", packageCode, DeliveryStatus.DISPATCHED
+        );
+        Customer customer = getSingleResultOrNull(customerQuery);
+        sendEmailAndPersistNotification(customer, subject, text, measurementLine);
+    }
+
+    private void sendNotificationToLogisticsOperator(
+            long packageCode,
+            String subject,
+            String text,
+            Measurement measurementLine
+    ) {
+        Query logisticsOperatorQuery = createPackageOwnershipQuery(
+                "findLogisticsOperatorPackage", packageCode, DeliveryStatus.DISPATCHED
+        );
+        String logisticsOperatorUsername = getSingleResultOrNull(logisticsOperatorQuery);
+        LogisticsOperator logisticsOperator = entityManager.find(LogisticsOperator.class, logisticsOperatorUsername);
+        sendEmailAndPersistNotification(logisticsOperator, subject, text, measurementLine);
+    }
+
+    private Query createPackageOwnershipQuery(String queryName, long packageCode, DeliveryStatus status) {
+        return entityManager.createNamedQuery(queryName, Package.class)
+                .setParameter("code", packageCode)
+                .setParameter("status", status);
+    }
+
+    private <T> T getSingleResultOrNull(Query query) {
+        List<T> results = query.getResultList();
+        return results.isEmpty() ? null : results.get(0);
+    }
+
+    private void sendEmailAndPersistNotification(User recipient, String subject, String text, Measurement measurementLine) {
+        if (recipient != null && recipient.getEmail() != null) {
+            emailBean.send(recipient.getEmail(), subject, text);
+            Notification notification = new Notification(text, recipient, measurementLine);
+            entityManager.persist(notification);
+        }
     }
 
     private String buildEnvironmentalSubject(Product product) {

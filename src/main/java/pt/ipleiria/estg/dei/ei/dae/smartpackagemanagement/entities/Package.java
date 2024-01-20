@@ -34,7 +34,7 @@ import java.util.List;
         ),
         @NamedQuery(
                 name = "findLogisticsOperatorPackage",
-                query = "SELECT d.order.customer FROM Package p " +
+                query = "SELECT d.logisticOperator FROM Package p " +
                         "JOIN p.deliveries d " +
                         "WHERE p.code = :code AND d.status = :status"
         ),
