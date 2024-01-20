@@ -30,11 +30,14 @@ public class StandardPackageBean {
 
     public long create(long code, String material, PackageType packageType, Date manufactureDate, Long initialProductId)
             throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
+        if(initialProductId == null){
+            throw new MyEntityNotFoundException("Initial product id cannot be null");
+        }
         if (exists(code)) {
             throw new MyEntityExistsException("A package with the code: " + code + " already exists");
         }
         try {
-            StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);
+            StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);//, initialProductId);
 
             if (initialProductId != null){//packageType != PackageType.TERTIARY &&
                 var product = entityManager.find(Product.class, initialProductId);
@@ -44,11 +47,57 @@ public class StandardPackageBean {
                 //standardPackage.addProduct(product);
                 entityManager.persist(standardPackage);
                 addProductToPackage(code, initialProductId);//
-                standardPackage.setInitialProductId(initialProductId);
+                standardPackage.setInitialProductId(initialProductId);//
                 productBean.addUnitStock(initialProductId);
             }
             //entityManager.persist(standardPackage);
             return standardPackage.getCode();
+        } catch (ConstraintViolationException err) {
+            throw new MyConstraintViolationException(err);
+        } catch (MyPackageProductAssociationViolationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public long createMany(long code, String material, PackageType packageType, Date manufactureDate, Long initialProductId, Long initialAmountCreation)
+            throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
+        if(initialProductId == null){
+            throw new MyEntityNotFoundException("Initial product id cannot be null");
+        }
+        try {
+            long totalPackagesCreated = 0;
+            boolean stop = false;
+            for(int i = 0; i < initialAmountCreation; i++) {
+                code = code + i;
+                int attempts = 0;
+                int maxAttempts = 10;
+                while (exists(code)) {
+                    code = code + 1;
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        stop = true;
+                        //throw new MyEntityExistsException("A package with the code: " + code + " already exists after " + maxAttempts + " attempts to increment it. Please choose another code.");
+                    }
+                }
+                if(stop == true) {
+                    break;
+                }
+                StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);//, initialProductId);
+
+                if (initialProductId != null) {//packageType != PackageType.TERTIARY &&
+                    var product = entityManager.find(Product.class, initialProductId);
+                    if (product == null) {
+                        throw new MyEntityNotFoundException("Product with id '" + initialProductId + "' for the package does not exist");
+                    }
+                    entityManager.persist(standardPackage);
+                    addProductToPackage(code, initialProductId);
+                    standardPackage.setInitialProductId(initialProductId);//
+                    productBean.addUnitStock(initialProductId);
+
+                    totalPackagesCreated++;
+                }
+            }
+            return totalPackagesCreated;
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         } catch (MyPackageProductAssociationViolationException e) {

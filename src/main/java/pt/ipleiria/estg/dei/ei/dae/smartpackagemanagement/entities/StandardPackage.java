@@ -43,6 +43,14 @@ public class StandardPackage extends Package {
         this.standardPackageProducts = new ArrayList<StandardPackageProduct>();
     }
 
+    public StandardPackage(long code, String material, PackageType packageType, Date manufactureDate, Long initialProductId) {
+        super(code, material, manufactureDate);
+        this.packageType = packageType;
+        this.transportPackageStandardPackages = new ArrayList<TransportPackageStandardPackage>();
+        this.standardPackageProducts = new ArrayList<StandardPackageProduct>();
+        this.initialProductId = initialProductId;
+    }
+
     public List<TransportPackageStandardPackage> getTransportPackageStandardPackages() {
         return transportPackageStandardPackages;
     }
