@@ -66,16 +66,10 @@ public class OrderBean {
         }
 
         calculatedTotalPrice = (Math.round(calculatedTotalPrice * 100) / 100);
-        totalPrice = (Math.round(totalPrice * 100) / 100);
-
-        if (totalPrice != calculatedTotalPrice){
-            throw new MyValidationException("Calculated price (" + calculatedTotalPrice + "€) does not match total price (" + totalPrice + "€)");
-        }
-
         var customer = (Customer) entityManager.find(Customer.class, username);
 
         try {
-            var order = new Order(address, phoneNumber, postCode, city, totalPrice, date, OrderStatus.PENDING, customer, orderItems);
+            var order = new Order(address, phoneNumber, postCode, city, calculatedTotalPrice, date, OrderStatus.PENDING, customer, orderItems);
             entityManager.persist(order);
 
             for (var orderItem : order.getOrderItems()){
