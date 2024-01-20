@@ -31,7 +31,7 @@ public class CustomerAssembler {
                 customer.getName(),
                 customer.getNif(),
                 customer.getAddress(),
-                OrderAssembler.from(customer.getOrders())
+                OrderAssembler.fromNoOrderItems(customer.getOrders())
         );
     }
 
