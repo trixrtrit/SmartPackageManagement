@@ -7,6 +7,7 @@ import org.hibernate.annotations.Where;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -25,6 +26,7 @@ public class StandardPackage extends Package {
 
     @OneToMany(mappedBy = "standardPackage", cascade = CascadeType.REMOVE)
     private List<TransportPackageStandardPackage> transportPackageStandardPackages;
+    private Long initialProductId;
 
     @OneToMany(mappedBy = "standardPackage", cascade = CascadeType.REMOVE)
     private List<StandardPackageProduct> standardPackageProducts;
@@ -34,8 +36,8 @@ public class StandardPackage extends Package {
         this.standardPackageProducts = new ArrayList<StandardPackageProduct>();
     }
 
-    public StandardPackage(long code, String material, PackageType packageType) {
-        super(code, material);
+    public StandardPackage(long code, String material, PackageType packageType, Date manufactureDate) {
+        super(code, material, manufactureDate);
         this.packageType = packageType;
         this.transportPackageStandardPackages = new ArrayList<TransportPackageStandardPackage>();
         this.standardPackageProducts = new ArrayList<StandardPackageProduct>();
@@ -63,5 +65,13 @@ public class StandardPackage extends Package {
 
     public void setStandardPackageProducts(List<StandardPackageProduct> standardPackageProducts) {
         this.standardPackageProducts = standardPackageProducts;
+    }
+
+    public Long getInitialProductId() {
+        return initialProductId;
+    }
+
+    public void setInitialProductId(Long initialProductId) {
+        this.initialProductId = initialProductId;
     }
 }

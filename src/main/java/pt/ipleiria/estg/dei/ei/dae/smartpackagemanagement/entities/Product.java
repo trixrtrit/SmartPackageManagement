@@ -298,4 +298,23 @@ public class Product extends Versionable implements Serializable {
         this.tertiaryPackQuantity = tertiaryPackQuantity;
     }
 
+    public void addUnitStock() {
+        this.unitStock = this.unitStock + 1;
+    }
+    public void addBoxStock() {
+        this.boxStock = this.boxStock + 1;
+    }
+    public void addContainerStock() {
+        this.containerStock = this.containerStock + 1;
+    }
+    public void addUnitStock(float amount) {
+        this.unitStock = this.unitStock + amount;
+    }
+    public void addBoxStock(float amount) {
+        this.boxStock = this.boxStock + amount;
+    }
+    public void addContainerStock(float amount) {
+        this.containerStock = this.containerStock + amount;
+    }
+
 }

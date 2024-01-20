@@ -310,4 +310,5 @@ public class ProductDTO implements Serializable {
     public void setProductParameters(List<ProductParameterDTO> productParameters) {
         this.productParameters = productParameters;
     }
+
 }
