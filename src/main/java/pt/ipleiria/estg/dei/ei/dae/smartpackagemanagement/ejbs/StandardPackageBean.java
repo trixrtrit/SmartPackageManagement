@@ -41,15 +41,18 @@ public class StandardPackageBean {
                 if (product == null){
                     throw new MyEntityNotFoundException("Product with id '" + initialProductId + "' for the package does not exist");
                 }
-                standardPackage.addProduct(product);
+                //standardPackage.addProduct(product);
+                entityManager.persist(standardPackage);
+                addProductToPackage(code, initialProductId);//
                 standardPackage.setInitialProductId(initialProductId);
                 productBean.addUnitStock(initialProductId);
             }
-
-            entityManager.persist(standardPackage);
+            //entityManager.persist(standardPackage);
             return standardPackage.getCode();
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
+        } catch (MyPackageProductAssociationViolationException e) {
+            throw new RuntimeException(e);
         }
     }
 
