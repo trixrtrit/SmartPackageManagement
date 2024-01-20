@@ -31,14 +31,17 @@ public class DeliveryDTO  implements Serializable {
     private List<StandardPackageDTO> standardPackages;
     private List<TransportPackageDTO> transportPackage;
 
+    private String logisticOperator;
+
     public DeliveryDTO() {
         this.standardPackages = new ArrayList<>();
         this.transportPackage = new ArrayList<>();
         this.packageCodes = new ArrayList<>();
     }
 
-    public DeliveryDTO(Long id, Date dispatchedDate, Date deliveredDate, DeliveryStatus status, Long orderId) {
+    public DeliveryDTO(Long id, String logisticOperator, Date dispatchedDate, Date deliveredDate, DeliveryStatus status, Long orderId) {
         this.id = id;
+        this.logisticOperator = logisticOperator;
         this.dispatchedDate = dispatchedDate;
         this.deliveredDate = deliveredDate;
         this.status = status;
@@ -50,6 +53,7 @@ public class DeliveryDTO  implements Serializable {
 
     public DeliveryDTO(
             Long id,
+            String logisticOperator,
             Date dispatchedDate,
             Date deliveredDate,
             DeliveryStatus status,
@@ -58,6 +62,7 @@ public class DeliveryDTO  implements Serializable {
             List<TransportPackageDTO> transportPackages
     ) {
         this.id = id;
+        this.logisticOperator = logisticOperator;
         this.dispatchedDate = dispatchedDate;
         this.deliveredDate = deliveredDate;
         this.status = status;

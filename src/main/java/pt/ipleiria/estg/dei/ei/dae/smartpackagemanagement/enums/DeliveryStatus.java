@@ -9,6 +9,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.serialization.EnumCust
 @JsonSerialize(using = EnumCustomSerializer.class)
 @JsonDeserialize(using = DeliveryStatusDeserializer.class)
 public enum DeliveryStatus implements EnumCustomSerialization {
+    PROCESSING,
     DISPATCHED,
     INTRANSIT,
     DELIVERED

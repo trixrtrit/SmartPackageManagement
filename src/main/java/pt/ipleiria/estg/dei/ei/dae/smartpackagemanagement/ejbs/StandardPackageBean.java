@@ -3,6 +3,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.*;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
@@ -30,25 +31,78 @@ public class StandardPackageBean {
 
     public long create(long code, String material, PackageType packageType, Date manufactureDate, Long initialProductId)
             throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
+        if(initialProductId == null){
+            throw new MyEntityNotFoundException("Initial product id cannot be null");
+        }
         if (exists(code)) {
             throw new MyEntityExistsException("A package with the code: " + code + " already exists");
         }
         try {
             StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);
+            entityManager.persist(standardPackage);
 
-            if (initialProductId != null){//packageType != PackageType.TERTIARY &&
+            if (initialProductId != null && packageType != PackageType.TERTIARY){//packageType != PackageType.TERTIARY &&
                 var product = entityManager.find(Product.class, initialProductId);
                 if (product == null){
                     throw new MyEntityNotFoundException("Product with id '" + initialProductId + "' for the package does not exist");
                 }
                 //standardPackage.addProduct(product);
-                entityManager.persist(standardPackage);
                 addProductToPackage(code, initialProductId);//
                 standardPackage.setInitialProductId(initialProductId);
-                productBean.addUnitStock(initialProductId);
+
+                if (packageType == PackageType.PRIMARY)
+                    productBean.addUnitStock(initialProductId);
+                if (packageType == PackageType.SECONDARY)
+                    productBean.addBoxStock(initialProductId);
             }
             //entityManager.persist(standardPackage);
             return standardPackage.getCode();
+        } catch (ConstraintViolationException err) {
+            throw new MyConstraintViolationException(err);
+        } catch (MyPackageProductAssociationViolationException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public long createMany(long code, String material, PackageType packageType, Date manufactureDate, Long initialProductId, Long initialAmountCreation)
+            throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
+        if(initialProductId == null){
+            throw new MyEntityNotFoundException("Initial product id cannot be null");
+        }
+        try {
+            long totalPackagesCreated = 0;
+            boolean stop = false;
+            for(int i = 0; i < initialAmountCreation; i++) {
+                code = code + i;
+                int attempts = 0;
+                int maxAttempts = 10;
+                while (exists(code)) {
+                    code = code + 1;
+                    attempts++;
+                    if (attempts >= maxAttempts) {
+                        stop = true;
+                        //throw new MyEntityExistsException("A package with the code: " + code + " already exists after " + maxAttempts + " attempts to increment it. Please choose another code.");
+                    }
+                }
+                if(stop == true) {
+                    break;
+                }
+                StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);//, initialProductId);
+
+                if (initialProductId != null) {//packageType != PackageType.TERTIARY &&
+                    var product = entityManager.find(Product.class, initialProductId);
+                    if (product == null) {
+                        throw new MyEntityNotFoundException("Product with id '" + initialProductId + "' for the package does not exist");
+                    }
+                    entityManager.persist(standardPackage);
+                    addProductToPackage(code, initialProductId);
+                    standardPackage.setInitialProductId(initialProductId);//
+                    productBean.addUnitStock(initialProductId);
+
+                    totalPackagesCreated++;
+                }
+            }
+            return totalPackagesCreated;
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         } catch (MyPackageProductAssociationViolationException e) {
@@ -85,6 +139,60 @@ public class StandardPackageBean {
         StandardPackage standardPackage = entityManager.find(StandardPackage.class, code);
         Hibernate.initialize(standardPackage.getStandardPackageProducts());
         return standardPackage;
+    }
+
+    public List<StandardPackage> getForDelivery(Long productId, PackageType packageType, int page, int pageSize){
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<StandardPackage> query = builder.createQuery(StandardPackage.class);
+        Root<StandardPackage> root = query.from(StandardPackage.class);
+
+        // Join with StandardPackageProduct
+        Join<StandardPackage, StandardPackageProduct> standardPackageProductJoin = root.join("standardPackageProducts", JoinType.INNER);
+
+        // Join with Product
+        Join<StandardPackageProduct, Product> productJoin = standardPackageProductJoin.join("product", JoinType.INNER);
+
+        Predicate combinedPredicate = getForDeliveryCombinedPredicate(productId, packageType, builder, root, productJoin);
+
+        // Set the query conditions
+        query.select(root).where(combinedPredicate);
+
+        // Pagination
+        TypedQuery<StandardPackage> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((page - 1) * pageSize);
+        typedQuery.setMaxResults(pageSize);
+
+        // Execute the query
+        return typedQuery.getResultList();
+    }
+
+    public long getForDeliveryCount(Long productId, PackageType packageType) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<StandardPackage> root = query.from(StandardPackage.class);
+        // Join with StandardPackageProduct
+        Join<StandardPackage, StandardPackageProduct> standardPackageProductJoin = root.join("standardPackageProducts", JoinType.INNER);
+
+        // Join with Product
+        Join<StandardPackageProduct, Product> productJoin = standardPackageProductJoin.join("product", JoinType.INNER);
+
+        Predicate combinedPredicate = getForDeliveryCombinedPredicate(productId, packageType, builder, root, productJoin);
+
+        query.select(builder.count(root));
+        query.where(builder.and(combinedPredicate));
+
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    private static Predicate getForDeliveryCombinedPredicate(Long productId, PackageType packageType, CriteriaBuilder builder, Root<StandardPackage> root, Join<StandardPackageProduct, Product> productJoin) {
+        // Conditions
+        Predicate packageTypePredicate = builder.equal(root.get("packageType"), packageType);
+        Predicate productPredicate = builder.equal(productJoin.get("id"), productId);
+        Predicate activePackagePredicate = builder.isTrue(root.get("isActive"));  // Assuming there's an 'isActive' field
+
+        // Combine conditions
+        Predicate combinedPredicate = builder.and(packageTypePredicate, productPredicate, activePackagePredicate);
+        return combinedPredicate;
     }
 
     public StandardPackage getPackageSensors(long code) throws MyEntityNotFoundException {

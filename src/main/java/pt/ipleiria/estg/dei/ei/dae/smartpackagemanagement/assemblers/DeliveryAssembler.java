@@ -1,10 +1,8 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers;
 
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.DeliveryDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Delivery;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Product;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.TransportPackage;
 
@@ -24,14 +22,14 @@ public class DeliveryAssembler {
         List<TransportPackage> transportPackages = partitionedPackages.get(false).stream()
                 .map(aPackage -> (TransportPackage) aPackage)
                 .collect(Collectors.toList());
-
         return new DeliveryDTO(
                 delivery.getId(),
+                delivery.getLogisticOperator(),
                 delivery.getDispatchedDate(),
                 delivery.getDeliveredDate(),
                 delivery.getStatus(),
                 delivery.getOrder().getId(),
-                StandardPackageAssembler.from(standardPackages),
+                StandardPackageAssembler.fromWithProducts(standardPackages),
                 TransportPackageAssembler.fromWithPackages(transportPackages)
         );
     }
@@ -43,6 +41,7 @@ public class DeliveryAssembler {
     public static DeliveryDTO fromNoPackages(Delivery delivery) {
         return new DeliveryDTO(
                 delivery.getId(),
+                delivery.getLogisticOperator(),
                 delivery.getDispatchedDate(),
                 delivery.getDeliveredDate(),
                 delivery.getStatus(),

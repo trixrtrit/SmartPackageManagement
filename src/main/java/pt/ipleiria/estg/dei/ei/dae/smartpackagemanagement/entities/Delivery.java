@@ -54,11 +54,14 @@ public class Delivery extends Versionable {
     )
     private List<Package> packages;
 
+    private String logisticOperator;
+
     public Delivery() {
         this.packages = new ArrayList<>();
     }
 
-    public Delivery(Date dispatchedDate, DeliveryStatus status, Order order) {
+    public Delivery(String logisticOperator, Date dispatchedDate, DeliveryStatus status, Order order) {
+        this.logisticOperator = logisticOperator;
         this.dispatchedDate = dispatchedDate;
         this.status = status;
         this.order = order;
@@ -123,5 +126,13 @@ public class Delivery extends Versionable {
         if (aPackage != null && packages.contains(aPackage)){
             packages.add(aPackage);
         }
+    }
+
+    public String getLogisticOperator() {
+        return logisticOperator;
+    }
+
+    public void setLogisticOperator(String logisticOperator) {
+        this.logisticOperator = logisticOperator;
     }
 }

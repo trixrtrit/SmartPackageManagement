@@ -101,13 +101,8 @@ public class StandardPackageService {
             throw new IllegalArgumentException("Product not found");
         }
 
-        Map<String, String> filterMap = new HashMap<>();
-        GenericFilterMapBuilder.addToFilterMap(true, filterMap, "isActive", "");
-        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
-        filterMap.put("Join/_/products/_/id/_/equal/isManyToMany", productId.toString());
-
-        var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
-        long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
+        var dtos = StandardPackageAssembler.from(standardPackageBean.getForDelivery(productId, packageType, page, pageSize));
+        long totalItems = standardPackageBean.getForDeliveryCount(productId, packageType);
         long totalPages = (totalItems + pageSize - 1) / pageSize;
         PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
         PaginationResponse<StandardPackageDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
@@ -190,22 +185,48 @@ public class StandardPackageService {
     @RolesAllowed({"LogisticsOperator", "Manufacturer"})
     public Response create(StandardPackageDTO standardPackageDTO)
             throws MyEntityExistsException, MyEntityNotFoundException, MyConstraintViolationException {
-
         if (isUnauthorizedAccess(standardPackageDTO.getPackageType()))
             return Response.status(Response.Status.UNAUTHORIZED)
                     .entity("UNAUTHORIZED")
                     .build();
-
-        long packageId = standardPackageBean.create(
-                standardPackageDTO.getCode(),
-                standardPackageDTO.getMaterial(),
-                standardPackageDTO.getPackageType(),
-                standardPackageDTO.getManufactureDate(),
-                standardPackageDTO.getInitialProductId()
-        );
-
-        var standardPackage = standardPackageBean.find(packageId);
-        return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
+        var amount = standardPackageDTO.getInitialAmountCreation();
+        if(amount <= 0){
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity("AMOUNT_MUST_BE_GREATER_THAN_ZERO")
+                    .build();
+        }
+        else if(amount == null || amount == 1){
+            long packageId = standardPackageBean.create(
+                    standardPackageDTO.getCode(),
+                    standardPackageDTO.getMaterial(),
+                    standardPackageDTO.getPackageType(),
+                    standardPackageDTO.getManufactureDate(),
+                    standardPackageDTO.getInitialProductId()
+            );
+            var standardPackage = standardPackageBean.find(packageId);
+            return Response.status(Response.Status.CREATED).entity(StandardPackageAssembler.from(standardPackage)).build();
+        }
+        else {
+            long result = standardPackageBean.createMany(
+                    standardPackageDTO.getCode(),
+                    standardPackageDTO.getMaterial(),
+                    standardPackageDTO.getPackageType(),
+                    standardPackageDTO.getManufactureDate(),
+                    standardPackageDTO.getInitialProductId(),
+                    standardPackageDTO.getInitialAmountCreation()
+            );
+            if (result >= 1) {
+                if(result == amount){
+                    return Response.status(Response.Status.CREATED).entity("Success: " + amount + " Packages were created").build();
+                }
+                else{
+                    return Response.status(207).entity("Only " + result + " Packages were created").build();
+                }
+            }
+        }
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity("ERROR_CREATING_PACKAGE")
+                .build();
     }
 
     private boolean isUnauthorizedAccess(PackageType packageType) {

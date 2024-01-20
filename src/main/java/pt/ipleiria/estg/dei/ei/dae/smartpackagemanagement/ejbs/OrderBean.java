@@ -106,9 +106,7 @@ public class OrderBean {
 
     public Order findWithDeliveries(Long id) throws MyEntityNotFoundException {
         var order = find(id);
-
         Hibernate.initialize(order.getDeliveries());
-
         for (var delivery : order.getDeliveries()) {
             Hibernate.initialize(delivery.getPackages());
             for (var aPackage : delivery.getPackages()){

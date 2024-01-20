@@ -326,7 +326,7 @@ public class ConfigBean {
     }
 
     private void seedPackages(int size, int maxSensorsPerPackage) {
-        int packageSize = size/maxSensorsPerPackage;
+        int packageSize = 10*size;
         var sensors = sensorBean.getSensors(new HashMap<String, String>(), 1, size);
         var products = productBean.getProducts(new HashMap<String, String>(), 1, size);
         var listOfProductIds = products.stream().map(product -> product.getId()).toArray();
@@ -339,6 +339,7 @@ public class ConfigBean {
                 var packType = packTypes[packageTypeNumber];
                 //get  random product id from list of product ids
                 long productNumber = (long) listOfProductIds[faker.number().numberBetween(0, listOfProductIds.length)];
+                System.out.println("seed packages iteration:[" + i + "] for productId:[" + productNumber + "]");
                 long packId = standardPackageBean.create(
                         faker.number().randomNumber(9, true),
                         faker.commerce().material(),
@@ -347,11 +348,12 @@ public class ConfigBean {
                         productNumber
 
                 );
-                for (int j = 0; j < numberOfSensors; j++) {
-                    standardPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
-                    lastAssociatedSensorId++;
-                }
-                standardPackageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
+                //todo assign sensors
+//                for (int j = 0; j < numberOfSensors; j++) {
+//                    standardPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());
+//                    lastAssociatedSensorId++;
+//                }
+//                standardPackageBean.removeSensorFromPackage(packId,sensors.get(lastAssociatedSensorId - numberOfSensors).getId());
                 //standardPackageBean.addProductToPackage(packId, products.get(i).getId());
             }
         } catch (Exception ex) {
