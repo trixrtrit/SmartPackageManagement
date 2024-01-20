@@ -138,6 +138,7 @@ public class StandardPackageService {
                 standardPackageDTO.getCode(),
                 standardPackageDTO.getMaterial(),
                 standardPackageDTO.getPackageType(),
+                standardPackageDTO.getManufactureDate(),
                 standardPackageDTO.getInitialProductId()
         );
 

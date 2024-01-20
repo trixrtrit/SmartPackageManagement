@@ -7,6 +7,7 @@ import org.hibernate.annotations.Where;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -34,8 +35,8 @@ public class StandardPackage extends Package {
         this.transportPackageStandardPackages = new ArrayList<TransportPackageStandardPackage>();
     }
 
-    public StandardPackage(long code, String material, PackageType packageType) {
-        super(code, material);
+    public StandardPackage(long code, String material, PackageType packageType, Date manufactureDate) {
+        super(code, material, manufactureDate);
         this.packageType = packageType;
         this.products = new ArrayList<Product>();
         this.transportPackageStandardPackages = new ArrayList<TransportPackageStandardPackage>();

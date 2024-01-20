@@ -13,10 +13,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstrain
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Logger;
 
 @Startup
@@ -346,7 +343,9 @@ public class ConfigBean {
                         faker.number().randomNumber(9, true),
                         faker.commerce().material(),
                         packType,
+                        new Date(),
                         productNumber
+
                 );
                 for (int j = 0; j < numberOfSensors; j++) {
                     standardPackageBean.addSensorToPackage(packId, sensors.get(lastAssociatedSensorId).getId());

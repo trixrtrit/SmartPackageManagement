@@ -17,6 +17,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExi
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageProductAssociationViolationException;
 
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,13 +33,13 @@ public class StandardPackageBean {
     @EJB
     private QueryBean<StandardPackage> standardPackageQueryBean;
 
-    public long create(long code, String material, PackageType packageType, Long initialProductId)
+    public long create(long code, String material, PackageType packageType, Date manufactureDate, Long initialProductId)
             throws MyEntityNotFoundException, MyConstraintViolationException, MyEntityExistsException {
         if (exists(code)) {
             throw new MyEntityExistsException("A package with the code: " + code + " already exists");
         }
         try {
-            StandardPackage standardPackage = new StandardPackage(code, material, packageType);
+            StandardPackage standardPackage = new StandardPackage(code, material, packageType, manufactureDate);
 
             if (initialProductId != null){//packageType != PackageType.TERTIARY &&
                 var product = entityManager.find(Product.class, initialProductId);
