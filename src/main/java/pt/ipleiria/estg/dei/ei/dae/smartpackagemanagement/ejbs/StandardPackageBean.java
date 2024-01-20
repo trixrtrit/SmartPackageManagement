@@ -3,6 +3,7 @@ package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs;
 import jakarta.ejb.EJB;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.*;
 import jakarta.validation.ConstraintViolationException;
 import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
@@ -69,6 +70,60 @@ public class StandardPackageBean {
         StandardPackage standardPackage = entityManager.find(StandardPackage.class, code);
         Hibernate.initialize(standardPackage.getStandardPackageProducts());
         return standardPackage;
+    }
+
+    public List<StandardPackage> getForDelivery(Long productId, PackageType packageType, int page, int pageSize){
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<StandardPackage> query = builder.createQuery(StandardPackage.class);
+        Root<StandardPackage> root = query.from(StandardPackage.class);
+
+        // Join with StandardPackageProduct
+        Join<StandardPackage, StandardPackageProduct> standardPackageProductJoin = root.join("standardPackageProducts", JoinType.INNER);
+
+        // Join with Product
+        Join<StandardPackageProduct, Product> productJoin = standardPackageProductJoin.join("product", JoinType.INNER);
+
+        Predicate combinedPredicate = getForDeliveryCombinedPredicate(productId, packageType, builder, root, productJoin);
+
+        // Set the query conditions
+        query.select(root).where(combinedPredicate);
+
+        // Pagination
+        TypedQuery<StandardPackage> typedQuery = entityManager.createQuery(query);
+        typedQuery.setFirstResult((page - 1) * pageSize);
+        typedQuery.setMaxResults(pageSize);
+
+        // Execute the query
+        return typedQuery.getResultList();
+    }
+
+    public long getForDeliveryCount(Long productId, PackageType packageType) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<StandardPackage> root = query.from(StandardPackage.class);
+        // Join with StandardPackageProduct
+        Join<StandardPackage, StandardPackageProduct> standardPackageProductJoin = root.join("standardPackageProducts", JoinType.INNER);
+
+        // Join with Product
+        Join<StandardPackageProduct, Product> productJoin = standardPackageProductJoin.join("product", JoinType.INNER);
+
+        Predicate combinedPredicate = getForDeliveryCombinedPredicate(productId, packageType, builder, root, productJoin);
+
+        query.select(builder.count(root));
+        query.where(builder.and(combinedPredicate));
+
+        return entityManager.createQuery(query).getSingleResult();
+    }
+
+    private static Predicate getForDeliveryCombinedPredicate(Long productId, PackageType packageType, CriteriaBuilder builder, Root<StandardPackage> root, Join<StandardPackageProduct, Product> productJoin) {
+        // Conditions
+        Predicate packageTypePredicate = builder.equal(root.get("packageType"), packageType);
+        Predicate productPredicate = builder.equal(productJoin.get("id"), productId);
+        Predicate activePackagePredicate = builder.isTrue(root.get("isActive"));  // Assuming there's an 'isActive' field
+
+        // Combine conditions
+        Predicate combinedPredicate = builder.and(packageTypePredicate, productPredicate, activePackagePredicate);
+        return combinedPredicate;
     }
 
     public StandardPackage getPackageSensors(long code) throws MyEntityNotFoundException {

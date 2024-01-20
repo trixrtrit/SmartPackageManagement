@@ -8,10 +8,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import org.hibernate.Hibernate;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageProductAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.*;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.MeasurementDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
@@ -78,7 +76,7 @@ public class StandardPackageService {
     @Path("/getForDelivery")
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
-    public Response getAll(@QueryParam("productId") Long productId,
+    public Response getForDelivery(@QueryParam("productId") Long productId,
                            @QueryParam("packageType") PackageType packageType,
                            @DefaultValue("1") @QueryParam("page") int page,
                            @DefaultValue("10") @QueryParam("pageSize") int pageSize
@@ -92,13 +90,8 @@ public class StandardPackageService {
             throw new IllegalArgumentException("Product not found");
         }
 
-        Map<String, String> filterMap = new HashMap<>();
-        GenericFilterMapBuilder.addToFilterMap(true, filterMap, "isActive", "");
-        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
-        filterMap.put("Join/_/products/_/id/_/equal/isManyToMany", productId.toString());
-
-        var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
-        long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
+        var dtos = StandardPackageAssembler.from(standardPackageBean.getForDelivery(productId, packageType, page, pageSize));
+        long totalItems = standardPackageBean.getForDeliveryCount(productId, packageType);
         long totalPages = (totalItems + pageSize - 1) / pageSize;
         PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
         PaginationResponse<StandardPackageDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
