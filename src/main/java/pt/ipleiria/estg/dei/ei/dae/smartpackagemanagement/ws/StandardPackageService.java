@@ -22,10 +22,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.StandardPackage;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageProductAssociationViolationException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
@@ -155,7 +152,9 @@ public class StandardPackageService {
     @Path("{code}/measurements")
     @Authenticated
     @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
-    public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
+    public Response getPackageMeasurements(@PathParam("code") long code)
+            throws MyEntityNotFoundException, MyPackageMeasurementInvalidAccessException {
+
         Package aPackage = null;
         String username = securityContext.getUserPrincipal().getName();
         if(securityContext.isUserInRole("LogisticsOperator")) {

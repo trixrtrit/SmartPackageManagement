@@ -6,7 +6,6 @@ import jakarta.ejb.Singleton;
 import jakarta.ejb.Startup;
 import net.datafaker.Faker;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.PrimaryPackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Sensor;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.PackageType;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;

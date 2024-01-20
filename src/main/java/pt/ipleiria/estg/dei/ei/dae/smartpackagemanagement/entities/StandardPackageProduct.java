@@ -26,6 +26,12 @@ import java.util.Date;
                         "WHERE sp.product.id = :productId "
         ),
         @NamedQuery(
+                name = "findPackageForManufacturer",
+                query = "SELECT COUNT(sp.id) FROM StandardPackageProduct sp " +
+                        "WHERE sp.standardPackage.code = :standardPkgCode " +
+                        "AND sp.product.manufacturer.username = :username"
+        ),
+        @NamedQuery(
                 name = "findCurrentProductByPackageId",
                 query = "SELECT sp.product FROM StandardPackageProduct sp " +
                         "WHERE sp.standardPackage.id = :packageId AND sp.removedAt IS NULL AND sp.standardPackage.isActive = true"

@@ -8,11 +8,10 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageMeasurementInvalidAccessException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Stateless
 public class PackageBean {
@@ -47,7 +46,7 @@ public class PackageBean {
             Class<? extends Package> pkgType,
             String username
     )
-            throws MyEntityNotFoundException {
+            throws MyEntityNotFoundException, MyPackageMeasurementInvalidAccessException {
         if(!this.exists(code, pkgType)) {
             throw new MyEntityNotFoundException("The package with the code: " + code + " does not exist");
         }
@@ -55,15 +54,31 @@ public class PackageBean {
         if (user == null) {
             throw new MyEntityNotFoundException("User not found");
         }
-        if (user instanceof Manufacturer) {
 
-        } else if (user instanceof Customer) {
-            // Handle Logistics-specific logic
+        if ((user instanceof Manufacturer && !packageHasManufacturerProduct(code, username))
+                || (user instanceof Customer && !packageIsFromCustomerOrder(code, username)) ) {
+            throw new MyPackageMeasurementInvalidAccessException("Unauthorized");
         }
         Package aPackage = entityManager.find(pkgType, code);
         Hibernate.initialize(aPackage.getSensorPackageList());
         aPackage.getSensorPackageList().forEach(sensorPackage -> Hibernate.initialize(sensorPackage.getMeasurements()));
         return aPackage;
+    }
+
+    public boolean packageHasManufacturerProduct(long standardPkgCode, String username) {
+        Query query = entityManager.createNamedQuery("findPackageForManufacturer", StandardPackageProduct.class)
+                .setParameter("standardPkgCode", standardPkgCode)
+                .setParameter("username", username);
+
+        return (Long) query.getSingleResult() > 0L;
+    }
+
+    public boolean packageIsFromCustomerOrder(long code, String username) {
+        Query query = entityManager.createNamedQuery("findPackageForCustomer", Package.class)
+                .setParameter("code", code)
+                .setParameter("username", username);
+
+        return (Long) query.getSingleResult() > 0L;
     }
 
     public List<Sensor> findPackageCurrentSensors(long packageCode){
