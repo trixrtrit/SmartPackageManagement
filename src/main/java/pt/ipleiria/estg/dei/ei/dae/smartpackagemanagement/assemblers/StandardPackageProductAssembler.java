@@ -10,7 +10,7 @@ public class StandardPackageProductAssembler {
     public static StandardPackageProductDTO from(StandardPackageProduct standardPackageProduct) {
         return new StandardPackageProductDTO(
                 standardPackageProduct.getId(),
-                ProductAssembler.fromWithProductParameters(standardPackageProduct.getProduct()),
+                ProductAssembler.from(standardPackageProduct.getProduct()),
                 standardPackageProduct.getAddedAt(),
                 standardPackageProduct.getRemovedAt()
         );

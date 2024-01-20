@@ -31,8 +31,13 @@ import java.util.Date;
                         "WHERE sp.standardPackage.code = :standardPkgCode " +
                         "AND sp.product.manufacturer.username = :username"
         ),
+        @NamedQuery(
+                name = "findCurrentProductByPackageId",
+                query = "SELECT sp.product FROM StandardPackageProduct sp " +
+                        "WHERE sp.standardPackage.id = :packageId AND sp.removedAt IS NULL AND sp.standardPackage.isActive = true"
+        ),
 })
-public class StandardPackageProduct extends Versionable{
+public class StandardPackageProduct extends Versionable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

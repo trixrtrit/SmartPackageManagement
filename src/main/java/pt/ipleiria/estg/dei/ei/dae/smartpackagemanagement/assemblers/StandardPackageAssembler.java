@@ -48,7 +48,7 @@ public class StandardPackageAssembler {
     }
 
     public static List<StandardPackageDTO> fromWithProductsAndParameters(List<StandardPackage> standardPackages) {
-        return standardPackages.stream().map(StandardPackageAssembler::fromWithProducts).collect(Collectors.toList());
+        return standardPackages.stream().map(StandardPackageAssembler::fromWithProductsAndParameters).collect(Collectors.toList());
     }
 
     public static StandardPackageDTO fromWithSensors(StandardPackage standardPackage) {

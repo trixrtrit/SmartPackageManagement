@@ -7,6 +7,7 @@ import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
+import org.hibernate.Hibernate;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.SensorPackageAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.StandardPackageAssembler;
@@ -15,6 +16,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.ProductDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.SensorDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.StandardPackageDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.PackageBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.StandardPackageBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Package;
@@ -38,6 +40,9 @@ public class StandardPackageService {
     @EJB
     private StandardPackageBean standardPackageBean;
 
+    @EJB
+    ProductBean productBean;
+
     @Context
     private SecurityContext securityContext;
 
@@ -56,6 +61,38 @@ public class StandardPackageService {
         GenericFilterMapBuilder.addToFilterMap(code, filterMap, "code", "eq");
         GenericFilterMapBuilder.addToFilterMap(material, filterMap, "material", "");
         GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "enum");
+
+        var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
+        long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<StandardPackageDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
+    }
+
+
+    @GET
+    @Path("/getForDelivery")
+    @Authenticated
+    @RolesAllowed({"LogisticsOperator"})
+    public Response getAll(@QueryParam("productId") Long productId,
+                           @QueryParam("packageType") PackageType packageType,
+                           @DefaultValue("1") @QueryParam("page") int page,
+                           @DefaultValue("10") @QueryParam("pageSize") int pageSize
+    ) throws IllegalArgumentException {
+
+        if (productId == null || packageType == null){
+            throw new IllegalArgumentException("The productId and the packageType are mandatory");
+        }
+
+        if(!productBean.exists(productId)){
+            throw new IllegalArgumentException("Product not found");
+        }
+
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(true, filterMap, "isActive", "");
+        GenericFilterMapBuilder.addToFilterMap(packageType, filterMap, "packageType", "");
+        filterMap.put("Join/_/products/_/id/_/equal/isManyToMany", productId.toString());
 
         var dtos = StandardPackageAssembler.from(standardPackageBean.getStandardPackages(filterMap, page, pageSize));
         long totalItems = standardPackageBean.getStandardPackagesCount(filterMap);
@@ -177,7 +214,7 @@ public class StandardPackageService {
                 product.getId()
         );
         var standardPackage = standardPackageBean.find(code);
-        return Response.ok(StandardPackageAssembler.fromWithProducts(standardPackage)).build();
+        return Response.ok(StandardPackageAssembler.from(standardPackage)).build();
     }
 
     @PUT
@@ -192,7 +229,7 @@ public class StandardPackageService {
                 product.getId()
         );
         var standardPackage = standardPackageBean.find(code);
-        return Response.ok(StandardPackageAssembler.fromWithProducts(standardPackage)).build();
+        return Response.ok(StandardPackageAssembler.from(standardPackage)).build();
     }
 
     @PUT
