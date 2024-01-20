@@ -28,8 +28,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationM
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.utils.DateUtil;
 
-import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -137,18 +137,9 @@ public class CustomerService {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
 
-        Date startDate = null;
-        Date endDate = null;
-        try {
-            if(startTime != null) {
-                startDate = new Date(startTime);
-            }
-            if(endTime != null) {
-                endDate = new Date(endTime);
-            }
-        } catch ( DateTimeParseException e ) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
-        }
+        Date[] dates = DateUtil.parseDates(startTime, endTime);
+        Date startDate = dates[0];
+        Date endDate = dates[1];
 
         Map<String, String> filterMap = new HashMap<>();
         GenericFilterMapBuilder.addToFilterMap(text, filterMap, "text", "");
