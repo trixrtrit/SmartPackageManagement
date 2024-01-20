@@ -19,6 +19,9 @@ public class Measurement extends Versionable{
     @JoinColumn(name = "sensor_package_id")
     private SensorPackage sensorPackage;
 
+    @OneToOne(mappedBy = "measurement", cascade = CascadeType.ALL,optional = true)
+    private Notification notification;
+
     public Measurement() {
     }
 
@@ -59,5 +62,13 @@ public class Measurement extends Versionable{
 
     public void setSensorPackage(SensorPackage sensorPackage) {
         this.sensorPackage = sensorPackage;
+    }
+
+    public Notification getNotification() {
+        return notification;
+    }
+
+    public void setNotification(Notification notification) {
+        this.notification = notification;
     }
 }

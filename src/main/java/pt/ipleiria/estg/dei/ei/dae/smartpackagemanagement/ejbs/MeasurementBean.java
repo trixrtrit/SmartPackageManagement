@@ -42,7 +42,8 @@ public class MeasurementBean {
         }
     }
 
-    private void processPackage(String measurement, Measurement measurementLine, long packageCode) {
+    private void processPackage(String measurement, Measurement measurementLine, long packageCode)
+            throws MyConstraintViolationException {
         Package currentPackage = measurementLine.getSensorPackage().getaPackage();
         if (currentPackage instanceof StandardPackage) {
             List<StandardPackageProduct> standardPackageProducts =
@@ -53,7 +54,8 @@ public class MeasurementBean {
         }
     }
 
-    private void processProductParameters(String measurement, Measurement measurementLine, long packageCode, StandardPackageProduct standardPackageProduct) {
+    private void processProductParameters(String measurement, Measurement measurementLine, long packageCode, StandardPackageProduct standardPackageProduct)
+            throws MyConstraintViolationException {
         List<ProductParameter> productParameters = standardPackageProduct.getProduct().getProductParameters();
         for (ProductParameter productParameter : productParameters) {
             if (Float.compare(productParameter.getMinValue(), Float.parseFloat(measurement)) > 0 ||
@@ -75,7 +77,7 @@ public class MeasurementBean {
             Product product,
             ProductParameter productParameter,
             long packageCode
-    ) {
+    ) throws MyConstraintViolationException {
         String subject = "Quality Control | Warning on product: " + product.getProductReference();
         String text = "Your product " + product.getProductReference() + " has gone beyond its regulated bounds [" +
                 productParameter.getMinValue() + "," + productParameter.getMaxValue() + "] \n" +
@@ -85,22 +87,30 @@ public class MeasurementBean {
                 product.getManufacturer().getEmail(),
                 subject,
                 text
+        );
+        try {
+            Notification notification = new Notification(text, product.getManufacturer(), measurementLine);
+            entityManager.persist(notification);
+            Query query = entityManager.createNamedQuery("findCustomerPackage", Package.class).
+                    setParameter("code", packageCode).setParameter("status", DeliveryStatus.DISPATCHED);
+            if (!query.getResultList().isEmpty()) {
+                Customer customer = (Customer) query.getResultList().get(0);
+                emailBean.send(
+                        customer.getEmail(),
+                        subject,
+                        text
                 );
-        Query query = entityManager.createNamedQuery("findCustomerPackage", Package.class).
-                setParameter("code", packageCode).setParameter("status", DeliveryStatus.DISPATCHED);
-        if(!query.getResultList().isEmpty()){
-            Customer customer = (Customer) query.getResultList().get(0);
-            emailBean.send(
-                    customer.getEmail(),
-                    subject,
-                    text
-            );
+                notification = new Notification(text, customer, measurementLine);
+                entityManager.persist(notification);
+            }
+        } catch (ConstraintViolationException err) {
+            throw new MyConstraintViolationException(err);
         }
     }
 
-    private SensorPackage findSensorPackage(long packageCode, long sensorId) throws MyEntityNotFoundException{
+    private SensorPackage findSensorPackage(long packageCode, long sensorId) throws MyEntityNotFoundException {
         try {
-            SensorPackage sensorPackage =  entityManager.createNamedQuery("findSensorPackage", SensorPackage.class)
+            SensorPackage sensorPackage = entityManager.createNamedQuery("findSensorPackage", SensorPackage.class)
                     .setParameter("packageCode", packageCode)
                     .setParameter("sensorId", sensorId)
                     .getSingleResult();
@@ -139,7 +149,7 @@ public class MeasurementBean {
         var measurements = entityManager.createQuery(query).
                 setFirstResult((pageNumber - 1) * pageSize).
                 setMaxResults(pageSize).getResultList();
-        for(Measurement measurement: measurements) {
+        for (Measurement measurement : measurements) {
             Package pkg = measurement.getSensorPackage().getaPackage();
             if (pkg instanceof StandardPackage) {
                 StandardPackage standardPkg = (StandardPackage) pkg;
@@ -171,7 +181,7 @@ public class MeasurementBean {
         return entityManager.createQuery(query).getSingleResult();
     }
 
-    public Measurement find(long measurementId)  throws MyEntityNotFoundException {
+    public Measurement find(long measurementId) throws MyEntityNotFoundException {
         Measurement measurement = entityManager.find(Measurement.class, measurementId);
         if (measurement == null) {
             throw new MyEntityNotFoundException("The measurement with the id: " + measurementId + " does not exist");
@@ -201,7 +211,7 @@ public class MeasurementBean {
             predicates.add(builder.lessThanOrEqualTo(root.get("sensorPackage").get("addedAt"), endDate));
         }
 
-        if(isActive != null && isActive) {
+        if (isActive != null && isActive) {
             predicates.add(builder.isNull(root.get("sensorPackage").get("removedAt")));
         }
         return predicates;

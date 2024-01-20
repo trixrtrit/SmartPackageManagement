@@ -1,10 +1,11 @@
 package pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -18,8 +19,11 @@ public class User extends Versionable{
     @Email
     @NotNull
     protected String email;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    protected List<Notification> notifications;
 
     public User() {
+        this.notifications = new ArrayList<Notification>();
     }
 
     public User(String username, String password, String name, String email) {
@@ -27,6 +31,7 @@ public class User extends Versionable{
         this.password = password;
         this.name = name;
         this.email = email;
+        this.notifications = new ArrayList<Notification>();
     }
 
     public String getUsername() {
@@ -59,5 +64,13 @@ public class User extends Versionable{
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
     }
 }

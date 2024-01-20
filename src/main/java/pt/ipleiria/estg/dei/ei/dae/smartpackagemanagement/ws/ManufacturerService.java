@@ -9,10 +9,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ManufacturerAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.NotificationAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.ProductAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.EmailBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ManufacturerBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.NotificationBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.ProductBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Manufacturer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -23,6 +25,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationR
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +38,8 @@ public class ManufacturerService {
     private ManufacturerBean manufacturerBean;
     @EJB
     private ProductBean productBean;
+    @EJB
+    private NotificationBean notificationBean;
     @EJB
     private EmailBean emailBean;
     @Context
@@ -125,6 +131,49 @@ public class ManufacturerService {
         return Response.status(Response.Status.NOT_FOUND)
                 .entity("ERROR_FINDING_MANUFACTURER")
                 .build();
+    }
+
+    @GET
+    @Path("{username}/notifications")
+    @Authenticated
+    @RolesAllowed({"Manufacturer"})
+    public Response getNotifications(
+            @PathParam("username") String username,
+            @QueryParam("text") String text,
+            @QueryParam("startTime") Long startTime,
+            @QueryParam("endTime") Long endTime,
+            @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
+        var principal = securityContext.getUserPrincipal();
+
+        if (securityContext.isUserInRole("Manufacturer") && !principal.getName().equals(username)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        Date startDate = null;
+        Date endDate = null;
+        try {
+            if(startTime != null) {
+                startDate = new Date(startTime);
+            }
+            if(endTime != null) {
+                endDate = new Date(endTime);
+            }
+        } catch ( DateTimeParseException e ) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
+        }
+
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(text, filterMap, "text", "");
+        GenericFilterMapBuilder.addToFilterMap(startDate, filterMap, "timestamp", "gte");
+        GenericFilterMapBuilder.addToFilterMap(endDate, filterMap, "timestamp", "lte");
+        var notifications = notificationBean.getNotifications(filterMap, page, pageSize);
+        var dtos = NotificationAssembler.from(notifications);
+        long totalItems = notificationBean.getNotificationsCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<NotificationDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
     }
 
     @POST

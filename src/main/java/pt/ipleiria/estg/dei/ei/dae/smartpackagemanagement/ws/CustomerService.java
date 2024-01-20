@@ -9,10 +9,13 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.SecurityContext;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.CustomerAssembler;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.NotificationAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.OrderAssembler;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.NotificationDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.CustomerBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.NotificationBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.OrderBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.EmailDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.EmailBean;
@@ -26,6 +29,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationR
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.specifications.GenericFilterMapBuilder;
 
+import java.time.format.DateTimeParseException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,9 +44,10 @@ public class CustomerService {
     private EmailBean emailBean;
     @Context
     private SecurityContext securityContext;
-
     @EJB
     private OrderBean orderBean;
+    @EJB
+    private NotificationBean notificationBean;
 
     @GET
     @Path("/all")
@@ -111,6 +117,49 @@ public class CustomerService {
         long totalPages = (totalItems + pageSize - 1) / pageSize;
         PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
         PaginationResponse<OrderDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
+        return Response.ok(paginationResponse).build();
+    }
+
+    @GET
+    @Path("{username}/notifications")
+    @Authenticated
+    @RolesAllowed({"Customer"})
+    public Response getNotifications(
+            @PathParam("username") String username,
+            @QueryParam("text") String text,
+            @QueryParam("startTime") Long startTime,
+            @QueryParam("endTime") Long endTime,
+            @DefaultValue("1") @QueryParam("page") int page,
+            @DefaultValue("10") @QueryParam("pageSize") int pageSize) {
+        var principal = securityContext.getUserPrincipal();
+
+        if (securityContext.isUserInRole("Customer") && !principal.getName().equals(username)) {
+            return Response.status(Response.Status.FORBIDDEN).build();
+        }
+
+        Date startDate = null;
+        Date endDate = null;
+        try {
+            if(startTime != null) {
+                startDate = new Date(startTime);
+            }
+            if(endTime != null) {
+                endDate = new Date(endTime);
+            }
+        } catch ( DateTimeParseException e ) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Invalid date format").build();
+        }
+
+        Map<String, String> filterMap = new HashMap<>();
+        GenericFilterMapBuilder.addToFilterMap(text, filterMap, "text", "");
+        GenericFilterMapBuilder.addToFilterMap(startDate, filterMap, "timestamp", "gte");
+        GenericFilterMapBuilder.addToFilterMap(endDate, filterMap, "timestamp", "lte");
+        var notifications = notificationBean.getNotifications(filterMap, page, pageSize);
+        var dtos = NotificationAssembler.from(notifications);
+        long totalItems = notificationBean.getNotificationsCount(filterMap);
+        long totalPages = (totalItems + pageSize - 1) / pageSize;
+        PaginationMetadata paginationMetadata = new PaginationMetadata(page, pageSize, totalItems, totalPages, dtos.size());
+        PaginationResponse<NotificationDTO> paginationResponse = new PaginationResponse<>(dtos, paginationMetadata);
         return Response.ok(paginationResponse).build();
     }
 
