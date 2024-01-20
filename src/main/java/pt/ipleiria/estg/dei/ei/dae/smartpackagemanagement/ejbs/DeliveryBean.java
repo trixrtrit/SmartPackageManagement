@@ -27,9 +27,10 @@ public class DeliveryBean {
     private QueryBean<Delivery> deliveryQueryBean;
     @EJB
     private OrderLogBean orderLogBean;
-
     @EJB
     private StandardPackageBean standardPackageBean;
+    @EJB
+    private NotificationBean notificationBean;
 
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public long create(String logisticOperator, Long orderId, ArrayList<Long> packageCodes)
@@ -167,6 +168,7 @@ public class DeliveryBean {
 
         if (deliveryStatus == DeliveryStatus.DELIVERED){
             delivery.setDeliveredDate(new Date());
+            notificationBean.fireDeliveryNotification(delivery.getOrder(), delivery.getLogisticOperator());
         }
 
         var orderLog = orderLogBean.create("Delivery status updated to " + deliveryStatus.toString(), delivery.getOrder().getId(), deliveryStatus.toString(), null);

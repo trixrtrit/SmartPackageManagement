@@ -68,7 +68,21 @@ public class NotificationBean {
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         }
+    }
 
+    public void fireDeliveryNotification(
+            Order order,
+            String logisticsUsername
+    ) throws MyConstraintViolationException {
+        String subject = buildDeliverySubject(order.getId());
+        String text = buildDeliveryText(order);
+        try {
+            LogisticsOperator logisticsOperator = entityManager.find(LogisticsOperator.class, logisticsUsername);
+            sendEmailAndPersistNotification(order.getCustomer(), subject, text, null);
+            sendEmailAndPersistNotification(logisticsOperator, subject, text, null);
+        } catch (ConstraintViolationException err) {
+            throw new MyConstraintViolationException(err);
+        }
     }
 
     private void sendNotificationToCustomer(
@@ -134,6 +148,10 @@ public class NotificationBean {
                 "On: " + measurementLine.getTimestamp().toString();
     }
 
+    private String buildSecuritySubject(long packageCode) {
+        return "Quality Control | Security Warning on package: " + packageCode;
+    }
+
     private String buildSecurityText(
             String measurement,
             long packageCode,
@@ -144,7 +162,22 @@ public class NotificationBean {
                 "On: " + measurementLine.getTimestamp().toString();
     }
 
-    private String buildSecuritySubject(long packageCode) {
-        return "Quality Control | Security Warning on package: " + packageCode;
+    private String buildDeliverySubject(long orderId) {
+        return "Order Delivery | Order #" + orderId;
+    }
+
+    private String buildDeliveryText(
+            Order order
+    ) {
+        StringBuilder message = new StringBuilder();
+        message.append("The order has been delivered to ").append(order.getAddress()).append("\n")
+                .append("With the items: \n");
+        for (OrderItem item : order.getOrderItems()) {
+            message.append("- ").append(item.getProduct().getName())
+                    .append(", Quantity: ").append(item.getQuantity())
+                    .append("\n");
+        }
+        message.append("On: ").append(order.getDate().toString());
+        return message.toString();
     }
 }
