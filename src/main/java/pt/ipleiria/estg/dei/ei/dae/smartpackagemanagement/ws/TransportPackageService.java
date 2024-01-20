@@ -20,6 +20,7 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.TransportPack
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityExistsException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyEntityNotFoundException;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyPackageMeasurementInvalidAccessException;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationMetadata;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.pagination.PaginationResponse;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.security.Authenticated;
@@ -96,9 +97,17 @@ public class TransportPackageService {
     @GET
     @Path("{code}/measurements")
     @Authenticated
-    @RolesAllowed({"LogisticsOperator", "Manufacturer", "Customer"})
-    public Response getPackageMeasurements(@PathParam("code") long code) throws MyEntityNotFoundException {
-        Package aPackage = packageBean.getPackageMeasurements(code, TransportPackage.class);
+    @RolesAllowed({"LogisticsOperator", "Customer"})
+    public Response getPackageMeasurements(@PathParam("code") long code)
+            throws MyEntityNotFoundException, MyPackageMeasurementInvalidAccessException {
+
+        Package aPackage = null;
+        String username = securityContext.getUserPrincipal().getName();
+        if(securityContext.isUserInRole("LogisticsOperator")) {
+            aPackage = packageBean.getPackageMeasurements(code, TransportPackage.class);
+        } else if (securityContext.isUserInRole("Customer")){
+            aPackage = packageBean.getPackageMeasurementsForUser(code, TransportPackage.class, username);
+        }
         if (aPackage != null) {
             var dtos = SensorPackageAssembler.fromWithMeasurements(aPackage.getSensorPackageList());
             return Response.ok(dtos).build();

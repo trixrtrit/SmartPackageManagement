@@ -25,6 +25,12 @@ import java.util.Date;
                 query = "SELECT sp FROM StandardPackageProduct sp " +
                         "WHERE sp.product.id = :productId "
         ),
+        @NamedQuery(
+                name = "findPackageForManufacturer",
+                query = "SELECT COUNT(sp.id) FROM StandardPackageProduct sp " +
+                        "WHERE sp.standardPackage.code = :standardPkgCode " +
+                        "AND sp.product.manufacturer.username = :username"
+        ),
 })
 public class StandardPackageProduct extends Versionable{
     @Id
