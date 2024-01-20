@@ -11,7 +11,7 @@ import java.util.Date;
         @NamedQuery(
                 name = "standardPackageProductExists",
                 query = "SELECT COUNT(sp.id) FROM StandardPackageProduct sp " +
-                        "WHERE sp.standardPackage.code = :standardPkgCode AND sp.product.id = :productId " +
+                        "WHERE sp.standardPackage.code = :standardPkgCode " +
                         "AND sp.removedAt IS NULL"
         ),
         @NamedQuery(

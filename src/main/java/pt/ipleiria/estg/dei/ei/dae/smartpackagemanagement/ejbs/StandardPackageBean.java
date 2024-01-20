@@ -265,10 +265,9 @@ public class StandardPackageBean {
         }
     }
 
-    private long standardPackageAssociatedToProductCount(long code, long productId){
+    private long standardPackageAssociatedToProductCount(long code){
         Query query = entityManager.createNamedQuery("standardPackageProductExists", StandardPackageProduct.class)
-                .setParameter("standardPkgCode", code)
-                .setParameter("productId", productId);
+                .setParameter("standardPkgCode", code);
         return (Long) query.getSingleResult();
     }
 
@@ -281,7 +280,7 @@ public class StandardPackageBean {
         Product product = entityManager.find(Product.class, productId);
         if (product == null)
             throw new MyEntityNotFoundException("The product with the id: " + productId + " does not exist");
-        if (standardPackage.getPackageType() != PackageType.TERTIARY && standardPackageAssociatedToProductCount(code, productId) > 0) {
+        if (standardPackage.getPackageType() != PackageType.TERTIARY && standardPackageAssociatedToProductCount(code) > 0) {
             throw new MyPackageProductAssociationViolationException("Non-tertiary packages cannot have more than one product");
         }
         StandardPackageProduct standardPackageProduct = new StandardPackageProduct(standardPackage, product);

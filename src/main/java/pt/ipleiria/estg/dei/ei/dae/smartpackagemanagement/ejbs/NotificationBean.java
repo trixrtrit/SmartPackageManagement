@@ -42,6 +42,9 @@ public class NotificationBean {
             ProductParameter productParameter,
             long packageCode
     ) throws MyConstraintViolationException {
+        measurementLine = entityManager.find(Measurement.class, measurementLine.getId());
+        product = entityManager.find(Product.class, product.getId());
+        productParameter = entityManager.find(ProductParameter.class, productParameter.getId());
         String subject = buildEnvironmentalSubject(product);;
         String text= buildEnvironmentalText(product, productParameter, measurement, packageCode, measurementLine);
         emailBean.send(product.getManufacturer().getEmail(), subject, text);

@@ -305,9 +305,9 @@ public class StandardPackageService {
     @Authenticated
     @RolesAllowed({"LogisticsOperator"})
     public Response removeProduct(@PathParam("code") long code, ProductDTO product)
-            throws MyEntityNotFoundException, MyPackageProductAssociationViolationException {
+            throws MyEntityNotFoundException {
 
-        standardPackageBean.addProductToPackage(
+        standardPackageBean.removeProductFromPackage(
                 code,
                 product.getId()
         );
