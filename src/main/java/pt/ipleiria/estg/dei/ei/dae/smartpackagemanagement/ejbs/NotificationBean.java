@@ -45,14 +45,22 @@ public class NotificationBean {
         measurementLine = entityManager.find(Measurement.class, measurementLine.getId());
         product = entityManager.find(Product.class, product.getId());
         productParameter = entityManager.find(ProductParameter.class, productParameter.getId());
+        System.out.println("PP "+ productParameter.getId());
+        System.out.println("product "+ product.getId());
+        System.out.println("measurementLine "+ measurementLine.getId());
         String subject = buildEnvironmentalSubject(product);;
         String text= buildEnvironmentalText(product, productParameter, measurement, packageCode, measurementLine);
+        System.out.println("hit1");
         emailBean.send(product.getManufacturer().getEmail(), subject, text);
         try {
             Notification notification = new Notification(text, product.getManufacturer(), measurementLine);
+            System.out.println("hit2");
             entityManager.persist(notification);
+            System.out.println("hit3");
             sendNotificationToCustomer(packageCode, subject, text, measurementLine);
+            System.out.println("hit4");
             sendNotificationToLogisticsOperator(packageCode, subject, text, measurementLine);
+            System.out.println("hit5");
         } catch (ConstraintViolationException err) {
             throw new MyConstraintViolationException(err);
         }
@@ -111,8 +119,10 @@ public class NotificationBean {
                 "findLogisticsOperatorPackage", packageCode, DeliveryStatus.DISPATCHED
         );
         String logisticsOperatorUsername = getSingleResultOrNull(logisticsOperatorQuery);
-        LogisticsOperator logisticsOperator = entityManager.find(LogisticsOperator.class, logisticsOperatorUsername);
-        sendEmailAndPersistNotification(logisticsOperator, subject, text, measurementLine);
+        if(logisticsOperatorUsername != null) {
+            LogisticsOperator logisticsOperator = entityManager.find(LogisticsOperator.class, logisticsOperatorUsername);
+            sendEmailAndPersistNotification(logisticsOperator, subject, text, measurementLine);
+        }
     }
 
     private Query createPackageOwnershipQuery(String queryName, long packageCode, DeliveryStatus status) {
