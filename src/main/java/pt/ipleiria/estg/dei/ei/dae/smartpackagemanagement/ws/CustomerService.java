@@ -14,11 +14,8 @@ import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.assemblers.OrderAssemb
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.CustomerDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.NotificationDTO;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.OrderDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.CustomerBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.NotificationBean;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.OrderBean;
+import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.*;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.dtos.EmailDTO;
-import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.ejbs.EmailBean;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.entities.Customer;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.enums.OrderStatus;
 import pt.ipleiria.estg.dei.ei.dae.smartpackagemanagement.exceptions.MyConstraintViolationException;
@@ -48,6 +45,9 @@ public class CustomerService {
     private OrderBean orderBean;
     @EJB
     private NotificationBean notificationBean;
+
+    @EJB
+    private StatisticsBean statisticsBean;
 
     @GET
     @Path("/all")
@@ -219,4 +219,6 @@ public class CustomerService {
         emailBean.send(customer.getEmail(), email.getSubject(), email.getMessage());
         return Response.status(Response.Status.OK).entity("E-mail sent").build();
     }
+
+
 }
